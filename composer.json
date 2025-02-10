@@ -1,0 +1,30 @@
+{
+    "name": "eclipsephp/core",
+    "description": "Core package for the Eclipse platform",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Eclipse\\Core\\": "src/",
+            "Eclipse\\Core\\Database\\Factories\\": "database/factories/",
+            "Eclipse\\Core\\Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "authors": [
+        {
+            "name": "DataLinx",
+            "email": "info@datalinx.si"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "spatie/laravel-package-tools": "^1.18"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Eclipse\\Core\\EclipseServiceProvider"
+            ]
+        }
+    }
+}

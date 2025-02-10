@@ -1,0 +1,9 @@
+# 1. Keep lines sorted alphabetically in this file
+# 2. Do not add OS or IDE specific lines here — do it in the global .gitignore: https://gist.github.com/subfuzion/db7f57fff2fb6998a16c
+# -----------------------
+/.phpunit.cache
+/build
+/composer.lock
+/node_modules
+/phpunit.xml
+/vendor
