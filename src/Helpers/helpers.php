@@ -27,6 +27,12 @@ if (! function_exists('template_path')) {
             $template = config('frontend.template') ?: 'default';
         }
 
-        return resource_path('frontend/' . $template . ($path ? "/$path" : ''));
+        if ($template === 'default') {
+            $base_path = base_path('vendor/eclipsephp/frontend/resources');
+        } else {
+            $base_path = resource_path('frontend/' . $template);
+        }
+
+        return $base_path . ($path ? "/$path" : '');
     }
 }
