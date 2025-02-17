@@ -1,8 +1,30 @@
 {
     "name": "eclipsephp/core",
     "description": "Core package for the Eclipse platform",
+    "keywords": [
+        "eclipse",
+        "filament",
+        "laravel"
+    ],
+    "homepage": "https://github.com/datalinx/eclipsephp-core",
     "type": "library",
     "license": "MIT",
+    "authors": [
+        {
+            "name": "DataLinx",
+            "email": "info@datalinx.si"
+        }
+    ],
+    "config": {
+        "optimize-autoloader": true,
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true,
+            "php-http/discovery": true
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
     "autoload": {
         "psr-4": {
             "Eclipse\\Core\\": "src/",
@@ -10,14 +32,6 @@
             "Eclipse\\Core\\Database\\Seeders\\": "database/seeders/"
         }
     },
-    "authors": [
-        {
-            "name": "DataLinx",
-            "email": "info@datalinx.si"
-        }
-    ],
-    "minimum-stability": "dev",
-    "prefer-stable": true,
     "require": {
         "php": "^8.3",
         "bezhansalleh/filament-language-switch": "^3.1",
@@ -32,21 +46,20 @@
         "spatie/laravel-permission": "^6.13"
     },
     "require-dev": {
-        "eclipsephp/app": "dev-main"
+        "orchestra/testbench": "^9.9"
+    },
+    "scripts": {
+        "format": "vendor/bin/pint",
+        "test": "vendor/bin/pest",
+        "post-root-package-install": [
+            "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
+        ]
     },
     "extra": {
         "laravel": {
             "providers": [
                 "Eclipse\\Core\\EclipseServiceProvider"
             ]
-        }
-    },
-    "config": {
-        "optimize-autoloader": true,
-        "sort-packages": true,
-        "allow-plugins": {
-            "pestphp/pest-plugin": true,
-            "php-http/discovery": true
         }
     }
 }
