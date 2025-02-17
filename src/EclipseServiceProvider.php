@@ -2,13 +2,15 @@
 
 namespace Eclipse\Core;
 
-use App\Models\User;
 use Eclipse\Core\Console\Commands\ClearCommand;
 use Eclipse\Core\Console\Commands\DeployCommand;
 use Eclipse\Core\Console\Commands\PostComposerInstall;
 use Eclipse\Core\Console\Commands\PostComposerUpdate;
+use Eclipse\Core\Models\User;
 use Eclipse\Core\Policies\UserPolicy;
+use Eclipse\Core\Providers\AdminPanelProvider;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Str;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
@@ -35,6 +37,10 @@ class EclipseServiceProvider extends PackageServiceProvider
 
         require_once __DIR__ . '/Helpers/helpers.php';
 
+        if ($this->isPanelRequest()) {
+            $this->app->register(AdminPanelProvider::class);
+        }
+
         return $this;
     }
 
@@ -46,5 +52,19 @@ class EclipseServiceProvider extends PackageServiceProvider
         Gate::policy(User::class, UserPolicy::class);
 
         return $this;
+    }
+
+    protected function isPanelRequest(): bool
+    {
+        if (Str::startsWith(request()->path(), 'admin')) {
+            return true;
+        }
+
+        // If the request Referer header contains the admin path, return true
+        if (Str::contains(request()->header('referer'), 'admin')) {
+            return true;
+        }
+
+        return false;
     }
 }

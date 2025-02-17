@@ -2,8 +2,8 @@
 
 namespace Eclipse\Core\Policies;
 
-use App\Models\User;
 use Eclipse\Core\Models\Locale;
+use Eclipse\Core\Models\User;
 
 class LocalePolicy
 {

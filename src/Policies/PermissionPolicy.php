@@ -2,7 +2,7 @@
 
 namespace Eclipse\Core\Policies;
 
-use App\Models\User;
+use Eclipse\Core\Models\User;
 use Eclipse\Core\Models\User\Permission;
 
 class PermissionPolicy

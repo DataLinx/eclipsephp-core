@@ -2,8 +2,8 @@
 
 namespace Eclipse\Core\Filament\Resources;
 
-use App\Models\User;
 use Eclipse\Core\Filament\Resources;
+use Eclipse\Core\Models\User;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Infolists\Components\Group;

@@ -2,7 +2,7 @@
 
 namespace Eclipse\Core\Database\Seeders;
 
-use App\Models\User;
+use Eclipse\Core\Models\User;
 use Illuminate\Database\Seeder;
 
 class UserSeeder extends Seeder

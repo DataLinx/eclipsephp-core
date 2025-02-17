@@ -2,6 +2,7 @@
 
 namespace Eclipse\Core\Models;
 
+use Eclipse\Core\Database\Factories\UserFactory;
 use Eclipse\Core\Foundation\Model\HasCompositeAttributes;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasAvatar;
@@ -118,5 +119,10 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, HasMedia,
     public function canAccessPanel(Panel $panel): bool
     {
         return true;
+    }
+
+    protected static function newFactory()
+    {
+        return UserFactory::new();
     }
 }

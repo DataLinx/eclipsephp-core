@@ -2,8 +2,8 @@
 
 namespace Eclipse\Core\Policies;
 
-use App\Models\User;
 use Eclipse\Core\Models\Site;
+use Eclipse\Core\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class SitePolicy
