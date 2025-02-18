@@ -46,7 +46,8 @@
         "spatie/laravel-permission": "^6.13"
     },
     "require-dev": {
-        "orchestra/testbench": "^9.9"
+        "orchestra/testbench": "^9.10",
+        "pestphp/pest": "^3.7"
     },
     "scripts": {
         "format": "vendor/bin/pint",
