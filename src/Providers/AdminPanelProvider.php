@@ -12,11 +12,9 @@ use Eclipse\Core\Models\Site;
 use Eclipse\Core\Models\User;
 use Eclipse\Core\Models\User\Permission;
 use Eclipse\Core\Models\User\Role;
-use Filament\Facades\Filament;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use Filament\Navigation\NavigationGroup;
 use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
@@ -152,13 +150,6 @@ class AdminPanelProvider extends PanelProvider
         Resource::scopeToTenant(false);
 
         setPermissionsTeamId(1);
-
-        // Register navigation groups and set order
-        Filament::registerNavigationGroups([
-            NavigationGroup::make('CRM'),
-            NavigationGroup::make('Users'),
-            NavigationGroup::make('Configuration'),
-        ]);
 
         // Set available languages for the Translatable package
         Config::set('translatable.locales', Locale::getAvailableLocales()->pluck('id')->toArray());
