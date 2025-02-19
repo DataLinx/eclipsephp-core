@@ -32,6 +32,11 @@
             "Eclipse\\Core\\Database\\Seeders\\": "database/seeders/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
     "require": {
         "php": "^8.3",
         "bezhansalleh/filament-language-switch": "^3.1",
@@ -47,7 +52,8 @@
     },
     "require-dev": {
         "orchestra/testbench": "^9.10",
-        "pestphp/pest": "^3.7"
+        "pestphp/pest": "^3.7",
+        "pestphp/pest-plugin-livewire": "^3.0"
     },
     "scripts": {
         "format": "vendor/bin/pint",
