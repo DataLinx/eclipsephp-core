@@ -65,6 +65,11 @@ class EclipseServiceProvider extends PackageServiceProvider
             return true;
         }
 
+        // If running tests, always return true to make the panel available
+        if ($this->app->runningInConsole() && config('app.env') === 'testing') {
+            return true;
+        }
+
         return false;
     }
 }

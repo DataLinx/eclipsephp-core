@@ -7,6 +7,7 @@ use BezhanSalleh\FilamentLanguageSwitch\LanguageSwitch;
 use CactusGalaxy\FilamentAstrotomic\FilamentAstrotomicTranslatablePlugin;
 use DutchCodingCompany\FilamentDeveloperLogins\FilamentDeveloperLoginsPlugin;
 use Eclipse\Core\Filament\Pages\EditProfile;
+use Eclipse\Core\Http\Middleware\SetupPanel;
 use Eclipse\Core\Models\Locale;
 use Eclipse\Core\Models\Site;
 use Eclipse\Core\Models\User;
@@ -58,7 +59,6 @@ class AdminPanelProvider extends PanelProvider
             ->topNavigation()
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverResources(in: base_path('vendor/eclipsephp/core/src/Filament/Resources'), for: 'Eclipse\\Core\\Filament\\Resources')
-//            ->discoverResources(in: base_path('vendor/eclipsephp/crm/src/Filament/Resources'), for: 'Eclipse\\CRM\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->discoverPages(in: base_path('vendor/eclipsephp/core/src/Filament/Pages'), for: 'Eclipse\\Core\\Filament\\Pages')
             ->pages([
@@ -88,6 +88,7 @@ class AdminPanelProvider extends PanelProvider
                 SubstituteBindings::class,
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
+                SetupPanel::class
             ])
             ->authMiddleware([
                 Authenticate::class,
@@ -148,10 +149,5 @@ class AdminPanelProvider extends PanelProvider
 
         // Set tenancy to off for all resources by default
         Resource::scopeToTenant(false);
-
-        setPermissionsTeamId(1);
-
-        // Set available languages for the Translatable package
-        Config::set('translatable.locales', Locale::getAvailableLocales()->pluck('id')->toArray());
     }
 }
