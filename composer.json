@@ -51,6 +51,7 @@
         "spatie/laravel-permission": "^6.13"
     },
     "require-dev": {
+        "laravel/pint": "^1.21",
         "orchestra/testbench": "^9.10",
         "pestphp/pest": "^3.7",
         "pestphp/pest-plugin-livewire": "^3.0"
