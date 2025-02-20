@@ -64,7 +64,8 @@ class AdminPanelProvider extends PanelProvider
                 Pages\Dashboard::class,
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
-            ->globalSearchKeyBindings(['ctrl+k', 'command+k'])->globalSearchFieldSuffix(fn (): ?string => match (Platform::detect()) {
+            ->globalSearchKeyBindings(['ctrl+k', 'command+k'])
+            ->globalSearchFieldSuffix(fn (): ?string => match (Platform::detect()) {
                 Platform::Windows, Platform::Linux => 'CTRL+K',
                 Platform::Mac => '⌘K',
                 default => null,
