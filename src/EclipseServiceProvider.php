@@ -35,7 +35,7 @@ class EclipseServiceProvider extends PackageServiceProvider
     {
         parent::register();
 
-        require_once __DIR__ . '/Helpers/helpers.php';
+        require_once __DIR__.'/Helpers/helpers.php';
 
         if ($this->isPanelRequest()) {
             $this->app->register(AdminPanelProvider::class);
