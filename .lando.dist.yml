@@ -1,0 +1,23 @@
+name: eclipse-core
+config:
+  php: '8.3'
+  via: cli
+services:
+  appserver:
+    type: php:custom
+    xdebug: "debug,develop,coverage"
+    overrides:
+      image: slimdeluxe/php:8.3-v1.0
+tooling:
+  test:
+    service: appserver
+    description: Run tests
+    cmd: "composer test"
+  format:
+    service: appserver
+    description: Fix code style issues
+    cmd: "composer format"
+  testbench:
+    service: appserver
+    description: Run testbench CLI
+    cmd: "vendor/bin/testbench"
