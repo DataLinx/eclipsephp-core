@@ -11,7 +11,14 @@
 |
 */
 
-pest()->extend(Tests\TestCase::class)->in('Feature');
+use Eclipse\Core\Database\Seeders\CoreSeeder;
+
+pest()->extend(Tests\TestCase::class)
+    ->use(Illuminate\Foundation\Testing\RefreshDatabase::class)
+    ->beforeEach(function () {
+        $this->seed(CoreSeeder::class);
+    })
+    ->in('Feature');
 
 /*
 |--------------------------------------------------------------------------

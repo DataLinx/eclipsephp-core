@@ -1,5 +1,5 @@
 <?php
 
-test('example', function () {
-    expect(true)->toBeTrue();
+test('panel login is visible', function () {
+    $this->get('/admin/login')->assertStatus(200);
 });
