@@ -58,10 +58,7 @@
     },
     "scripts": {
         "format": "vendor/bin/pint",
-        "test": "vendor/bin/testbench package:test",
-        "post-root-package-install": [
-            "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
-        ]
+        "test": "vendor/bin/testbench package:test"
     },
     "extra": {
         "laravel": {
