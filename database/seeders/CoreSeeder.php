@@ -19,7 +19,7 @@ class CoreSeeder extends Seeder
 
         setPermissionsTeamId($site->id);
 
-        // User roles and permissions
-        $this->call(RolesAndPermissionsSeeder::class);
+        // Users
+        $this->call(UserSeeder::class);
     }
 }
