@@ -96,11 +96,9 @@ class AdminPanelProvider extends PanelProvider
             ->plugins([
                 EnvironmentIndicatorPlugin::make(),
                 FilamentDeveloperLoginsPlugin::make()
-                    ->enabled(app()->environment('local'))
+                    ->enabled(app()->isLocal())
                     ->modelClass(User::class)
-                    ->users([
-                        'Super admin' => 'test@datalinx.si',
-                    ]),
+                    ->users(config('eclipse.developer_logins')),
                 FilamentAstrotomicTranslatablePlugin::make(),
             ]);
     }
