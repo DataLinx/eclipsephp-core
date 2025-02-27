@@ -41,7 +41,7 @@ return [
                         'email' => 'another@example.com',
                     ],
                 ],
-            ]
+            ],
         ],
     ],
 
