@@ -4,6 +4,9 @@ namespace Eclipse\Core\Providers;
 
 use Astrotomic\Translatable\Translatable;
 use BezhanSalleh\FilamentLanguageSwitch\LanguageSwitch;
+use BezhanSalleh\FilamentShield\Facades\FilamentShield;
+use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
+use BezhanSalleh\FilamentShield\Middleware\SyncShieldTenant;
 use CactusGalaxy\FilamentAstrotomic\FilamentAstrotomicTranslatablePlugin;
 use DutchCodingCompany\FilamentDeveloperLogins\FilamentDeveloperLoginsPlugin;
 use Eclipse\Core\Filament\Pages\EditProfile;
@@ -37,7 +40,6 @@ use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Str;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use pxlrbt\FilamentEnvironmentIndicator\EnvironmentIndicatorPlugin;
-use Spatie\Permission\PermissionServiceProvider;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -74,6 +76,9 @@ class AdminPanelProvider extends PanelProvider
             ->simplePageMaxContentWidth(MaxWidth::Medium)
             ->tenant(Site::class, slugAttribute: 'domain')
             ->tenantDomain('{tenant:domain}')
+            ->tenantMiddleware([
+                SyncShieldTenant::class,
+            ], isPersistent: true)
             ->widgets([
                 Widgets\AccountWidget::class,
                 Widgets\FilamentInfoWidget::class,
@@ -94,6 +99,7 @@ class AdminPanelProvider extends PanelProvider
                 Authenticate::class,
             ])
             ->plugins([
+                FilamentShieldPlugin::make(),
                 EnvironmentIndicatorPlugin::make(),
                 FilamentDeveloperLoginsPlugin::make()
                     ->enabled(app()->isLocal())
@@ -107,8 +113,6 @@ class AdminPanelProvider extends PanelProvider
     {
         parent::register();
 
-        $this->app->register(PermissionServiceProvider::class);
-
         FilamentView::registerRenderHook('panels::body.end', fn (): string => Blade::render("@vite('resources/js/app.js')"));
     }
 
@@ -117,9 +121,13 @@ class AdminPanelProvider extends PanelProvider
      */
     public function boot(): void
     {
+        // Set up Spatie Laravel permissions
         app(\Spatie\Permission\PermissionRegistrar::class)
             ->setPermissionClass(Permission::class)
             ->setRoleClass(Role::class);
+
+        // Prohibit Filament's destructive commands in production
+        FilamentShield::prohibitDestructiveCommands($this->app->isProduction());
 
         Tables\Columns\TextColumn::configureUsing(function (Tables\Columns\TextColumn $column): void {
             if (Str::match('@^translations?\.(\w+)$@', $column->getName())) {

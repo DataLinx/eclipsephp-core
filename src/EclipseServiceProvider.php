@@ -23,6 +23,8 @@ class EclipseServiceProvider extends PackageServiceProvider
             ])
             ->hasConfigFile([
                 'eclipse',
+                'filament-shield',
+                'permission',
             ])
             ->discoversMigrations()
             ->runsMigrations()

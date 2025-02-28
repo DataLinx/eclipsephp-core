@@ -20,9 +20,6 @@ class SetupPanel
         // Set available languages for the Translatable package
         Config::set('translatable.locales', Locale::getAvailableLocales()->pluck('id')->toArray());
 
-        // TODO Set tenant based on the HTTP host
-        setPermissionsTeamId(1);
-
         return $next($request);
     }
 }
