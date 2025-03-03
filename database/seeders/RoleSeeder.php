@@ -12,8 +12,16 @@ class RoleSeeder extends Seeder
      */
     public function run(): void
     {
-        Role::factory()
-            ->count(5)
-            ->create();
+        if (is_array(config('eclipse.seed.roles.presets'))) {
+            foreach (config('eclipse.seed.roles.presets') as $preset) {
+                Role::create($preset['data']);
+            }
+        }
+
+        if (config('eclipse.seed.roles.count') > 0) {
+            Role::factory()
+                ->count(config('eclipse.seed.roles.count'))
+                ->create();
+        }
     }
 }

@@ -19,6 +19,20 @@ return [
     | All settings are optional.
     */
     'seed' => [
+        'roles' => [
+            // Number of randomly generated roles
+            'count' => 2,
+            // Roles with preset data
+            // Required attributes: name, guard_name
+            'presets' => [
+                [
+                    'data' => [
+                        'name' => 'admin',
+                        'guard_name' => 'web',
+                    ],
+                ],
+            ],
+        ],
         'users' => [
             // Number of randomly generated users
             'count' => 5,
@@ -38,8 +52,9 @@ return [
                 ],
                 [
                     'data' => [
-                        'email' => 'another@example.com',
+                        'email' => 'admin@example.com',
                     ],
+                    'role' => 'admin',
                 ],
             ]
         ],
@@ -54,7 +69,7 @@ return [
     */
     'developer_logins' => [
         'Super admin' => 'test@example.com',
-        'Editor' => 'another@example.com',
+        'Admin' => 'admin@example.com',
     ],
 
 ];

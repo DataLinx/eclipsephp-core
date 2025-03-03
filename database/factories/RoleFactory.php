@@ -22,9 +22,8 @@ class RoleFactory extends Factory
     public function definition(): array
     {
         return [
-            'site_id' => \Eclipse\Core\Models\Site::factory(),
-            'name' => fake()->name(),
-            'guard_name' => fake()->text(255),
+            'name' => str(fake()->words(2, true))->snake(),
+            'guard_name' => 'web',
         ];
     }
 }

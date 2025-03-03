@@ -20,6 +20,9 @@ class CoreSeeder extends Seeder
             '--minimal' => null,
         ]);
 
+        // Seed additional roles
+        $this->call(RoleSeeder::class);
+
         // Create main site
         $site = Site::create([
             'domain' => basename(config('app.url')),
