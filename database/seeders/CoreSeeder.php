@@ -4,12 +4,21 @@ namespace Eclipse\Core\Database\Seeders;
 
 use Eclipse\Core\Models\Site;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Artisan;
 
 class CoreSeeder extends Seeder
 {
     public function run(): void
     {
         $this->call(LocaleSeeder::class);
+
+        // Seed roles and permissions with Filament Shield plugin
+        Artisan::call('shield:generate', [
+            '--all' => null,
+            '--panel' => 'admin',
+            '--option' => 'permissions',
+            '--minimal' => null,
+        ]);
 
         // Create main site
         $site = Site::create([
