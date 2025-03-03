@@ -24,11 +24,11 @@ class UserSeeder extends Seeder
 
             $data = $preset['data'];
 
-            if ( ! isset($data['first_name'])) {
+            if (! isset($data['first_name'])) {
                 $data['first_name'] = fake()->firstName;
             }
 
-            if ( ! isset($data['last_name'])) {
+            if (! isset($data['last_name'])) {
                 $data['last_name'] = fake()->lastName;
             }
 
