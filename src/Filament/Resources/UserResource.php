@@ -58,6 +58,15 @@ class UserResource extends Resource implements HasShieldPermissions
             ->required(fn (string $context): bool => $context === 'create')
             ->label(fn (string $context): string => $context === 'create' ? 'Password' : 'Set new password');
 
+        $schema[] = Forms\Components\Select::make('roles')
+            ->relationship('roles', 'name')
+            ->saveRelationshipsUsing(function (User $record, $state) {
+                $record->roles()->syncWithPivotValues($state, [config('permission.column_names.team_foreign_key') => getPermissionsTeamId()]);
+            })
+            ->multiple()
+            ->preload()
+            ->searchable();
+
         return $form->schema($schema);
     }
 
