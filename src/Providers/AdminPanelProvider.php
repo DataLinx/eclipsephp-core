@@ -16,6 +16,7 @@ use Eclipse\Core\Models\Site;
 use Eclipse\Core\Models\User;
 use Eclipse\Core\Models\User\Permission;
 use Eclipse\Core\Models\User\Role;
+use Eclipse\Core\Policies\User\RolePolicy;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
@@ -37,6 +38,7 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use pxlrbt\FilamentEnvironmentIndicator\EnvironmentIndicatorPlugin;
@@ -155,5 +157,8 @@ class AdminPanelProvider extends PanelProvider
 
         // Set tenancy to off for all resources by default
         Resource::scopeToTenant(false);
+
+        // Register policies for classes that can't be guessed automatically
+        Gate::policy(Role::class, RolePolicy::class);
     }
 }

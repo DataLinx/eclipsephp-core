@@ -2,6 +2,7 @@
 
 namespace Eclipse\Core\Filament\Resources;
 
+use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
 use Eclipse\Core\Filament\Resources;
 use Eclipse\Core\Models\Site;
 use Filament\Forms;
@@ -11,7 +12,7 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 
-class SiteResource extends Resource
+class SiteResource extends Resource implements HasShieldPermissions
 {
     protected static ?string $model = Site::class;
 
@@ -93,5 +94,17 @@ class SiteResource extends Resource
     public static function getNavigationGroup(): ?string
     {
         return 'Configuration';
+    }
+
+
+    public static function getPermissionPrefixes(): array
+    {
+        return [
+            'view_any',
+            'create',
+            'update',
+            'delete',
+            'delete_any',
+        ];
     }
 }

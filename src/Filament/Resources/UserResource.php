@@ -2,6 +2,7 @@
 
 namespace Eclipse\Core\Filament\Resources;
 
+use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
 use Eclipse\Core\Filament\Resources;
 use Eclipse\Core\Models\User;
 use Filament\Forms;
@@ -21,7 +22,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Hash;
 
-class UserResource extends Resource
+class UserResource extends Resource implements HasShieldPermissions
 {
     protected static ?string $model = User::class;
 
@@ -248,6 +249,18 @@ class UserResource extends Resource
             'first_name',
             'last_name',
             'email',
+        ];
+    }
+
+    public static function getPermissionPrefixes(): array
+    {
+        return [
+            'view_any',
+            'view',
+            'create',
+            'update',
+            'delete',
+            'delete_any',
         ];
     }
 }
