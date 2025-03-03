@@ -128,9 +128,13 @@ class AdminPanelProvider extends PanelProvider
             ->setPermissionClass(Permission::class)
             ->setRoleClass(Role::class);
 
-        // Prohibit Filament's destructive commands in production
+        // Prohibit Filament Shield's destructive commands in production
         FilamentShield::prohibitDestructiveCommands($this->app->isProduction());
 
+        // Load customized translations for Filament Shield
+        $this->loadTranslationsFrom(__DIR__.'/../../resources/lang/vendor/filament-shield', 'filament-shield');
+
+        // Configure search for translatable model attributes
         Tables\Columns\TextColumn::configureUsing(function (Tables\Columns\TextColumn $column): void {
             if (Str::match('@^translations?\.(\w+)$@', $column->getName())) {
                 $column
