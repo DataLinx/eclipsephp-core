@@ -38,6 +38,7 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
@@ -123,6 +124,12 @@ class AdminPanelProvider extends PanelProvider
      */
     public function boot(): void
     {
+        // For unit tests...
+        if (app()->runningUnitTests()) {
+            // Set the correct user model in auth config
+            Config::set('auth.providers.users.model', User::class);
+        }
+
         // Set up Spatie Laravel permissions
         app(\Spatie\Permission\PermissionRegistrar::class)
             ->setPermissionClass(Permission::class)
