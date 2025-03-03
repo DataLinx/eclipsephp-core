@@ -1,5 +1,7 @@
 <?php
 
+use Eclipse\Core\Database\Seeders\CoreSeeder;
+
 /*
 |--------------------------------------------------------------------------
 | Test Case
@@ -10,8 +12,6 @@
 | need to change it using the "pest()" function to bind a different classes or traits.
 |
 */
-
-use Eclipse\Core\Database\Seeders\CoreSeeder;
 
 pest()->extend(Tests\TestCase::class)
     ->use(Illuminate\Foundation\Testing\RefreshDatabase::class)
