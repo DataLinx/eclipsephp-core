@@ -2,15 +2,13 @@
 
 namespace Eclipse\Core\Policies;
 
-use Eclipse\Core\Models\User;
 use Eclipse\Core\Models\Locale;
+use Eclipse\Core\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class LocalePolicy
 {
     use HandlesAuthorization;
-
-
 
     /**
      * Determine whether the user can view any models.

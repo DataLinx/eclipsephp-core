@@ -96,7 +96,6 @@ class SiteResource extends Resource implements HasShieldPermissions
         return 'Configuration';
     }
 
-
     public static function getPermissionPrefixes(): array
     {
         return [
