@@ -9,6 +9,10 @@ services:
     overrides:
       image: slimdeluxe/php:8.3-v1.0
 tooling:
+  php:
+    service: appserver
+  composer:
+    service: appserver
   test:
     service: appserver
     description: Run tests
