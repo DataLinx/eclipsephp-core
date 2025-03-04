@@ -20,6 +20,7 @@ use Eclipse\Core\Policies\User\RolePolicy;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Navigation\NavigationItem;
 use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
@@ -109,6 +110,14 @@ class AdminPanelProvider extends PanelProvider
                     ->modelClass(User::class)
                     ->users(config('eclipse.developer_logins')),
                 FilamentAstrotomicTranslatablePlugin::make(),
+            ])
+            ->navigationItems([
+                NavigationItem::make('Telescope')
+                    ->url('/telescope', shouldOpenInNewTab: true)
+                    ->icon('heroicon-s-arrow-top-right-on-square')
+                    ->group('Tools')
+                    ->sort(1000)
+                    ->hidden(fn (): bool => ! config('telescope.enabled', false))
             ]);
     }
 

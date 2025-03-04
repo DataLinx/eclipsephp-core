@@ -29,7 +29,7 @@ class PostComposerUpdate extends Command
 
         // Publish Laravel assets
         // ------------------
-        $this->call('vendor:publish', ['--tag' => 'laravel-assets']);
+        $this->call('vendor:publish', ['--tag' => 'laravel-assets', '--force' => true]);
 
         // ------------------
 

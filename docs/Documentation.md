@@ -2,6 +2,14 @@ Welcome to the Eclipse Core documentation!
 
 🛠️️️ **This is obviously a work in progress!** 🛠️
 
+## Debugging
+
+### Laravel Telescope
+Telescope is already installed with the core package and ready to use in the development environment.
+To enable it, just set the `TELESCOPE_ENABLED` variable in your `.env` file to `true` and visit the `/telescope` URL or click the _Tools > Telescope_ link in the panel navigation.
+
+To use the dark theme also set the `TELESCOPE_DARK_THEME`.
+
 ## Users
 
 ### Authorization

@@ -72,4 +72,16 @@ return [
         'Admin' => 'admin@example.com',
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Telescope package additional configuration
+    |--------------------------------------------------------------------------
+    */
+    'telescope' => [
+        /*
+         * Enable dark theme?
+         */
+        'dark_theme' => (bool) env('TELESCOPE_DARK_THEME', false),
+    ],
+
 ];
