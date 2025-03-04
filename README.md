@@ -3,6 +3,7 @@
 <img src="docs/assets/logo.svg" title="Eclipse" width="300px" alt="Eclipse"/>
 
 [![Tests](https://github.com/DataLinx/eclipsephp-core/actions/workflows/test-runner.yml/badge.svg)](https://github.com/DataLinx/eclipsephp-core/actions/workflows/test-runner.yml)
+[![codecov](https://codecov.io/gh/DataLinx/eclipsephp-core/graph/badge.svg?token=GI7KK230DO)](https://codecov.io/gh/DataLinx/eclipsephp-core)
 ![Packagist Downloads](https://img.shields.io/packagist/dt/eclipsephp/core)
 [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-%23FE5196?logo=conventionalcommits&logoColor=white)](https://conventionalcommits.org)
 
