@@ -25,4 +25,5 @@
 /package.json export-ignore
 /package-lock.json export-ignore
 /phpunit.xml.dist export-ignore
+/README.md export-ignore
 /testbench.example.yaml export-ignore

@@ -1,0 +1,12 @@
+<svg width="1300" height="400" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <linearGradient id="a">
+            <stop style="stop-color:#8d1fe0;stop-opacity:1" offset="0"/>
+            <stop style="stop-color:#c414d7;stop-opacity:1" offset=".463"/>
+            <stop style="stop-color:#ff00c7;stop-opacity:1" offset="1"/>
+        </linearGradient>
+        <linearGradient xlink:href="#a" id="b" x1="626.784" y1="411.653" x2="953.838" y2="411.653" gradientUnits="userSpaceOnUse" gradientTransform="translate(80.201)"/>
+    </defs>
+    <path style="display:inline;fill:url(#b);stroke:none;stroke-width:.246;stroke-dasharray:none;stroke-opacity:1" d="M790.31 248.248a163.404 163.404 0 0 0-163.404 163.404A163.404 163.404 0 0 0 790.31 575.057a163.404 163.404 0 0 0 40.102-5.328 163.404 163.404 0 0 0 40.1 5.328 163.404 163.404 0 0 0 163.404-163.405A163.404 163.404 0 0 0 870.51 248.248a163.404 163.404 0 0 0-39.453 5.188 163.404 163.404 0 0 0-40.748-5.188zm80.201 19.158a144.247 144.247 0 0 1 144.248 144.246A144.247 144.247 0 0 1 870.511 555.9a144.247 144.247 0 0 1-3.74-.295 163.404 163.404 0 0 0 86.943-143.953 163.404 163.404 0 0 0-86.199-144.01 144.247 144.247 0 0 1 2.996-.236z" transform="translate(-574.729 -211.652)"/>
+    <path style="font-size:96px;font-family:Molot;-inkscape-font-specification:'Molot, Normal';text-align:center;text-anchor:middle;white-space:pre;stroke-width:20.1" d="M561.487 761.497v-16.8h-24v-9.216h20.64v-16.8h-20.64v-7.488h20.64l3.36-8.544v-8.352h-44.928v67.2zm14.208-67.2c-4.992 0-8.448 3.456-8.448 8.352v50.496c0 4.896 3.456 8.352 8.448 8.352h36.48v-16.8H588.27v-33.504h20.64l3.264-8.544v-8.352zm42.24 67.2h42.048v-16.8h-21.12v-50.4h-20.928zm67.776 0v-67.2h-20.928v67.2zm28.704-50.304h8.352v12.576h-8.352zm20.928 29.376c4.992 0 8.448-3.552 8.448-8.448v-29.472c0-4.896-3.456-8.352-8.448-8.352h-41.952v67.2h21.024v-20.928zm18.912-12.384 18.24 12.096v4.416H748.59v16.8h36.576c4.896 0 8.352-3.456 8.352-8.352V737.88c0-5.376-1.056-8.352-5.664-11.424l-18.24-12.192v-3.072h20.64l3.264-8.64v-8.256h-36.48c-4.992 0-8.448 3.456-8.448 8.352v14.112c0 5.376 1.056 8.256 5.664 11.424zm89.952 33.312v-16.8h-24v-9.216h20.64v-16.8h-20.64v-7.488h20.64l3.36-8.544v-8.352h-44.928v67.2z" transform="matrix(2.23962 0 0 2.23962 -642.884 -1430.216)" aria-label="ECLIPSE"/>
+</svg>
