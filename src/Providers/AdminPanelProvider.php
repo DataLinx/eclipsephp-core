@@ -117,7 +117,7 @@ class AdminPanelProvider extends PanelProvider
                     ->icon('heroicon-s-arrow-top-right-on-square')
                     ->group('Tools')
                     ->sort(1000)
-                    ->hidden(fn (): bool => ! config('telescope.enabled', false))
+                    ->hidden(fn (): bool => ! config('telescope.enabled', false)),
             ]);
     }
 
