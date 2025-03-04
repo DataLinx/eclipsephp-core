@@ -4,7 +4,6 @@ namespace Eclipse\Core;
 
 use Eclipse\Core\Console\Commands\ClearCommand;
 use Eclipse\Core\Console\Commands\DeployCommand;
-use Eclipse\Core\Console\Commands\PostComposerInstall;
 use Eclipse\Core\Console\Commands\PostComposerUpdate;
 use Eclipse\Core\Providers\AdminPanelProvider;
 use Eclipse\Core\Providers\TelescopeServiceProvider;
@@ -19,7 +18,6 @@ class EclipseServiceProvider extends PackageServiceProvider
             ->hasCommands([
                 ClearCommand::class,
                 DeployCommand::class,
-                PostComposerInstall::class,
                 PostComposerUpdate::class,
             ])
             ->hasConfigFile([
