@@ -20,6 +20,7 @@ use Eclipse\Core\Policies\User\RolePolicy;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Navigation\NavigationGroup;
 use Filament\Navigation\NavigationItem;
 use Filament\Pages;
 use Filament\Panel;
@@ -110,6 +111,11 @@ class AdminPanelProvider extends PanelProvider
                     ->modelClass(User::class)
                     ->users(config('eclipse.developer_logins')),
                 FilamentAstrotomicTranslatablePlugin::make(),
+            ])
+            ->navigationGroups([
+                NavigationGroup::make('Users'),
+                NavigationGroup::make('Configuration'),
+                NavigationGroup::make('Tools'),
             ])
             ->navigationItems([
                 NavigationItem::make('Telescope')
