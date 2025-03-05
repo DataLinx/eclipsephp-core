@@ -87,10 +87,9 @@ class UserResource extends Resource implements HasShieldPermissions
                 ->searchable()
                 ->sortable()
                 ->toggleable(),
-            Tables\Columns\TextColumn::make('full_name')
-                ->searchable(query: function (Builder $query, string $search): Builder {
-                    return $query->whereRaw(User::getCompositeDefinition('full_name').' LIKE ?', ["%$search%"]);
-                })
+            Tables\Columns\TextColumn::make('name')
+                ->label('Full name')
+                ->searchable()
                 ->sortable()
                 ->toggleable(),
         ];
@@ -148,7 +147,12 @@ class UserResource extends Resource implements HasShieldPermissions
 
         $filters[] = Tables\Filters\QueryBuilder::make()
             ->constraints([
-                TextConstraint::make('first_name'),
+                TextConstraint::make('first_name')
+                    ->label('First name'),
+                TextConstraint::make('last_name')
+                    ->label('Last name'),
+                TextConstraint::make('name')
+                    ->label('Full name'),
             ]);
 
         return $table
@@ -200,7 +204,7 @@ class UserResource extends Resource implements HasShieldPermissions
                         ->circular(),
                     Group::make()
                         ->schema([
-                            TextEntry::make('full_name')
+                            TextEntry::make('name')
                                 ->label('Full name'),
                             TextEntry::make('email')
                                 ->icon(config('eclipse.email_verification') ? fn (User $user) => $user->email_verified_at ? 'heroicon-s-check-circle' : 'heroicon-s-x-circle' : null)

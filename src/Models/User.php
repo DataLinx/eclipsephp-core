@@ -3,7 +3,6 @@
 namespace Eclipse\Core\Models;
 
 use Eclipse\Core\Database\Factories\UserFactory;
-use Eclipse\Core\Foundation\Model\HasCompositeAttributes;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasAvatar;
 use Filament\Models\Contracts\HasName;
@@ -14,13 +13,13 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\Permission\Traits\HasRoles;
 
 /**
  * @property int $id
+ * @property-read string|null $name
  * @property string|null $first_name
  * @property string|null $last_name
  * @property string $email
@@ -29,11 +28,10 @@ use Spatie\Permission\Traits\HasRoles;
  * @property string|null $remember_token
  * @property string|null $created_at
  * @property string|null $updated_at
- * @property-read string $full_name User's full name
  */
 class User extends Authenticatable implements FilamentUser, HasAvatar, HasMedia, HasName, HasTenants
 {
-    use HasCompositeAttributes, HasFactory, HasRoles, InteractsWithMedia, Notifiable;
+    use HasFactory, HasRoles, InteractsWithMedia, Notifiable;
 
     protected $table = 'users';
 
@@ -92,20 +90,6 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, HasMedia,
         return "$this->first_name $this->last_name";
     }
 
-    protected static function defineCompositeAttributes(): array
-    {
-        switch (DB::getDriverName()) {
-            case 'sqlite':
-                return [
-                    'full_name' => "users.first_name || ' ' || users.last_name",
-                ];
-            default:
-                return [
-                    'full_name' => "TRIM(CONCAT(IFNULL(users.first_name, ''), ' ', IFNULL(users.last_name, '')))",
-                ];
-        }
-    }
-
     public function canAccessTenant(Model $tenant): bool
     {
         return $this->sites()->whereKey($tenant)->exists();
@@ -124,5 +108,12 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, HasMedia,
     protected static function newFactory()
     {
         return UserFactory::new();
+    }
+
+    protected static function booted()
+    {
+        static::saving(function (self $user) {
+            $user->name = trim("$user->first_name $user->last_name");
+        });
     }
 }
