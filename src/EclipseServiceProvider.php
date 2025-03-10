@@ -21,6 +21,7 @@ class EclipseServiceProvider extends PackageServiceProvider
                 PostComposerUpdate::class,
             ])
             ->hasConfigFile([
+                'blade-heroicons',
                 'eclipse',
                 'filament-shield',
                 'permission',
