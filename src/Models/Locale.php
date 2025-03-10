@@ -2,14 +2,18 @@
 
 namespace Eclipse\Core\Models;
 
+use Eclipse\Core\Database\Factories\LocaleFactory;
 use Eclipse\Core\Models\Scopes\ActiveScope;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 #[ScopedBy([ActiveScope::class])]
 class Locale extends Model
 {
+    use HasFactory;
+
     protected $keyType = 'string';
 
     public $incrementing = false;
@@ -41,5 +45,10 @@ class Locale extends Model
         return self::where('is_active', true)
             ->where('is_available_in_panel', true)
             ->get();
+    }
+
+    protected static function newFactory(): LocaleFactory
+    {
+        return LocaleFactory::new();
     }
 }

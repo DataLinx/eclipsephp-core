@@ -2,7 +2,7 @@
 
 namespace Eclipse\Core\Models;
 
-use Eclipse\Core\Models\User\Role;
+use Eclipse\Core\Database\Factories\SiteFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -32,13 +32,8 @@ class Site extends Model
         ];
     }
 
-    /**
-     * Get all user roles.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function roles()
+    protected static function newFactory(): SiteFactory
     {
-        return $this->hasMany(Role::class);
+        return SiteFactory::new();
     }
 }
