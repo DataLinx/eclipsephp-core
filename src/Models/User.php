@@ -5,7 +5,6 @@ namespace Eclipse\Core\Models;
 use Eclipse\Core\Database\Factories\UserFactory;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasAvatar;
-use Filament\Models\Contracts\HasName;
 use Filament\Models\Contracts\HasTenants;
 use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -29,7 +28,7 @@ use Spatie\Permission\Traits\HasRoles;
  * @property string|null $created_at
  * @property string|null $updated_at
  */
-class User extends Authenticatable implements FilamentUser, HasAvatar, HasMedia, HasName, HasTenants
+class User extends Authenticatable implements FilamentUser, HasAvatar, HasMedia, HasTenants
 {
     use HasFactory, HasRoles, InteractsWithMedia, Notifiable;
 
@@ -83,11 +82,6 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, HasMedia,
     public function getFilamentAvatarUrl(): ?string
     {
         return $this->getMedia('avatars')->first()?->getUrl();
-    }
-
-    public function getFilamentName(): string
-    {
-        return "$this->first_name $this->last_name";
     }
 
     public function canAccessTenant(Model $tenant): bool
