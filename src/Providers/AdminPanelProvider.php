@@ -66,9 +66,9 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->topNavigation()
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
-            ->discoverResources(in: $package_src . 'Filament/Resources', for: 'Eclipse\\Core\\Filament\\Resources')
+            ->discoverResources(in: $package_src.'Filament/Resources', for: 'Eclipse\\Core\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
-            ->discoverPages(in: $package_src . 'Filament/Pages', for: 'Eclipse\\Core\\Filament\\Pages')
+            ->discoverPages(in: $package_src.'Filament/Pages', for: 'Eclipse\\Core\\Filament\\Pages')
             ->pages([
                 Pages\Dashboard::class,
             ])
