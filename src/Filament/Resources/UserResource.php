@@ -34,7 +34,7 @@ class UserResource extends Resource implements HasShieldPermissions
 
     public static function form(Form $form): Form
     {
-        $schema = [
+        return $form->schema([
             Forms\Components\SpatieMediaLibraryFileUpload::make('avatar')
                 ->collection('avatars')
                 ->avatar()
@@ -43,31 +43,25 @@ class UserResource extends Resource implements HasShieldPermissions
             self::getFirstNameFormComponent(),
             self::getLastNameFormComponent(),
             self::getEmailFormComponent(),
-        ];
-
-        if (config('eclipse.email_verification')) {
-            $schema[] = Forms\Components\DateTimePicker::make('email_verified_at')
-                ->disabled();
-        }
-
-        $schema[] = Forms\Components\TextInput::make('password')
-            ->password()
-            ->revealable()
-            ->dehydrateStateUsing(fn ($state) => Hash::make($state))
-            ->dehydrated(fn ($state) => filled($state))
-            ->required(fn (string $context): bool => $context === 'create')
-            ->label(fn (string $context): string => $context === 'create' ? 'Password' : 'Set new password');
-
-        $schema[] = Forms\Components\Select::make('roles')
-            ->relationship('roles', 'name')
-            ->saveRelationshipsUsing(function (User $record, $state) {
-                $record->roles()->syncWithPivotValues($state, [config('permission.column_names.team_foreign_key') => getPermissionsTeamId()]);
-            })
-            ->multiple()
-            ->preload()
-            ->searchable();
-
-        return $form->schema($schema);
+            Forms\Components\DateTimePicker::make('email_verified_at')
+                ->visible(config('eclipse.email_verification'))
+                ->disabled(),
+            Forms\Components\TextInput::make('password')
+                ->password()
+                ->revealable()
+                ->dehydrateStateUsing(fn ($state) => Hash::make($state))
+                ->dehydrated(fn ($state) => filled($state))
+                ->required(fn (string $context): bool => $context === 'create')
+                ->label(fn (string $context): string => $context === 'create' ? 'Password' : 'Set new password'),
+            Forms\Components\Select::make('roles')
+                ->relationship('roles', 'name')
+                ->saveRelationshipsUsing(function (User $record, $state) {
+                    $record->roles()->syncWithPivotValues($state, [config('permission.column_names.team_foreign_key') => getPermissionsTeamId()]);
+                })
+                ->multiple()
+                ->preload()
+                ->searchable()
+        ]);
     }
 
     public static function table(Table $table): Table
@@ -102,20 +96,21 @@ class UserResource extends Resource implements HasShieldPermissions
                 ->icon(fn (User $user) => $user->email_verified_at ? 'heroicon-s-check-circle' : 'heroicon-s-x-circle')
                 ->iconColor(fn (User $user) => $user->email_verified_at ? Color::Green : Color::Red)
                 ->tooltip(fn (User $user) => $user->email_verified_at ? 'Verified' : 'Not verified');
-
-            $columns[] = Tables\Columns\TextColumn::make('email_verified_at')
-                ->label('Verified email')
-                ->placeholder('Not verified')
-                ->dateTime()
-                ->sortable()
-                ->toggleable()
-                ->width(150);
         } else {
             $columns[] = Tables\Columns\TextColumn::make('email')
                 ->searchable()
                 ->sortable()
                 ->width(150);
         }
+
+        $columns[] = Tables\Columns\TextColumn::make('email_verified_at')
+            ->label('Verified email')
+            ->placeholder('Not verified')
+            ->dateTime()
+            ->sortable()
+            ->toggleable()
+            ->visible(config('eclipse.email_verification'))
+            ->width(150);
 
         $columns[] = Tables\Columns\TextColumn::make('created_at')
             ->dateTime()
@@ -129,10 +124,8 @@ class UserResource extends Resource implements HasShieldPermissions
             ->toggleable(isToggledHiddenByDefault: true)
             ->width(150);
 
-        $filters = [];
-
-        if (config('eclipse.email_verification')) {
-            $filters[] = Tables\Filters\TernaryFilter::make('email_verified_at')
+        $filters = [
+            Tables\Filters\TernaryFilter::make('email_verified_at')
                 ->label('Email verification')
                 ->nullable()
                 ->placeholder('All users')
@@ -142,18 +135,18 @@ class UserResource extends Resource implements HasShieldPermissions
                     true: fn (Builder $query) => $query->whereNotNull('email_verified_at'),
                     false: fn (Builder $query) => $query->whereNull('email_verified_at'),
                     blank: fn (Builder $query) => $query,
-                );
-        }
-
-        $filters[] = Tables\Filters\QueryBuilder::make()
-            ->constraints([
-                TextConstraint::make('first_name')
-                    ->label('First name'),
-                TextConstraint::make('last_name')
-                    ->label('Last name'),
-                TextConstraint::make('name')
-                    ->label('Full name'),
-            ]);
+                )
+                ->visible(config('eclipse.email_verification')),
+            Tables\Filters\QueryBuilder::make()
+                ->constraints([
+                    TextConstraint::make('first_name')
+                        ->label('First name'),
+                    TextConstraint::make('last_name')
+                        ->label('Last name'),
+                    TextConstraint::make('name')
+                        ->label('Full name'),
+                ]),
+        ];
 
         return $table
             ->columns($columns)
