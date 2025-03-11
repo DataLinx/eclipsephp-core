@@ -50,6 +50,8 @@ class AdminPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
     {
+        $package_src = __DIR__.'/../../src/';
+
         return $panel
             ->default()
             ->id('admin')
@@ -64,9 +66,9 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->topNavigation()
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
-            ->discoverResources(in: base_path('vendor/eclipsephp/core/src/Filament/Resources'), for: 'Eclipse\\Core\\Filament\\Resources')
+            ->discoverResources(in: $package_src . 'Filament/Resources', for: 'Eclipse\\Core\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
-            ->discoverPages(in: base_path('vendor/eclipsephp/core/src/Filament/Pages'), for: 'Eclipse\\Core\\Filament\\Pages')
+            ->discoverPages(in: $package_src . 'Filament/Pages', for: 'Eclipse\\Core\\Filament\\Pages')
             ->pages([
                 Pages\Dashboard::class,
             ])
@@ -109,7 +111,7 @@ class AdminPanelProvider extends PanelProvider
                 FilamentDeveloperLoginsPlugin::make()
                     ->enabled(app()->isLocal())
                     ->modelClass(User::class)
-                    ->users(config('eclipse.developer_logins')),
+                    ->users(config('eclipse.developer_logins') ?: []),
                 FilamentAstrotomicTranslatablePlugin::make(),
             ])
             ->navigationGroups([
