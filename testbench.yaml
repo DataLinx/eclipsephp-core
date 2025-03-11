@@ -1,3 +1,5 @@
 workbench:
   # Do not run database migrations from the default skeleton
   install: false
+providers:
+  - Eclipse\Core\EclipseServiceProvider
