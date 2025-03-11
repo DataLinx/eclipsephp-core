@@ -60,7 +60,7 @@ class UserResource extends Resource implements HasShieldPermissions
                 })
                 ->multiple()
                 ->preload()
-                ->searchable()
+                ->searchable(),
         ]);
     }
 
