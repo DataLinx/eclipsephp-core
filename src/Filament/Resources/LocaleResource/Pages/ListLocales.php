@@ -13,7 +13,7 @@ class ListLocales extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make()->label(__('core::locale.list.create')),
+            Actions\CreateAction::make()->label(__('eclipse::locale.list.create')),
         ];
     }
 }

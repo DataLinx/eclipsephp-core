@@ -14,7 +14,7 @@ class EclipseServiceProvider extends PackageServiceProvider
 {
     public function configurePackage(Package $package): void
     {
-        $package->name('core')
+        $package->name('eclipse')
             ->hasCommands([
                 ClearCommand::class,
                 DeployCommand::class,
