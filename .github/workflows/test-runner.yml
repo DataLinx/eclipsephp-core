@@ -63,9 +63,6 @@ jobs:
       - name: Install dependencies
         run: composer update --prefer-dist --no-progress --${{ matrix.dependency-version }}
 
-      - name: Publish configs
-        run: ./vendor/bin/testbench vendor:publish --tag=eclipse-config
-
       - name: Run test suite
         run: composer test -- --coverage-clover ./coverage.xml
 
