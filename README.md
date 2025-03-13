@@ -11,15 +11,18 @@
 
 ## About
 
-This is the core module for [Eclipse](https://github.com/DataLinx/eclipsephp-app), a PHP app built with Filament and the [TALL stack](https://tallstack.dev/).
+This is the core package for [Eclipse](https://github.com/DataLinx/eclipsephp-app), a PHP app built with Filament and the [TALL stack](https://tallstack.dev/).
 
-It's an opinionated package, containing all the core resources and other code, including our selection of Filament plugins as dependencies. It's included in all our Eclipse projects and it's purpose is to have as much code as possible, thus keeping the skeleton/app package as slim as possible to make maintenance of apps easy.
+It's an **opinionated package**, containing all the core resources and other code, including our selection of Filament plugins as dependencies. It's included in all our Eclipse projects and it's purpose is to have as much code as possible, thus keeping the skeleton/app package as slim as possible to make maintenance of apps easy.
 
-## Requirements
-See [Requirements](https://github.com/DataLinx/eclipsephp-app?tab=readme-ov-file#requirements) on the main Eclipse repository.
+Non-opinionated code will be separated into own Filament plugins or other support packages.
 
-## Getting started
-TODO
+### Out-of-the-box features
+* User management
+* Roles and permissions
+* Domain based multi-tenancy
+* Multi-language
+* Compatible with standard Laravel and Filament packages
 
 ## Documentation
 Read the documentation [here](docs/Documentation.md).
