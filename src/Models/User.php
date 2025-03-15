@@ -44,6 +44,8 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, HasMedia,
         'last_name',
         'email',
         'password',
+        'last_login_at',
+        'login_count',
     ];
 
     /**
@@ -66,6 +68,7 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, HasMedia,
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'last_login_at' => 'datetime',
         ];
     }
 
@@ -109,5 +112,19 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, HasMedia,
         static::saving(function (self $user) {
             $user->name = trim("$user->first_name $user->last_name");
         });
+
+        static::creating(function (self $user) {
+            if (is_null($user->login_count)) {
+                $user->login_count = 0;
+            }
+        });
+    }
+
+    // Add the following method to the User model: last_login_at & login_count features
+    public function updateLoginTracking()
+    {
+        $this->last_login_at = now();
+        $this->increment('login_count');
+        $this->save();
     }
 }

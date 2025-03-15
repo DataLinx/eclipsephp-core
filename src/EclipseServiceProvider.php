@@ -27,6 +27,9 @@ class EclipseServiceProvider extends PackageServiceProvider
                 'permission',
                 'telescope',
             ])
+            ->hasMigrations([
+                'add_login_tracking_to_users',
+            ])
             ->discoversMigrations()
             ->runsMigrations()
             ->hasTranslations();
