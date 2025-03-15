@@ -115,12 +115,6 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, HasMedia,
             $user->name = trim("$user->first_name $user->last_name");
         });
 
-        static::creating(function (self $user) {
-            if (is_null($user->login_count)) {
-                $user->login_count = 0;
-            }
-        });
-
         static::retrieved(function (self $user) {
             if ($user->trashed() && request()->routeIs('login')) {
                 throw new \Exception('This account has been deactivated.');
@@ -128,7 +122,11 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, HasMedia,
         });
     }
 
-    // Add the following method to the User model: last_login_at & login_count features
+    /**
+     * Update the user's last login timestamp and increment login count.
+     *
+     * @return void
+     */
     public function updateLoginTracking()
     {
         $this->last_login_at = now();
@@ -136,7 +134,12 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, HasMedia,
         $this->save();
     }
 
-    // Add the following method to the User model: delete method
+    /**
+     * Delete the user account, preventing self-deletion.
+     *
+     * @throws \Exception If the user attempts to delete their own account.
+     * @return bool|null
+     */
     public function delete()
     {
         if ($this->id === auth()->id()) {
