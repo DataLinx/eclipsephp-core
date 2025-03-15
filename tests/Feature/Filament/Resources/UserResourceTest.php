@@ -130,7 +130,11 @@ test('user can be deleted', function () {
         ->assertTableActionEnabled(DeleteAction::class, $user)
         ->callTableAction(DeleteAction::class, $user);
 
-    $this->assertModelMissing($user);
+    // $this->assertModelMissing($user);
+
+    // replaced the above line with the following because this properly checks that the user is soft deleted instead of completely removed from the database.
+
+    $this->assertSoftDeleted('users', ['id' => $user->id]);
 });
 
 test('authed user cannot delete himself', function () {

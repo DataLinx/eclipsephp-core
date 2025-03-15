@@ -32,6 +32,8 @@ class UserResource extends Resource implements HasShieldPermissions
 
     protected static ?string $recordTitleAttribute = 'first_name';
 
+    protected static bool $softDeletes = true;
+
     public static function form(Form $form): Form
     {
         return $form->schema([
@@ -86,6 +88,16 @@ class UserResource extends Resource implements HasShieldPermissions
                 ->searchable()
                 ->sortable()
                 ->toggleable(),
+            Tables\Columns\TextColumn::make('last_login_at')
+                ->label('Last login')
+                ->dateTime()
+                ->sortable()
+                ->toggleable(),
+            Tables\Columns\TextColumn::make('login_count')
+                ->label('Total Logins')
+                ->sortable()
+                ->numeric()
+                ->formatStateUsing(fn (?int $state) => $state ?? 0),
         ];
 
         if (config('eclipse.email_verification')) {
@@ -145,7 +157,14 @@ class UserResource extends Resource implements HasShieldPermissions
                         ->label('Last name'),
                     TextConstraint::make('name')
                         ->label('Full name'),
+                    TextConstraint::make('last_login_at')
+                        ->label('Last login Date'),
+                    TextConstraint::make('login_count')
+                        ->label('Total Logins'),
                 ]),
+
+                // added trash filter
+                Tables\Filters\TrashedFilter::make()
         ];
 
         return $table
@@ -155,7 +174,14 @@ class UserResource extends Resource implements HasShieldPermissions
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\ViewAction::make(),
                     Tables\Actions\EditAction::make(),
-                    Tables\Actions\DeleteAction::make()->disabled(fn (User $user) => $user->id === auth()->user()->id),
+                    Tables\Actions\DeleteAction::make()->disabled(fn (User $user) => $user->id === auth()->user()->id)
+                    ->visible(fn (User $user) => $user->id !== auth()->user()->id)
+                    ->authorize(fn () => auth()->user()->can('delete', User::class)) 
+                    ->requiresConfirmation(),
+                    Tables\Actions\RestoreAction::make()
+                    ->visible(fn (User $user) => $user->trashed())
+                    ->authorize(fn () => auth()->user()->can('restore', User::class))
+                    ->requiresConfirmation(),
                 ]),
             ])
             ->bulkActions([
