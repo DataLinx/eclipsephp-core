@@ -15,6 +15,7 @@ use Illuminate\Support\Collection;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\Permission\Traits\HasRoles;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * @property int $id
@@ -30,9 +31,10 @@ use Spatie\Permission\Traits\HasRoles;
  */
 class User extends Authenticatable implements FilamentUser, HasAvatar, HasMedia, HasTenants
 {
-    use HasFactory, HasRoles, InteractsWithMedia, Notifiable;
+    use HasFactory, HasRoles, InteractsWithMedia, Notifiable, SoftDeletes;
 
     protected $table = 'users';
+    protected $dates = ['deleted_at'];
 
     /**
      * The attributes that are mass assignable.
@@ -118,6 +120,12 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, HasMedia,
                 $user->login_count = 0;
             }
         });
+
+        static::retrieved(function (self $user) {
+            if ($user->trashed() && request()->routeIs('login')) {
+                throw new \Exception('This account has been deactivated.');
+            }
+        });
     }
 
     // Add the following method to the User model: last_login_at & login_count features
@@ -126,5 +134,15 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, HasMedia,
         $this->last_login_at = now();
         $this->increment('login_count');
         $this->save();
+    }
+
+    // Add the following method to the User model: delete method
+    public function delete()
+    {
+        if ($this->id === auth()->id()) {
+            throw new \Exception('You cannot delete your own account.');
+        }
+
+        return parent::delete();
     }
 }
