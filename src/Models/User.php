@@ -16,6 +16,7 @@ use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Permission\Exceptions\UnauthorizedException;
 
 /**
  * @property int $id
@@ -28,6 +29,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string|null $remember_token
  * @property string|null $created_at
  * @property string|null $updated_at
+ * @property string|null $deleted_at
  */
 class User extends Authenticatable implements FilamentUser, HasAvatar, HasMedia, HasTenants
 {
@@ -116,10 +118,10 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, HasMedia,
         });
 
         static::retrieved(function (self $user) {
-            if ($user->trashed() && request()->routeIs('login')) {
+            if ($user->trashed() && auth()->check() && request()->routeIs('login')) {
                 throw new \Exception('This account has been deactivated.');
             }
-        });
+        });        
     }
 
     /**
@@ -140,12 +142,29 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, HasMedia,
      * @throws \Exception If the user attempts to delete their own account.
      * @return bool|null
      */
-    public function delete()
+    public function delete(): ?bool
     {
-        if ($this->id === auth()->id()) {
+        $authUser = auth()->user();
+
+        if (!$authUser || !$authUser->hasAnyRole(['super-admin']) && !$authUser->hasPermissionTo('delete users')) {
+            throw new UnauthorizedException(403, 'You do not have permission to delete users.');
+        }
+
+        if ($this->id === $authUser->id) {
             throw new \Exception('You cannot delete your own account.');
         }
 
         return parent::delete();
+    }
+
+    public function restore(): bool
+    {
+        $authUser = auth()->user();
+
+        if (!$authUser || !$authUser->hasAnyRole(['super-admin']) && !$authUser->hasPermissionTo('restore users')) {
+            throw new UnauthorizedException(403, 'You do not have permission to restore users.');
+        }
+
+        return parent::restore();
     }
 }

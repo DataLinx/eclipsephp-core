@@ -32,7 +32,7 @@ class UserResource extends Resource implements HasShieldPermissions
 
     protected static ?string $recordTitleAttribute = 'first_name';
 
-    protected static bool $softDeletes = true;
+    protected static bool $softDelete = true;
 
     public static function form(Form $form): Form
     {
@@ -174,13 +174,13 @@ class UserResource extends Resource implements HasShieldPermissions
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\ViewAction::make(),
                     Tables\Actions\EditAction::make(),
-                    Tables\Actions\DeleteAction::make()->disabled(fn (User $user) => $user->id === auth()->user()->id)
-                    ->visible(fn (User $user) => $user->id !== auth()->user()->id)
-                    ->authorize(fn () => auth()->user()->can('delete', User::class)) 
+                    Tables\Actions\DeleteAction::make()
+                    ->authorize(fn () => auth()->user()?->hasPermissionTo('delete users'))
+                    ->visible(fn () => auth()->user()?->hasPermissionTo('delete users'))
                     ->requiresConfirmation(),
                     Tables\Actions\RestoreAction::make()
                     ->visible(fn (User $user) => $user->trashed())
-                    ->authorize(fn () => auth()->user()->can('restore', User::class))
+                    ->authorize(fn () => auth()->user()->can('restore users', User::class))
                     ->requiresConfirmation(),
                 ]),
             ])
@@ -293,6 +293,7 @@ class UserResource extends Resource implements HasShieldPermissions
             'update',
             'delete',
             'delete_any',
+            'restore',
         ];
     }
 }

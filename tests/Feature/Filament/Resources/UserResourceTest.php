@@ -7,11 +7,16 @@ use Eclipse\Core\Models\User;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Permission;
 
 use function Pest\Livewire\livewire;
 
 beforeEach(function () {
     $this->set_up_super_admin_and_tenant();
+
+    collect(['delete users', 'restore users'])->each(fn ($permission) => 
+        Permission::firstOrCreate(['name' => $permission, 'guard_name' => 'web'])
+    );
 });
 
 test('authorized access can be allowed', function () {
@@ -123,9 +128,16 @@ test('users can be searched', function () {
 });
 
 test('user can be deleted', function () {
-    $user = User::factory()->create();
+    $this->set_up_super_admin_and_tenant();
 
+    $admin = auth()->user();
+
+    $admin->syncPermissions(['delete users']);
+
+    $user = User::factory()->create();
+    
     livewire(ListUsers::class)
+        ->assertSuccessful()
         ->assertTableActionExists(DeleteAction::class)
         ->assertTableActionEnabled(DeleteAction::class, $user)
         ->callTableAction(DeleteAction::class, $user);
