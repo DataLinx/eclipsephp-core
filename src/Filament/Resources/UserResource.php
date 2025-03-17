@@ -170,7 +170,7 @@ class UserResource extends Resource implements HasShieldPermissions
                     Tables\Actions\ViewAction::make(),
                     Tables\Actions\EditAction::make(),
                     Tables\Actions\DeleteAction::make()
-                    ->disabled(fn (User $user) => $user->id === auth()->user()->id),
+                        ->disabled(fn (User $user) => $user->id === auth()->user()->id),
                 ]),
             ])
             ->bulkActions([
