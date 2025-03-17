@@ -5,10 +5,11 @@ namespace Eclipse\Core;
 use Eclipse\Core\Console\Commands\ClearCommand;
 use Eclipse\Core\Console\Commands\DeployCommand;
 use Eclipse\Core\Console\Commands\PostComposerUpdate;
+use Eclipse\Core\Models\User;
 use Eclipse\Core\Providers\AdminPanelProvider;
 use Eclipse\Core\Providers\TelescopeServiceProvider;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Auth\Events\Login;
+use Illuminate\Support\Facades\Event;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
@@ -40,6 +41,12 @@ class EclipseServiceProvider extends PackageServiceProvider
 
         require_once __DIR__.'/Helpers/helpers.php';
 
+        Event::listen(Login::class, function ($event) {
+            if ($event->user instanceof User) {
+                $event->user->updateLoginTracking();
+            }
+        });
+        
         $this->app->register(AdminPanelProvider::class);
 
         if ($this->app->environment('local')) {

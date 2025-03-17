@@ -86,6 +86,16 @@ class UserResource extends Resource implements HasShieldPermissions
                 ->searchable()
                 ->sortable()
                 ->toggleable(),
+            Tables\Columns\TextColumn::make('last_login_at')
+                ->label('Last login')
+                ->dateTime()
+                ->sortable()
+                ->toggleable(),
+            Tables\Columns\TextColumn::make('login_count')
+                ->label('Total Logins')
+                ->sortable()
+                ->numeric()
+                ->formatStateUsing(fn (?int $state) => $state ?? 0),
         ];
 
         if (config('eclipse.email_verification')) {
@@ -145,6 +155,10 @@ class UserResource extends Resource implements HasShieldPermissions
                         ->label('Last name'),
                     TextConstraint::make('name')
                         ->label('Full name'),
+                    TextConstraint::make('last_login_at')
+                        ->label('Last login Date'),
+                    TextConstraint::make('login_count')
+                        ->label('Total Logins'),
                 ]),
         ];
 
@@ -155,7 +169,8 @@ class UserResource extends Resource implements HasShieldPermissions
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\ViewAction::make(),
                     Tables\Actions\EditAction::make(),
-                    Tables\Actions\DeleteAction::make()->disabled(fn (User $user) => $user->id === auth()->user()->id),
+                    Tables\Actions\DeleteAction::make()
+                    ->disabled(fn (User $user) => $user->id === auth()->user()->id),
                 ]),
             ])
             ->bulkActions([
