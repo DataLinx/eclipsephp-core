@@ -175,13 +175,11 @@ class UserResource extends Resource implements HasShieldPermissions
                     Tables\Actions\ViewAction::make(),
                     Tables\Actions\EditAction::make(),
                     Tables\Actions\DeleteAction::make()
-                    ->authorize(fn () => auth()->user()?->hasPermissionTo('delete users'))
-                    ->visible(fn () => auth()->user()?->hasPermissionTo('delete users'))
-                    ->requiresConfirmation(),
+                        ->authorize(fn (User $record) => auth()->user()->can('delete_user') && auth()->id() !== $record->id)
+                        ->requiresConfirmation(),
                     Tables\Actions\RestoreAction::make()
-                    ->visible(fn (User $user) => $user->trashed())
-                    ->authorize(fn () => auth()->user()->can('restore users', User::class))
-                    ->requiresConfirmation(),
+                        ->visible(fn (User $user) => $user->trashed() && auth()->user()->can('restore_user'))
+                        ->requiresConfirmation(),
                 ]),
             ])
             ->bulkActions([
@@ -294,6 +292,9 @@ class UserResource extends Resource implements HasShieldPermissions
             'delete',
             'delete_any',
             'restore',
+            'restore_any',
+            'force_delete',
+            'force_delete_any',
         ];
     }
 }
