@@ -7,6 +7,8 @@ use Eclipse\Core\Console\Commands\DeployCommand;
 use Eclipse\Core\Console\Commands\PostComposerUpdate;
 use Eclipse\Core\Providers\AdminPanelProvider;
 use Eclipse\Core\Providers\TelescopeServiceProvider;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
@@ -32,7 +34,7 @@ class EclipseServiceProvider extends PackageServiceProvider
             ->hasTranslations();
     }
 
-    public function register()
+    public function register(): self
     {
         parent::register();
 
@@ -40,11 +42,22 @@ class EclipseServiceProvider extends PackageServiceProvider
 
         $this->app->register(AdminPanelProvider::class);
 
-        if ($this->app->environment('local') && class_exists(\Laravel\Telescope\TelescopeServiceProvider::class)) {
+        if ($this->app->environment('local')) {
             $this->app->register(\Laravel\Telescope\TelescopeServiceProvider::class);
             $this->app->register(TelescopeServiceProvider::class);
         }
 
         return $this;
+    }
+
+    public function boot(): void
+    {
+        parent::boot();
+
+        // Enable Model strictness when not in production
+        Model::shouldBeStrict(! app()->isProduction());
+
+        // Do not allow destructive DB commands in production
+        DB::prohibitDestructiveCommands(app()->isProduction());
     }
 }
