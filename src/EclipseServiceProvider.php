@@ -9,6 +9,8 @@ use Eclipse\Core\Models\User;
 use Eclipse\Core\Providers\AdminPanelProvider;
 use Eclipse\Core\Providers\TelescopeServiceProvider;
 use Illuminate\Auth\Events\Login;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
