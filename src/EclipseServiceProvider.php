@@ -35,7 +35,7 @@ class EclipseServiceProvider extends PackageServiceProvider
             ->hasTranslations();
     }
 
-    public function register()
+    public function register(): self
     {
         parent::register();
 
@@ -49,11 +49,22 @@ class EclipseServiceProvider extends PackageServiceProvider
         
         $this->app->register(AdminPanelProvider::class);
 
-        if ($this->app->environment('local') && class_exists(\Laravel\Telescope\TelescopeServiceProvider::class)) {
+        if ($this->app->environment('local')) {
             $this->app->register(\Laravel\Telescope\TelescopeServiceProvider::class);
             $this->app->register(TelescopeServiceProvider::class);
         }
 
         return $this;
+    }
+
+    public function boot(): void
+    {
+        parent::boot();
+
+        // Enable Model strictness when not in production
+        Model::shouldBeStrict(! app()->isProduction());
+
+        // Do not allow destructive DB commands in production
+        DB::prohibitDestructiveCommands(app()->isProduction());
     }
 }
