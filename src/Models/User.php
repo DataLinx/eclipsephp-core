@@ -155,4 +155,16 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, HasMedia,
     {
         return parent::restore();
     }
+
+    /**
+     * Update the user's last login timestamp and increment login count.
+     *
+     * @return void
+     */
+    public function updateLoginTracking()
+    {
+        $this->last_login_at = now();
+        $this->increment('login_count');
+        $this->save();
+    }
 }
