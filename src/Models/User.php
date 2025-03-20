@@ -144,13 +144,7 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, HasMedia,
      */
     public function delete(): ?bool
     {
-        $authUser = auth()->user();
-
-        if (!$authUser || !$authUser->hasAnyRole(['super-admin']) && !$authUser->hasPermissionTo('delete users')) {
-            throw new UnauthorizedException(403, 'You do not have permission to delete users.');
-        }
-
-        if ($this->id === $authUser->id) {
+        if ($this->id === auth()->id()) {
             throw new \Exception('You cannot delete your own account.');
         }
 
@@ -159,12 +153,18 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, HasMedia,
 
     public function restore(): bool
     {
-        $authUser = auth()->user();
-
-        if (!$authUser || !$authUser->hasAnyRole(['super-admin']) && !$authUser->hasPermissionTo('restore users')) {
-            throw new UnauthorizedException(403, 'You do not have permission to restore users.');
-        }
-
         return parent::restore();
+    }
+
+    /**
+     * Update the user's last login timestamp and increment login count.
+     *
+     * @return void
+     */
+    public function updateLoginTracking()
+    {
+        $this->last_login_at = now();
+        $this->increment('login_count');
+        $this->save();
     }
 }

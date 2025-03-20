@@ -14,9 +14,11 @@ use function Pest\Livewire\livewire;
 beforeEach(function () {
     $this->set_up_super_admin_and_tenant();
 
-    collect(['delete users', 'restore users'])->each(fn ($permission) => 
+    collect(['delete_user', 'restore_user'])->each(fn ($permission) => 
         Permission::firstOrCreate(['name' => $permission, 'guard_name' => 'web'])
     );
+
+    auth()->user()->syncPermissions(['delete_user', 'restore_user']);
 });
 
 test('authorized access can be allowed', function () {
@@ -132,7 +134,7 @@ test('user can be deleted', function () {
 
     $admin = auth()->user();
 
-    $admin->syncPermissions(['delete users']);
+    $admin->syncPermissions(['delete_user']);
 
     $user = User::factory()->create();
     
@@ -141,10 +143,6 @@ test('user can be deleted', function () {
         ->assertTableActionExists(DeleteAction::class)
         ->assertTableActionEnabled(DeleteAction::class, $user)
         ->callTableAction(DeleteAction::class, $user);
-
-    // $this->assertModelMissing($user);
-
-    // replaced the above line with the following because this properly checks that the user is soft deleted instead of completely removed from the database.
 
     $this->assertSoftDeleted('users', ['id' => $user->id]);
 });
