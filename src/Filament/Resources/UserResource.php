@@ -179,7 +179,7 @@ class UserResource extends Resource implements HasShieldPermissions
                         ->requiresConfirmation(),
                     Tables\Actions\RestoreAction::make()
                         ->visible(fn (User $user) => $user->trashed() && auth()->user()->can('restore_user'))
-                        ->requiresConfirmation(),
+                        ->requiresConfirmation()
                         ->disabled(fn (User $user) => $user->id === auth()->user()->id),
                 ]),
             ])
