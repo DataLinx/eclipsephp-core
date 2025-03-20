@@ -16,7 +16,6 @@ use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Spatie\Permission\Exceptions\UnauthorizedException;
 
 /**
  * @property int $id

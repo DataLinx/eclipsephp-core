@@ -13,12 +13,6 @@ use function Pest\Livewire\livewire;
 
 beforeEach(function () {
     $this->set_up_super_admin_and_tenant();
-
-    collect(['delete_user', 'restore_user'])->each(fn ($permission) => 
-        Permission::firstOrCreate(['name' => $permission, 'guard_name' => 'web'])
-    );
-
-    auth()->user()->syncPermissions(['delete_user', 'restore_user']);
 });
 
 test('authorized access can be allowed', function () {
@@ -130,12 +124,6 @@ test('users can be searched', function () {
 });
 
 test('user can be deleted', function () {
-    $this->set_up_super_admin_and_tenant();
-
-    $admin = auth()->user();
-
-    $admin->syncPermissions(['delete_user']);
-
     $user = User::factory()->create();
     
     livewire(ListUsers::class)
@@ -148,13 +136,14 @@ test('user can be deleted', function () {
 });
 
 test('authed user cannot delete himself', function () {
+    $superAdmin = User::withTrashed()->find($this->superAdmin->id);
 
     // Assert on table row action
     livewire(ListUsers::class)
-        ->assertTableActionDisabled(DeleteAction::class, $this->superAdmin);
+        ->assertTableActionDisabled(DeleteAction::class, $superAdmin);
 
     // Assert on bulk delete
-    $users = User::all();
+    $users = User::all();   
 
     livewire(ListUsers::class)
         ->callTableBulkAction(DeleteBulkAction::class, $users)

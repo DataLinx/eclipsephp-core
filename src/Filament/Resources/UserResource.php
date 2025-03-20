@@ -20,6 +20,7 @@ use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Tables\Filters\QueryBuilder\Constraints\TextConstraint;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Hash;
 
 class UserResource extends Resource implements HasShieldPermissions
@@ -31,8 +32,6 @@ class UserResource extends Resource implements HasShieldPermissions
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
     protected static ?string $recordTitleAttribute = 'first_name';
-
-    protected static bool $softDelete = true;
 
     public static function form(Form $form): Form
     {
@@ -162,9 +161,7 @@ class UserResource extends Resource implements HasShieldPermissions
                     TextConstraint::make('login_count')
                         ->label('Total Logins'),
                 ]),
-
-                // added trash filter
-                Tables\Filters\TrashedFilter::make()
+            Tables\Filters\TrashedFilter::make()
         ];
 
         return $table
@@ -175,12 +172,11 @@ class UserResource extends Resource implements HasShieldPermissions
                     Tables\Actions\ViewAction::make(),
                     Tables\Actions\EditAction::make(),
                     Tables\Actions\DeleteAction::make()
-                        ->authorize(fn (User $record) => auth()->user()->can('delete_user') && auth()->id() !== $record->id)
-                        ->requiresConfirmation(),
+                    ->authorize(fn (User $record) => auth()->user()->can('delete_user') && auth()->id() !== $record->id)
+                    ->requiresConfirmation(),
                     Tables\Actions\RestoreAction::make()
-                        ->visible(fn (User $user) => $user->trashed() && auth()->user()->can('restore_user'))
-                        ->requiresConfirmation()
-                        ->disabled(fn (User $user) => $user->id === auth()->user()->id),
+                    ->visible(fn (User $user) => $user->trashed() && auth()->user()->can('restore_user'))
+                    ->requiresConfirmation(),  
                 ]),
             ])
             ->bulkActions([
@@ -281,6 +277,14 @@ class UserResource extends Resource implements HasShieldPermissions
             'last_name',
             'email',
         ];
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->withoutGlobalScopes([
+                SoftDeletingScope::class,
+            ]);
     }
 
     public static function getPermissionPrefixes(): array
