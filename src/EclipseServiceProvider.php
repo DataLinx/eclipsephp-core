@@ -48,7 +48,7 @@ class EclipseServiceProvider extends PackageServiceProvider
                 $event->user->updateLoginTracking();
             }
         });
-      
+
         $this->app->register(AdminPanelProvider::class);
 
         if ($this->app->environment('local')) {

@@ -1,10 +1,10 @@
 <?php
 
 use Eclipse\Core\Models\User;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Auth\Access\AuthorizationException;
 
 uses(RefreshDatabase::class);
 
@@ -79,13 +79,13 @@ test('non-authorized user cannot restore another user', function () {
 test('trashed user cannot login', function () {
     $userToTrash = User::factory()->create([
         'email' => 'trashed@example.com',
-        'password' => bcrypt('password')
+        'password' => bcrypt('password'),
     ]);
     $userToTrash->delete();
     Auth::logout();
     $attempt = Auth::attempt([
         'email' => 'trashed@example.com',
-        'password' => 'password'
+        'password' => 'password',
     ]);
     $this->assertFalse($attempt);
 });
@@ -124,7 +124,7 @@ test('can view trashed users when user has permissions', function () {
 test('filament resource can handle trashed users', function () {
     $userToTrash = User::factory()->create([
         'name' => 'Trashed User',
-        'email' => 'trashed@example.com'
+        'email' => 'trashed@example.com',
     ]);
     $userToTrash->delete();
     Auth::login($this->superAdmin);

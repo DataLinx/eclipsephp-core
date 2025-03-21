@@ -161,7 +161,7 @@ class UserResource extends Resource implements HasShieldPermissions
                     TextConstraint::make('login_count')
                         ->label('Total Logins'),
                 ]),
-            Tables\Filters\TrashedFilter::make()
+            Tables\Filters\TrashedFilter::make(),
         ];
 
         return $table
@@ -172,11 +172,11 @@ class UserResource extends Resource implements HasShieldPermissions
                     Tables\Actions\ViewAction::make(),
                     Tables\Actions\EditAction::make(),
                     Tables\Actions\DeleteAction::make()
-                    ->authorize(fn (User $record) => auth()->user()->can('delete_user') && auth()->id() !== $record->id)
-                    ->requiresConfirmation(),
+                        ->authorize(fn (User $record) => auth()->user()->can('delete_user') && auth()->id() !== $record->id)
+                        ->requiresConfirmation(),
                     Tables\Actions\RestoreAction::make()
-                    ->visible(fn (User $user) => $user->trashed() && auth()->user()->can('restore_user'))
-                    ->requiresConfirmation(),  
+                        ->visible(fn (User $user) => $user->trashed() && auth()->user()->can('restore_user'))
+                        ->requiresConfirmation(),
                 ]),
             ])
             ->bulkActions([
