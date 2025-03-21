@@ -44,9 +44,13 @@ class UserPolicy
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user): bool
+    public function delete(User $authenticatedUser, User $user): bool
     {
-        return $user->can('delete_user');
+        if ($authenticatedUser->id === $user->id) {
+            return false;
+        }
+
+        return $authenticatedUser->can('delete_user');
     }
 
     /**
@@ -55,5 +59,37 @@ class UserPolicy
     public function deleteAny(User $user): bool
     {
         return $user->can('delete_any_user');
+    }
+
+    /**
+     * Determine whether the user can restore the model.
+     */
+    public function restore(User $user): bool
+    {
+        return $user->can('restore_user');
+    }
+
+    /**
+     * Determine whether the user can bulk restore.
+     */
+    public function restoreAny(User $user): bool
+    {
+        return $user->can('restore_any_user');
+    }
+
+    /**
+     * Determine whether the user can permanently delete the model.
+     */
+    public function forceDelete(User $user): bool
+    {
+        return $user->can('force_delete_user');
+    }
+
+    /**
+     * Determine whether the user can permanently bulk delete.
+     */
+    public function forceDeleteAny(User $user): bool
+    {
+        return $user->can('force_delete_any_user');
     }
 }

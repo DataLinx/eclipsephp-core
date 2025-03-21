@@ -7,6 +7,7 @@ use Eclipse\Core\Models\User;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Permission;
 
 use function Pest\Livewire\livewire;
 
@@ -124,23 +125,25 @@ test('users can be searched', function () {
 
 test('user can be deleted', function () {
     $user = User::factory()->create();
-
+    
     livewire(ListUsers::class)
+        ->assertSuccessful()
         ->assertTableActionExists(DeleteAction::class)
         ->assertTableActionEnabled(DeleteAction::class, $user)
         ->callTableAction(DeleteAction::class, $user);
 
-    $this->assertModelMissing($user);
+    $this->assertSoftDeleted('users', ['id' => $user->id]);
 });
 
 test('authed user cannot delete himself', function () {
+    $superAdmin = User::withTrashed()->find($this->superAdmin->id);
 
     // Assert on table row action
     livewire(ListUsers::class)
-        ->assertTableActionDisabled(DeleteAction::class, $this->superAdmin);
+        ->assertTableActionDisabled(DeleteAction::class, $superAdmin);
 
     // Assert on bulk delete
-    $users = User::all();
+    $users = User::all();   
 
     livewire(ListUsers::class)
         ->callTableBulkAction(DeleteBulkAction::class, $users)

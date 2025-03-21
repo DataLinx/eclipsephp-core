@@ -15,6 +15,7 @@ use Illuminate\Support\Collection;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\Permission\Traits\HasRoles;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * @property int $id
@@ -27,12 +28,14 @@ use Spatie\Permission\Traits\HasRoles;
  * @property string|null $remember_token
  * @property string|null $created_at
  * @property string|null $updated_at
+ * @property string|null $deleted_at
  */
 class User extends Authenticatable implements FilamentUser, HasAvatar, HasMedia, HasTenants
 {
-    use HasFactory, HasRoles, InteractsWithMedia, Notifiable;
+    use HasFactory, HasRoles, InteractsWithMedia, Notifiable, SoftDeletes;
 
     protected $table = 'users';
+    protected $dates = ['deleted_at'];
 
     /**
      * The attributes that are mass assignable.
@@ -112,6 +115,12 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, HasMedia,
         static::saving(function (self $user) {
             $user->name = trim("$user->first_name $user->last_name");
         });
+
+        static::retrieved(function (self $user) {
+            if ($user->trashed() && auth()->check() && request()->routeIs('login')) {
+                throw new \Exception('This account has been deactivated.');
+            }
+        });        
     }
 
     /**
@@ -124,5 +133,20 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, HasMedia,
         $this->last_login_at = now();
         $this->increment('login_count');
         $this->save();
+    }
+
+    /**
+     * Delete the user account, preventing self-deletion.
+     *
+     * @throws \Exception If the user attempts to delete their own account.
+     * @return bool|null
+     */
+    public function delete(): ?bool
+    {
+        if ($this->id === auth()->id()) {
+            throw new \Exception('You cannot delete your own account.');
+        }
+
+        return parent::delete();
     }
 }

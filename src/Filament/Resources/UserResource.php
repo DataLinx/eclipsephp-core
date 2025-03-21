@@ -20,6 +20,7 @@ use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Tables\Filters\QueryBuilder\Constraints\TextConstraint;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Hash;
 
 class UserResource extends Resource implements HasShieldPermissions
@@ -160,6 +161,7 @@ class UserResource extends Resource implements HasShieldPermissions
                     TextConstraint::make('login_count')
                         ->label('Total Logins'),
                 ]),
+            Tables\Filters\TrashedFilter::make()
         ];
 
         return $table
@@ -170,7 +172,11 @@ class UserResource extends Resource implements HasShieldPermissions
                     Tables\Actions\ViewAction::make(),
                     Tables\Actions\EditAction::make(),
                     Tables\Actions\DeleteAction::make()
-                        ->disabled(fn (User $user) => $user->id === auth()->user()->id),
+                    ->authorize(fn (User $record) => auth()->user()->can('delete_user') && auth()->id() !== $record->id)
+                    ->requiresConfirmation(),
+                    Tables\Actions\RestoreAction::make()
+                    ->visible(fn (User $user) => $user->trashed() && auth()->user()->can('restore_user'))
+                    ->requiresConfirmation(),  
                 ]),
             ])
             ->bulkActions([
@@ -273,6 +279,14 @@ class UserResource extends Resource implements HasShieldPermissions
         ];
     }
 
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->withoutGlobalScopes([
+                SoftDeletingScope::class,
+            ]);
+    }
+
     public static function getPermissionPrefixes(): array
     {
         return [
@@ -282,6 +296,10 @@ class UserResource extends Resource implements HasShieldPermissions
             'update',
             'delete',
             'delete_any',
+            'restore',
+            'restore_any',
+            'force_delete',
+            'force_delete_any',
         ];
     }
 }
