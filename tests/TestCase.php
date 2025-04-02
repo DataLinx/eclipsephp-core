@@ -14,6 +14,8 @@ abstract class TestCase extends BaseTestCase
 
     protected ?User $superAdmin = null;
 
+    protected ?User $user = null;
+
     protected function setUp(): void
     {
         // Always show errors when testing
@@ -57,6 +59,23 @@ abstract class TestCase extends BaseTestCase
         $this->superAdmin->sites()->attach($site);
 
         $this->actingAs($this->superAdmin);
+
+        Filament::setTenant($site);
+
+        return $this;
+    }
+
+    /**
+     * Set up a common user with no roles or permissions
+     */
+    protected function set_up_common_user_and_tenant(): self
+    {
+        $site = Site::first();
+
+        $this->user = User::factory()->create();
+        $this->user->sites()->attach($site);
+
+        $this->actingAs($this->user);
 
         Filament::setTenant($site);
 
