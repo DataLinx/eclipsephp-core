@@ -5,23 +5,27 @@ Docs will be restructured when things get implemented.
 
 <!-- TOC -->
 * [Introduction](#introduction)
-  * [System requirements](#system-requirements)
+  * [💻 System requirements](#-system-requirements)
     * [Server](#server)
     * [Development](#development)
-  * [Getting started](#getting-started)
-* [Plugin development](#plugin-development)
-  * [Setting up](#setting-up)
-  * [Running tests](#running-tests)
-  * [Debugging](#debugging)
+  * [🛟 Getting started](#-getting-started)
+* [🔌 Plugin development](#-plugin-development)
+  * [⚙️ Setting up](#-setting-up)
+  * [▶️ Running tests](#-running-tests)
+    * [Console](#console)
+    * [PhpStorm](#phpstorm)
+    * [Testing with multiple PHP versions](#testing-with-multiple-php-versions)
+  * [🪲 Debugging](#-debugging)
+    * [Xdebug in PhpStorm](#xdebug-in-phpstorm)
     * [Laravel Telescope](#laravel-telescope)
-* [Core concepts](#core-concepts)
-  * [Users](#users)
+* [📑 Core concepts](#-core-concepts)
+  * [🙋‍♂️ Users](#-users)
     * [Authorization](#authorization)
 <!-- TOC -->
 
 # Introduction
 
-## System requirements
+## 💻 System requirements
 
 ### Server
 * PHP >= 8.3
@@ -42,7 +46,7 @@ However, if you want to create a new project via composer (recommended), you nee
 All other system requirements are automatically included by the Lando instance.
 Node.js and npm are provided in the lando container.
 
-## Getting started
+## 🛟 Getting started
 1. Create a new project with composer:
     ```shell
     composer create-project eclipsephp/app myprojectname -s dev
@@ -60,14 +64,14 @@ That's it! Open the provided link and the public page should be shown. Add `/adm
 
 By doing these few steps you now have a functional Filament app with our Eclipse core package.
 
-# Plugin development
+# 🔌 Plugin development
 Unfortunately, plugin development is not yet fully self-contained, meaning you need the app skeleton, where you will add the plugin you want to develop as a dependency that is symlinked from a local folder.  
 However, this is needed only if you want to manually test the plugin in the app (in your browser), since running the tests uses a default Testbench Laravel skeleton.
 
 🔶 **Please note**: the core package is in fact not a Filament plugin, but nevertheless everything for plugin development also applies for core development.  
 
-## Setting up
-1. Follow the above [Getting started](Documentation.md#getting-started) section to set up an app skeleton.
+## ⚙️ Setting up
+1. Follow the above [Getting started](Documentation.md#-getting-started) section to set up an app skeleton.
 2. Then, `git clone` the plugin you want to work on to a local folder inside the app, e.g. `packages/my-package`.
 3. Add the local folder as a repository in the app's `composer.json`, e.g.:
     ```
@@ -80,7 +84,9 @@ However, this is needed only if you want to manually test the plugin in the app 
     ```
 4. Run `composer update` to create the symlink.
 
-## Running tests
+## ▶️ Running tests
+
+### Console
 You can run the tests inside the package with
 ```shell
   lando test
@@ -97,7 +103,35 @@ This is just a proxy to the testbench `package:test` command.
 ```
 The reason for this is that these config files include other vendor configs that are already pre-configured the way we want them to be (i.e. multi-tenancy). All other plugins do not have this requirement — they must be built to fit any configuration.
 
-## Debugging
+💡 If you ever get an error stating your app encryption key is not set, it means the Testbench skeleton is not set up. Run `composer setup` and everything needed will be set up. 
+
+### PhpStorm
+See our [Testing with PhpStorm](https://github.com/DataLinx/php-package-template/blob/main/docs/Testing%20with%20PhpStorm.md) guide to set up testing in PhpStorm.
+
+⚠️ Please note: if you run tests in PhpStorm, the Pest cache in the `vendor/pestphp/pest/.temp` dir is created with your root user for some reason. It's not a problem, until you want to run tests in the console. If you want to switch to testing in the console, you have to delete the created directories inside the `.temp` dir.
+If you know how to fix this, please open a discussion or better yet, submit a pull request.
+
+### Testing with multiple PHP versions
+See our [Running tests for a specific PHP version with Lando](https://github.com/DataLinx/php-package-template/blob/main/docs/Running%20tests%20for%20a%20specific%20PHP%20version.md#running-tests-for-a-specific-php-version-with-lando) guide.
+
+Apart from that, make sure that your alternative `composer.json`: 
+* has a `name` attribute
+* includes the package service provider in `extra.laravel`
+* includes the same `autoload` and `autoload-dev` lines  
+
+... since these cannot be merged from the main `composer.json`.
+
+Also, when testing inside the alternative Lando env, for some reason, you must use the long form `composer run-script test` instead of just `composer test`, like in the project root.
+
+## 🪲 Debugging
+
+### Xdebug in PhpStorm
+If you follow the guide above on how to set up testing in PhpStorm, you are all set to debug while running tests. Just set breakpoints in code and run the test.
+
+<!--
+### Xdebug through the browser
+TODO
+-->
 
 ### Laravel Telescope
 Telescope is already installed with the core package and ready to use in the development environment.
@@ -105,11 +139,11 @@ To enable it, just set the `TELESCOPE_ENABLED` variable in your `.env` file to `
 
 To use the dark theme also set the `TELESCOPE_DARK_THEME`.
 
-# Core concepts
+# 📑 Core concepts
 
 The following section explains the core concepts and applies to both app and plugin development.
 
-## Users
+## 🙋‍♂️ Users
 
 ### Authorization
 For user authorization purposes, we use the [spatie/laravel-permission](https://spatie.be/docs/laravel-permission/v6) package and the [Filament Shield plugin](https://filamentphp.com/plugins/bezhansalleh-shield).
