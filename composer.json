@@ -44,6 +44,7 @@
         "cactus-galaxy/filament-astrotomic": "^0.3.0",
         "datalinx/php-utils": "^2.5",
         "dutchcodingcompany/filament-developer-logins": "^1.6",
+        "eclipsephp/world-plugin": "dev-main",
         "filament/filament": "^3.2.126",
         "filament/spatie-laravel-media-library-plugin": "^3.2",
         "laravel/telescope": "^5.5",

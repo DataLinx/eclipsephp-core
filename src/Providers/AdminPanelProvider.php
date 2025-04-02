@@ -17,6 +17,7 @@ use Eclipse\Core\Models\User;
 use Eclipse\Core\Models\User\Permission;
 use Eclipse\Core\Models\User\Role;
 use Eclipse\Core\Policies\User\RolePolicy;
+use Eclipse\World\EclipseWorld;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
@@ -69,6 +70,8 @@ class AdminPanelProvider extends PanelProvider
             ->discoverResources(in: $package_src.'Filament/Resources', for: 'Eclipse\\Core\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->discoverPages(in: $package_src.'Filament/Pages', for: 'Eclipse\\Core\\Filament\\Pages')
+            ->discoverClusters(in: app_path('Filament/Clusters'), for: 'App\\Filament\\Clusters')
+            ->discoverClusters(in: $package_src.'Filament/Clusters', for: 'Eclipse\\Core\\Filament\\Clusters')
             ->pages([
                 Pages\Dashboard::class,
             ])
@@ -113,6 +116,7 @@ class AdminPanelProvider extends PanelProvider
                     ->modelClass(User::class)
                     ->users(config('eclipse.developer_logins') ?: []),
                 FilamentAstrotomicTranslatablePlugin::make(),
+                EclipseWorld::make(),
             ])
             ->navigationGroups([
                 NavigationGroup::make('Users'),
