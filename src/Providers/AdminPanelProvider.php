@@ -130,6 +130,13 @@ class AdminPanelProvider extends PanelProvider
                     ->group('Tools')
                     ->sort(1000)
                     ->hidden(fn (): bool => ! config('telescope.enabled', false)),
+                NavigationItem::make('Horizon')
+                    ->url('/horizon', shouldOpenInNewTab: true)
+                    ->icon('heroicon-s-arrow-top-right-on-square')
+                    ->group('Tools')
+                    ->sort(1001)
+                    // Always visible for local env, otherwise the viewHorizon permission is required
+                    ->visible(fn (User $user): bool => app()->isLocal() || $user->can('viewHorizon')),
             ]);
     }
 

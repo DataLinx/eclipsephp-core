@@ -22,6 +22,10 @@ class DeployCommand extends Command
         // ------------------
         $this->call('filament:optimize');
 
+        // Terminate Horizon workers so that any code changes are received
+        // ------------------
+        $this->call('horizon:terminate');
+
         // ------------------
 
         $this->newLine();

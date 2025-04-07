@@ -7,6 +7,7 @@ use Eclipse\Core\Console\Commands\DeployCommand;
 use Eclipse\Core\Console\Commands\PostComposerUpdate;
 use Eclipse\Core\Models\User;
 use Eclipse\Core\Providers\AdminPanelProvider;
+use Eclipse\Core\Providers\HorizonServiceProvider;
 use Eclipse\Core\Providers\TelescopeServiceProvider;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Database\Eloquent\Model;
@@ -29,6 +30,7 @@ class EclipseServiceProvider extends PackageServiceProvider
                 'blade-heroicons',
                 'eclipse',
                 'filament-shield',
+                'horizon',
                 'permission',
                 'telescope',
             ])
@@ -55,6 +57,8 @@ class EclipseServiceProvider extends PackageServiceProvider
             $this->app->register(\Laravel\Telescope\TelescopeServiceProvider::class);
             $this->app->register(TelescopeServiceProvider::class);
         }
+
+        $this->app->register(HorizonServiceProvider::class);
 
         return $this;
     }

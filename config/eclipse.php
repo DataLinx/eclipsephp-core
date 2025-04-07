@@ -84,4 +84,19 @@ return [
         'dark_theme' => (bool) env('TELESCOPE_DARK_THEME', false),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Horizon package additional configuration
+    |--------------------------------------------------------------------------
+    */
+    'horizon' => [
+        /*
+         * List of email addresses of users that are allowed to view the Horizon
+         * panel in non-local environments
+         */
+        'emails' => [
+            //
+        ],
+    ],
+
 ];
