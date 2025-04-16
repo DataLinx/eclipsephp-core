@@ -4,8 +4,6 @@ use Eclipse\Core\Models\Locale;
 
 test('panel is set up correctly', function () {
 
-    $this->migrate();
-
     // Send a request to load the panel and middleware
     $this->get('/admin/login')->assertStatus(200);
 

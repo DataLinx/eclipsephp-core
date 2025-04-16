@@ -1,6 +1,7 @@
 <?php
 
 use Eclipse\Core\Database\Seeders\CoreSeeder;
+use Tests\TestCase;
 
 /*
 |--------------------------------------------------------------------------
@@ -13,15 +14,12 @@ use Eclipse\Core\Database\Seeders\CoreSeeder;
 |
 */
 
-pest()->extend(Tests\TestCase::class)
+uses(TestCase::class)
     ->use(Illuminate\Foundation\Testing\RefreshDatabase::class)
     ->beforeEach(function () {
         $this->seed(CoreSeeder::class);
     })
-    ->in('Feature');
-
-pest()->extend(Tests\TestCase::class)
-    ->in('Unit');
+    ->in(__DIR__);
 
 /*
 |--------------------------------------------------------------------------
@@ -34,9 +32,9 @@ pest()->extend(Tests\TestCase::class)
 |
 */
 
-expect()->extend('toBeOne', function () {
-    return $this->toBe(1);
-});
+// expect()->extend('toBeOne', function () {
+//    return $this->toBe(1);
+// });
 
 /*
 |--------------------------------------------------------------------------
@@ -49,7 +47,7 @@ expect()->extend('toBeOne', function () {
 |
 */
 
-function something()
-{
-    // ..
-}
+//function something()
+//{
+//    // ..
+//}

@@ -4,10 +4,6 @@ use Eclipse\Core\Models\Site;
 use Eclipse\Core\Models\User;
 use Filament\Facades\Filament;
 
-beforeEach(function () {
-    $this->migrate();
-});
-
 test('get filament avatar url', function () {
     $user = User::factory()->create();
 

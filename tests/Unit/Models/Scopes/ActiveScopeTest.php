@@ -5,8 +5,6 @@ use Eclipse\Core\Models\Scopes\ActiveScope;
 
 test('active scope works', function () {
 
-    $this->artisan('migrate');
-
     // Create Locale with is_active = 0
     Locale::factory()->create(['id' => 'xx', 'is_active' => 0]);
 

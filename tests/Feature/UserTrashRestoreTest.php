@@ -6,8 +6,6 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 
-uses(RefreshDatabase::class);
-
 beforeEach(function () {
     $this->set_up_super_admin_and_tenant();
 });

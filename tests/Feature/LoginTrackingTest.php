@@ -1,10 +1,7 @@
 <?php
 
 use Eclipse\Core\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Auth;
-
-uses(RefreshDatabase::class);
 
 test('new users have no login history', function () {
     $user = User::factory()->create();
