@@ -15,6 +15,7 @@
 /docs export-ignore
 /env export-ignore
 /tests export-ignore
+/workbench export-ignore
 
 /.editorconfig export-ignore
 /.gitattributes export-ignore
