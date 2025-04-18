@@ -137,7 +137,7 @@ class AdminPanelProvider extends PanelProvider
 
         // Add plugins from the plugin registry
         foreach (app(PluginRegistry::class)->getPlugins() as $plugin) {
-            $panel->plugin($plugin)->getPlugin();
+            $panel->plugin($plugin);
         }
 
         return $panel;
