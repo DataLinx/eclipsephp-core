@@ -4,8 +4,9 @@ namespace Eclipse\Core\Http\Middleware;
 
 use Closure;
 use Eclipse\Core\Models\Locale;
+use Filament\Facades\Filament;
+use Filament\SpatieLaravelTranslatablePlugin;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Config;
 use Symfony\Component\HttpFoundation\Response;
 
 class SetupPanel
@@ -17,8 +18,18 @@ class SetupPanel
      */
     public function handle(Request $request, Closure $next): Response
     {
-        // Set available languages for the Translatable package
-        Config::set('translatable.locales', Locale::getAvailableLocales()->pluck('id')->toArray());
+        $localeIds = Locale::getAvailableLocales()->pluck('id')->toArray();
+
+        $panel = Filament::getPanel();
+
+        if ($panel) {
+            // Set locales for the Translatable plugin
+            $panel
+                ->plugin(
+                    SpatieLaravelTranslatablePlugin::make()
+                        ->defaultLocales($localeIds)
+                );
+        }
 
         return $next($request);
     }
