@@ -8,7 +8,6 @@ use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use BezhanSalleh\FilamentShield\Middleware\SyncShieldTenant;
 use DutchCodingCompany\FilamentDeveloperLogins\FilamentDeveloperLoginsPlugin;
 use Eclipse\Core\Filament\Pages\EditProfile;
-use Eclipse\Core\Http\Middleware\SetupPanel;
 use Eclipse\Core\Models\Locale;
 use Eclipse\Core\Models\Site;
 use Eclipse\Core\Models\User;
@@ -26,6 +25,7 @@ use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Resources\Resource;
+use Filament\SpatieLaravelTranslatablePlugin;
 use Filament\Support\Colors\Color;
 use Filament\Support\Enums\MaxWidth;
 use Filament\Support\Enums\Platform;
@@ -41,6 +41,7 @@ use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use pxlrbt\FilamentEnvironmentIndicator\EnvironmentIndicatorPlugin;
 
@@ -49,6 +50,13 @@ class AdminPanelProvider extends PanelProvider
     public function panel(Panel $panel): Panel
     {
         $package_src = __DIR__.'/../../src/';
+
+        // Get locales if the table exists, otherwise fallback to the default locale (when database is not set up yet)
+        if (Schema::hasTable('locales')) {
+            $localeIds = Locale::getAvailableLocales()->pluck('id')->toArray();
+        } else {
+            $localeIds = [config('app.locale', 'en')];
+        }
 
         $panel
             ->default()
@@ -100,7 +108,6 @@ class AdminPanelProvider extends PanelProvider
                 SubstituteBindings::class,
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
-                SetupPanel::class,
             ])
             ->authMiddleware([
                 Authenticate::class,
@@ -113,6 +120,8 @@ class AdminPanelProvider extends PanelProvider
                     ->modelClass(User::class)
                     ->users(config('eclipse.developer_logins') ?: []),
                 EclipseWorld::make(),
+                SpatieLaravelTranslatablePlugin::make()
+                    ->defaultLocales($localeIds)
             ])
             ->navigationGroups([
                 NavigationGroup::make('Users'),
