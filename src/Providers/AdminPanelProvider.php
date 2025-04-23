@@ -123,7 +123,7 @@ class AdminPanelProvider extends PanelProvider
                     ->users(config('eclipse.developer_logins') ?: []),
                 EclipseWorld::make(),
                 SpatieLaravelTranslatablePlugin::make()
-                    ->defaultLocales($localeIds)
+                    ->defaultLocales($localeIds),
             ])
             ->navigationGroups([
                 NavigationGroup::make('Users'),
