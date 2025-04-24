@@ -7,10 +7,11 @@ use Eclipse\Core\Models\User;
 use Filament\Facades\Filament;
 use Orchestra\Testbench\Concerns\WithWorkbench;
 use Orchestra\Testbench\TestCase as BaseTestCase;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 abstract class TestCase extends BaseTestCase
 {
-    use WithWorkbench;
+    use WithWorkbench, RefreshDatabase;
 
     protected ?User $superAdmin = null;
 
@@ -21,6 +22,9 @@ abstract class TestCase extends BaseTestCase
         // Always show errors when testing
         ini_set('display_errors', 1);
         error_reporting(E_ALL);
+
+        // config()->set('database.default', 'sqlite');
+        // config()->set('database.connections.sqlite.database', database_path('testing.sqlite'));
 
         parent::setUp();
 

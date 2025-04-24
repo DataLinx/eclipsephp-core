@@ -16,13 +16,15 @@
     </source>
     <php>
         <server name="APP_ENV" value="testing"/>
+        <server name="APP_KEY" value="base64:QIj9Xow3vowLrZ9DpsziH6figQTF/Zyoz9ssW8M7DIs="/>
         <server name="BCRYPT_ROUNDS" value="4"/>
         <server name="CACHE_DRIVER" value="array"/>
         <server name="DB_CONNECTION" value="sqlite"/>
-        <server name="DB_DATABASE" value=":memory:"/>
+        <server name="DB_DATABASE" value="database/testing.sqlite"/>
         <server name="MAIL_MAILER" value="array"/>
         <server name="QUEUE_CONNECTION" value="sync"/>
         <server name="SESSION_DRIVER" value="array"/>
         <server name="TELESCOPE_ENABLED" value="false"/>
+        <server name="TELESCOPE_STORAGE_DATABASE_CONNECTION" value="sqlite"/>
     </php>
 </phpunit>
