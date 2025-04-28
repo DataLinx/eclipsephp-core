@@ -99,4 +99,13 @@ return [
         ],
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Additional tools to be displayed in the "Tools" menu of the admin panel
+    |--------------------------------------------------------------------------
+    */
+    'tools' => [
+        'phpmyadmin' => env('PHPMYADMIN_URL'),
+    ],
+
 ];

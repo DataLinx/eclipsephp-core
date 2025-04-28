@@ -141,7 +141,7 @@ class AdminPanelProvider extends PanelProvider
                     ->url('/horizon', shouldOpenInNewTab: true)
                     ->icon('heroicon-s-arrow-top-right-on-square')
                     ->group('Tools')
-                    ->sort(1001)
+                    ->sort(2000)
                     // Always visible for local env, otherwise the viewHorizon permission is required
                     ->visible(fn (User $user): bool => app()->isLocal() || $user->can('viewHorizon')),
             ]);
@@ -149,6 +149,16 @@ class AdminPanelProvider extends PanelProvider
         // Add plugins from the plugin registry
         foreach (app(PluginRegistry::class)->getPlugins() as $plugin) {
             $panel->plugin($plugin);
+        }
+
+        if (config('eclipse.tools.phpmyadmin')) {
+            $panel->navigationItems([
+                NavigationItem::make('phpMyAdmin')
+                    ->url(config('eclipse.tools.phpmyadmin'), shouldOpenInNewTab: true)
+                    ->icon('heroicon-s-arrow-top-right-on-square')
+                    ->group('Tools')
+                    ->sort(900),
+            ]);
         }
 
         return $panel;
