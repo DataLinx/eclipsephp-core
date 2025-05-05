@@ -22,7 +22,8 @@ class LocaleFactory extends Factory
     public function definition(): array
     {
         return [
-            'id' => fake()->languageCode(),
+            // For the id attribute, use a number to avoid clashes with real locales
+            'id' => fake()->numberBetween(10, 99),
             'name' => fake()->name(),
             'native_name' => fake()->text(50),
             'system_locale' => fake()->locale(),
