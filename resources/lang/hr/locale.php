@@ -14,13 +14,26 @@ return [
     'is_active' => 'Aktivan',
     'is_available_in_panel' => 'Upotreba',
 
+    'sections' => [
+        'basic' => 'Osnovni podaci',
+        'datetime_formats' => 'Formati datuma i vremena',
+    ],
+
     'nav' => [
         'item' => 'Jezici',
     ],
-    'list' => [
-        'create' => 'Kreiraj jezik',
-    ],
+
     'actions' => [
-        'edit' => 'Uredi',
+        'create' => [
+            'label' => 'Kreiraj jezik',
+            'heading' => 'Kreiraj jezik',
+        ],
+        'edit' => [
+            'label' => 'Uredi',
+            'heading' => 'Uredi jezik',
+        ],
+        'delete' => [
+            'heading' => 'Brisanje jezika',
+        ],
     ],
 ];

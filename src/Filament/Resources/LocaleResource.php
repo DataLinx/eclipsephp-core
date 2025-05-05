@@ -6,11 +6,14 @@ use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
 use Eclipse\Core\Filament\Resources;
 use Eclipse\Core\Models\Locale;
 use Eclipse\Core\Models\Scopes\ActiveScope;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Actions\ActionGroup;
+use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\HtmlString;
@@ -23,7 +26,7 @@ class LocaleResource extends Resource implements HasShieldPermissions
 
     public static function form(Form $form): Form
     {
-        $schema = [
+        $basic = [
             TextInput::make('id')
                 ->label(__('eclipse::locale.id'))
                 ->maxLength(2)
@@ -48,39 +51,40 @@ class LocaleResource extends Resource implements HasShieldPermissions
         if (! empty($locales)) {
             $options = explode("\n", trim($locales));
 
-            $schema[] = Select::make('system_locale')
+            $basic[] = Select::make('system_locale')
                 ->required()
                 ->options(array_combine($options, $options))
                 ->searchable()
                 ->label(__('eclipse::locale.system_locale'));
         } else {
-            $schema[] = TextInput::make('system_locale')
+            $basic[] = TextInput::make('system_locale')
                 ->required()
                 ->maxLength(255)
                 ->label(__('eclipse::locale.system_locale'));
         }
 
-        $helper_text = new HtmlString(fstr(__('eclipse::locale.datetime_format_help'))->parsePlaceholders(['link' => '<a href="https://www.php.net/manual/en/datetime.format.php" target="_blank" class="font-bold">PHP DateTime Format</a>']));
+        return $form->schema([
+            Section::make(__('eclipse::locale.sections.basic'))
+                ->schema($basic),
+            Section::make(__('eclipse::locale.sections.datetime_formats'))
+                ->description(new HtmlString(fstr(__('eclipse::locale.datetime_format_help'))->parsePlaceholders(['link' => '<a href="https://www.php.net/manual/en/datetime.format.php" target="_blank" class="font-bold">PHP DateTime Format</a>'])))
+                ->schema([
+                    TextInput::make('datetime_format')
+                        ->required()
+                        ->maxLength(255)
+                        ->label(__('eclipse::locale.datetime_format')),
 
-        $schema[] = TextInput::make('datetime_format')
-            ->required()
-            ->maxLength(255)
-            ->helperText($helper_text)
-            ->label(__('eclipse::locale.datetime_format'));
+                    TextInput::make('date_format')
+                        ->required()
+                        ->maxLength(255)
+                        ->label(__('eclipse::locale.date_format')),
 
-        $schema[] = TextInput::make('date_format')
-            ->required()
-            ->maxLength(255)
-            ->helperText($helper_text)
-            ->label(__('eclipse::locale.date_format'));
-
-        $schema[] = TextInput::make('time_format')
-            ->required()
-            ->maxLength(255)
-            ->helperText($helper_text)
-            ->label(__('eclipse::locale.time_format'));
-
-        return $form->schema($schema);
+                    TextInput::make('time_format')
+                        ->required()
+                        ->maxLength(255)
+                        ->label(__('eclipse::locale.time_format')),
+                ]),
+        ]);
     }
 
     public static function table(Table $table): Table
@@ -114,18 +118,24 @@ class LocaleResource extends Resource implements HasShieldPermissions
                     ->label(__('eclipse::locale.time_format')),
                 Tables\Columns\ToggleColumn::make('is_active')
                     ->label(__('eclipse::locale.is_active'))
-                    ->sortable(),
+                    ->sortable()
+                    ->disabled(fn (Locale $record): bool => ! auth()->user()->can('update', $record)),
                 Tables\Columns\ToggleColumn::make('is_available_in_panel')
                     ->label(__('eclipse::locale.is_available_in_panel'))
                     ->disabled(function (Locale $record): bool {
-                        return ! $record->is_active;
+                        return ! $record->is_active or ! auth()->user()->can('update', $record);
                     }),
             ])
             ->filters([
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make()->label(__('eclipse::locale.actions.edit')),
+                Tables\Actions\EditAction::make()->label(__('eclipse::locale.actions.edit.label')),
+                ActionGroup::make([
+                    DeleteAction::make()
+                        ->label(__('eclipse-world::countries.actions.delete.label'))
+                        ->modalHeading(__('eclipse-world::countries.actions.delete.heading')),
+                ]),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

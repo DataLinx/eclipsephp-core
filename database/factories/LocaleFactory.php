@@ -22,14 +22,15 @@ class LocaleFactory extends Factory
     public function definition(): array
     {
         return [
+            'id' => fake()->languageCode(),
             'name' => fake()->name(),
-            'native_name' => fake()->text(255),
-            'system_locale' => fake()->text(255),
+            'native_name' => fake()->text(50),
+            'system_locale' => fake()->locale(),
             'is_active' => fake()->boolean(),
             'is_available_in_panel' => fake()->boolean(),
-            'datetime_format' => fake()->text(255),
-            'date_format' => fake()->text(255),
-            'time_format' => fake()->text(255),
+            'datetime_format' => fake()->text(20),
+            'date_format' => fake()->text(10),
+            'time_format' => fake()->text(10),
         ];
     }
 }
