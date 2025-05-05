@@ -89,8 +89,6 @@ class AdminPanelProvider extends PanelProvider
                 Platform::Mac => '⌘K',
                 default => null,
             })
-            ->maxContentWidth(MaxWidth::Full)
-            ->simplePageMaxContentWidth(MaxWidth::Medium)
             ->tenant(Site::class, slugAttribute: 'domain')
             ->tenantDomain('{tenant:domain}')
             ->tenantMiddleware([
