@@ -21,6 +21,12 @@ Docs will be restructured when things get implemented.
 * [📑 Core concepts](#-core-concepts)
   * [🙋‍♂️ Users](#-users)
     * [Authorization](#authorization)
+  * [🔍 Search](#-search)
+    * [Set up Scout and Typesense](#set-up-scout-and-typesense)
+    * [Preparing the model for search](#preparing-the-model-for-search)
+    * [Enabling search in Filament controllers](#enabling-search-in-filament-controllers)
+    * [Indexing](#indexing-)
+    * [Debugging](#debugging)
 <!-- TOC -->
 
 # Introduction
@@ -43,7 +49,7 @@ However, if you want to create a new project via composer (recommended), you nee
 * PHP >= 8.3
 * Composer
 
-All other system requirements are automatically included by the Lando instance.
+The Lando instance automatically includes all other system requirements.
 Node.js and npm are provided in the lando container.
 
 ## 🛟 Getting started
@@ -60,7 +66,7 @@ Node.js and npm are provided in the lando container.
     lando start
     ```` 
 
-That's it! Open the provided link and the public page should be shown. Add `/admin` to the URL to see the admin panel. The database is already migrated and seeded and the test logins have already been set.
+That's it! Open the provided link and the public page should be shown. Add `/admin` to the URL to see the admin panel. The database is already migrated and seeded, and the test logins have already been set.
 
 By doing these few steps you now have a functional Filament app with our Eclipse core package.
 
@@ -68,7 +74,7 @@ By doing these few steps you now have a functional Filament app with our Eclipse
 Unfortunately, plugin development is not yet fully self-contained, meaning you need the app skeleton, where you will add the plugin you want to develop as a dependency that is symlinked from a local folder.  
 However, this is needed only if you want to manually test the plugin in the app (in your browser), since running the tests uses a default Testbench Laravel skeleton.
 
-🔶 **Please note**: the core package is in fact not a Filament plugin, but nevertheless everything for plugin development also applies for core development.  
+🔶 **Please note**: the core package is in fact not a Filament plugin, but nevertheless, everything for plugin development also applies for core development.  
 
 ## ⚙️ Setting up
 1. Follow the above [Getting started](Documentation.md#-getting-started) section to set up an app skeleton.
@@ -101,14 +107,14 @@ This is just a proxy to the testbench `package:test` command.
 ```shell
   lando testbench vendor:publish --tag=eclipse-config
 ```
-The reason for this is that these config files include other vendor configs that are already pre-configured the way we want them to be (i.e. multi-tenancy). All other plugins do not have this requirement — they must be built to fit any configuration.
+The reason for this is that these config files include other vendor configs that are already pre-configured the way we want them to be (i.e., multi-tenancy). All other plugins do not have this requirement — they must be built to fit any configuration.
 
 💡 If you ever get an error stating your app encryption key is not set, it means the Testbench skeleton is not set up. Run `composer setup` and everything needed will be set up. 
 
 ### PhpStorm
 See our [Testing with PhpStorm](https://github.com/DataLinx/php-package-template/blob/main/docs/Testing%20with%20PhpStorm.md) guide to set up testing in PhpStorm.
 
-⚠️ Please note: if you run tests in PhpStorm, the Pest cache in the `vendor/pestphp/pest/.temp` dir is created with your root user for some reason. It's not a problem, until you want to run tests in the console. If you want to switch to testing in the console, you have to delete the created directories inside the `.temp` dir.
+⚠️ Please note: if you run tests in PhpStorm, the Pest cache in the `vendor/pestphp/pest/.temp` dir is created with your root user for some reason. It's not a problem until you want to run tests in the console. If you want to switch to testing in the console, you have to delete the created directories inside the `.temp` dir.
 If you know how to fix this, please open a discussion or better yet, submit a pull request.
 
 ### Testing with multiple PHP versions
@@ -146,9 +152,9 @@ The following section explains the core concepts and applies to both app and plu
 ## 🙋‍♂️ Users
 
 ### Authorization
-For user authorization purposes, we use the [spatie/laravel-permission](https://spatie.be/docs/laravel-permission/v6) package and the [Filament Shield plugin](https://filamentphp.com/plugins/bezhansalleh-shield).
+For user authorization, we use the [spatie/laravel-permission](https://spatie.be/docs/laravel-permission/v6) package and the [Filament Shield plugin](https://filamentphp.com/plugins/bezhansalleh-shield).
 
-This setup does not change any core [Laravel authorization](https://laravel.com/docs/11.x/authorization) principles, but it expands and makes it work in Filament.
+This setup does not change any core [Laravel authorization](https://laravel.com/docs/authorization) principles, but it expands and makes it work in Filament.
 
 There are two important points of integration:
 
@@ -187,4 +193,103 @@ There are two important points of integration:
    ```
    This creates a policy class in your app policies directory, so if developing a plugin, you must move it to your plugin's policies directory.
 
-With this done, Filament will automatically use the model policies for access authorization, as described in the [Filament docs](https://filamentphp.com/docs/3.x/panels/resources/getting-started#authorization), while you can also use all the standard [Laravel authorization methods](https://laravel.com/docs/11.x/authorization#authorizing-actions-using-policies), such as `$user->can('update', $locale)` etc. 
+With this done, Filament will automatically use the model policies for access authorization, as described in the [Filament docs](https://filamentphp.com/docs/3.x/panels/resources/getting-started#authorization), while you can also use all the standard [Laravel authorization methods](https://laravel.com/docs/authorization#authorizing-actions-using-policies), such as `$user->can('update', $locale)` etc. 
+
+## 🔍 Search
+  
+Eclipse plugins are already integrated with the global search and Typesense.
+
+### Set up Scout and Typesense
+In the default Eclipse app, Typesense is already configured as the Laravel Scout driver.
+
+However, in case you need to add Typesense to an existing project, first add the service specification in your Lando file:
+```yaml
+services:
+  typesense:
+    type: typesense:28.0
+    portforward: 8108
+    apiKey: abc
+```
+Rebuild the container with `lando rebuild -y`.
+
+Secondly, follow the Scout installation instructions [here](https://laravel.com/docs/scout#installation), but do not change your model — this is done later below.
+
+Then, set the same API key in your `.env` file and use `typesense` as host.
+```dotenv
+SCOUT_DRIVER=typesense
+SCOUT_QUEUE=true
+
+TYPESENSE_API_KEY=abc
+TYPESENSE_HOST=typesense
+```
+The Typesense service will now be running and ready to use by your app.
+
+### Preparing the model for search
+1. Add the `Eclipse\Common\Foundation\Models\IsSearchable` trait to your model class (e.g. `Product`).
+2. Implement the `getTypesenseSettings()` method in your model. For the key-value format, follow the [Laravel Scout docs](https://laravel.com/docs/scout#preparing-data-for-storage-in-typesense).  
+   See our [Product specification here](https://github.com/DataLinx/eclipsephp-catalogue-plugin/blob/98a0d4e35741d28c010c1a5a56de5b2cf34a8dbf/src/Models/Product.php#L48) in the catalogue plugin for a working example.  
+   Notes:
+   * See Typesense docs for the `collection-schema` specification [here](https://typesense.org/docs/28.0/api/collections.html#schema-parameters).
+   * [Here](https://typesense.org/docs/28.0/api/collections.html#field-types) are the available field types.
+   * Translatable attributes should be specified with a dot-underscore-asterisk notation, e.g. `name_.*` for the field name parameter, and with underscore-asterisk only for the `search-parameters` array.  
+3. Add the model settings to the Scout config.  
+   In your service provider `register` method, inject your model's settings into the `scout.typesense.model-settings` config array, e.g.:  
+   ```php
+   public function register()
+   {
+        parent::register();
+
+        $settings = Config::get('scout.typesense.model-settings', []);
+
+        $settings += [
+            Product::class => Product::getTypesenseSettings(),
+            // More models here...
+        ];
+
+        Config::set('scout.typesense.model-settings', $settings);
+   }
+   ```
+    
+### Enabling search in Filament controllers
+1. Add the `Eclipse\Common\Foundation\Pages\HasScoutSearch` trait to your Filament `List` controller (e.g. `ListProducts`).
+2. Add the `->searchable()` method call to your table definition in your Filament `Resource` class (e.g. `ProductResource`).
+    ```php
+    public static function table(Table $table): Table
+    {
+        return $table
+            ->columns([
+                TextColumn::make('id'),
+
+                TextColumn::make('name')
+                    ->toggleable(false),
+            ])
+            ->searchable();
+    }
+    ```
+3. Implement the `getGloballySearchableAttributes()` method in the `Resource` class to enable global search for the model, e.g.:
+    ```php
+    public static function getGloballySearchableAttributes(): array
+    {
+        return [
+            'code',
+            'barcode',
+            'manufacturers_code',
+            'suppliers_code',
+            'name',
+            'short_description',
+            'description',
+        ];
+    }
+    ```
+   
+### Indexing 
+Indexing happens on the fly when a model is saved, thanks to the `IsSearchable` trait.  
+However, when initially setting things up for an existing model with records in the database, you need to run the batch import. For our `Product` model, you could do that in the console like so:
+```shell
+  php artisan scout:import "Eclipse\Catalogue\Product"
+```
+Read more about indexing in the Laravel docs [here](https://laravel.com/docs/scout#indexing).
+
+### Debugging
+To better understand and help you debug any problems you may encounter when implementing search with Typesense, you can use the Typesense Dashboard app that is available for all platforms [here](https://github.com/bfritscher/typesense-dashboard).  
+To connect, use the parameters you specified in your Lando file.
