@@ -2,6 +2,8 @@
 
 namespace Eclipse\Core;
 
+use Eclipse\Common\Foundation\Providers\PackageServiceProvider;
+use Eclipse\Common\Package;
 use Eclipse\Core\Console\Commands\ClearCommand;
 use Eclipse\Core\Console\Commands\DeployCommand;
 use Eclipse\Core\Console\Commands\PostComposerUpdate;
@@ -13,12 +15,11 @@ use Illuminate\Auth\Events\Login;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
-use Spatie\LaravelPackageTools\Package;
-use Spatie\LaravelPackageTools\PackageServiceProvider;
+use Spatie\LaravelPackageTools\Package as SpatiePackage;
 
 class EclipseServiceProvider extends PackageServiceProvider
 {
-    public function configurePackage(Package $package): void
+    public function configurePackage(SpatiePackage|Package $package): void
     {
         $package->name('eclipse')
             ->hasCommands([
@@ -32,8 +33,10 @@ class EclipseServiceProvider extends PackageServiceProvider
                 'filament-shield',
                 'horizon',
                 'permission',
+                'settings',
                 'telescope',
             ])
+            ->hasSettings()
             ->discoversMigrations()
             ->runsMigrations()
             ->hasTranslations();

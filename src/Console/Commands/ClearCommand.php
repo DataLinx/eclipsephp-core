@@ -22,6 +22,10 @@ class ClearCommand extends Command
         // ------------------
         $this->call('filament:optimize-clear');
 
+        // Clear settings cache
+        // ------------------
+        $this->call('settings:clear-cache');
+
         // ------------------
 
         $this->newLine();
