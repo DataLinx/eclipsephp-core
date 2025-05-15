@@ -146,7 +146,8 @@ class AdminPanelProvider extends PanelProvider
                     // Always visible for local env, otherwise the viewHorizon permission is required
                     ->visible(fn (User $user): bool => app()->isLocal() || $user->can('viewHorizon')),
             ])
-            ->databaseNotifications();
+            ->databaseNotifications()
+            ->unsavedChangesAlerts();
 
         // Add plugins from the plugin registry
         foreach (app(PluginRegistry::class)->getPlugins() as $plugin) {
