@@ -20,7 +20,7 @@ Non-opinionated code will be separated into own Filament plugins or other suppor
 ### Out-of-the-box features
 * User management
 * Roles and permissions
-* Domain based multi-tenancy
+* Domain based multi-tenancy (multi-sites)
 * Multi-language
 * Compatible with standard Laravel and Filament packages
 
