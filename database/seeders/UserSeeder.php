@@ -38,12 +38,18 @@ class UserSeeder extends Seeder
             $user = User::create($data);
 
             // Assign user to all sites/tenants
-            $user->sites()->attach(Site::all());
+            foreach (Site::all() as $site) {
+                $user->sites()->attach($site);
 
-            if (isset($preset['role'])) {
-                $user->assignRole($preset['role'])->save();
+                if (isset($preset['role'])) {
+                    setPermissionsTeamId($site->id);
+                    $user->assignRole($preset['role'])->save();
+                }
             }
         }
+
+        // Reset tenant ID, in case it was changed
+        setPermissionsTeamId(Site::first()->id);
 
         // Create an additional batch of random users, if required
         if (config('eclipse.seed.users.count') > 0) {

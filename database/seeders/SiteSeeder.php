@@ -12,8 +12,27 @@ class SiteSeeder extends Seeder
      */
     public function run(): void
     {
-        Site::factory()
-            ->count(5)
-            ->create();
+        if (config('eclipse.multi_site')) {
+            // Create sites from seeder config
+            $config = config('eclipse.seed.sites');
+
+            // Create preset sites
+            if (! empty($config['presets'])) {
+                foreach ($config['presets'] as $preset) {
+                    Site::create($preset['data']);
+                }
+            }
+
+            // Create random sites
+            if (! empty($config['count']) && $config['count'] > 0) {
+                Site::factory()->count($config['count'])->create();
+            }
+        } else {
+            // Create default site from config data
+            Site::create([
+                'domain' => basename(config('app.url')),
+                'name' => config('app.name'),
+            ]);
+        }
     }
 }

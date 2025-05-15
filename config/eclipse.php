@@ -4,6 +4,13 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Enable/disable multi-site feature
+    |--------------------------------------------------------------------------
+    */
+    'multi_site' => (bool) env('ECLIPSE_MULTI_SITE', false),
+
+    /*
+    |--------------------------------------------------------------------------
     | Enable/disable user email verification
     |--------------------------------------------------------------------------
     | Set this boolean to true if you want to enable parts of the application
@@ -55,6 +62,26 @@ return [
                         'email' => 'admin@example.com',
                     ],
                     'role' => 'admin',
+                ],
+            ],
+        ],
+        // Sites — only used if the multi-site feature is enabled above
+        'sites' => [
+            // Number of randomly generated sites
+            'count' => 0,
+            // Sites with preset data
+            'presets' => [
+                [
+                    'data' => [
+                        'domain' => basename(config('app.url')),
+                        'name' => config('app.name'),
+                    ],
+                ],
+                [
+                    'data' => [
+                        'domain' => 'another.lndo.site',
+                        'name' => 'Another site',
+                    ],
                 ],
             ],
         ],

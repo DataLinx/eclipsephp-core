@@ -106,4 +106,9 @@ class SiteResource extends Resource implements HasShieldPermissions
             'delete_any',
         ];
     }
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return config('eclipse.multi_site');
+    }
 }

@@ -96,6 +96,7 @@ class AdminPanelProvider extends PanelProvider
             ->tenantMiddleware([
                 SyncShieldTenant::class,
             ], isPersistent: true)
+            ->tenantMenu(config('eclipse.multi_site', false))
             ->widgets([
                 Widgets\AccountWidget::class,
                 Widgets\FilamentInfoWidget::class,

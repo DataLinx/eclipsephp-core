@@ -2,7 +2,6 @@
 
 namespace Eclipse\Core\Database\Seeders;
 
-use Eclipse\Core\Models\Site;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Artisan;
 
@@ -23,13 +22,8 @@ class CoreSeeder extends Seeder
         // Seed additional roles
         $this->call(RoleSeeder::class);
 
-        // Create main site
-        $site = Site::create([
-            'domain' => basename(config('app.url')),
-            'name' => config('app.name'),
-        ]);
-
-        setPermissionsTeamId($site->id);
+        // Sites
+        $this->call(SiteSeeder::class);
 
         // Users
         $this->call(UserSeeder::class);
