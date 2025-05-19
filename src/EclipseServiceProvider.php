@@ -32,6 +32,7 @@ class EclipseServiceProvider extends PackageServiceProvider
                 'eclipse',
                 'filament-shield',
                 'horizon',
+                'log-viewer',
                 'permission',
                 'settings',
                 'telescope',
