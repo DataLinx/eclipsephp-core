@@ -6,7 +6,7 @@ services:
     xdebug: "debug,develop,coverage"
     via: cli
     overrides:
-      image: slimdeluxe/php:8.3-v1.1
+      image: slimdeluxe/php:8.3-v1.2
 tooling:
   php:
     service: appserver
