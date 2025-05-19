@@ -145,6 +145,12 @@ class AdminPanelProvider extends PanelProvider
                     ->sort(2000)
                     // Always visible for local env, otherwise the viewHorizon permission is required
                     ->visible(fn (User $user): bool => app()->isLocal() || $user->can('viewHorizon')),
+                NavigationItem::make('Log viewer')
+                    ->url('/'.config('log-viewer.route_path', 'log-viewer'), shouldOpenInNewTab: true)
+                    ->icon('heroicon-s-arrow-top-right-on-square')
+                    ->group('Tools')
+                    ->sort(3000)
+                    ->hidden(fn (): bool => ! config('log-viewer.enabled', false) || ! auth()->user()->hasRole('super_admin')),
             ])
             ->databaseNotifications()
             ->unsavedChangesAlerts();

@@ -26,6 +26,11 @@ class SetupSite
 
         Registry::setSite($site);
 
+        // Set log viewer restriction... must be done after the site is initialized
+        LogViewer::auth(function ($request) {
+            return $request->user() && $request->user()->hasRole('super_admin');
+        });
+
         return $next($request);
     }
 }

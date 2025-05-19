@@ -27,9 +27,10 @@ class PostComposerUpdate extends Command
     {
         $this->line('Running Eclipse Post Composer update procedure...');
 
-        // Publish Laravel assets
+        // Publish vendor assets
         // ------------------
         $this->call('vendor:publish', ['--tag' => 'laravel-assets', '--force' => true]);
+        $this->call('log-viewer:publish');
 
         // ------------------
 

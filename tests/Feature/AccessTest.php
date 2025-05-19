@@ -41,3 +41,34 @@ test('horizon is accessible for allowed users', function () {
     $this->actingAs($other_user);
     $this->get('/horizon')->assertStatus(403);
 });
+
+test('log viewer is not accessible for guests', function () {
+    $this->get(config('log-viewer.route_path', 'log-viewer'))->assertStatus(403);
+});
+
+test('log viewer is not accessible for non-super-admin users', function () {
+    // Create a regular user
+    $user = User::factory()->create();
+
+    // Assert the user doesn't have super_admin role
+    $this->assertFalse($user->hasRole('super_admin'));
+
+    // Test access
+    $this->actingAs($user);
+    $this->get(config('log-viewer.route_path', 'log-viewer'))->assertStatus(403);
+});
+
+test('log viewer is accessible for super admin users', function () {
+    // Create a user
+    $user = User::factory()->create();
+
+    // Assign super_admin role
+    $user->assignRole('super_admin');
+
+    // Assert the user has super_admin role
+    $this->assertTrue($user->hasRole('super_admin'));
+
+    // Test access
+    $this->actingAs($user);
+    $this->get(config('log-viewer.route_path', 'log-viewer'))->assertStatus(200);
+});
