@@ -15,7 +15,7 @@ use Eclipse\Core\Models\User;
 use Eclipse\Core\Models\User\Permission;
 use Eclipse\Core\Models\User\Role;
 use Eclipse\Core\Policies\User\RolePolicy;
-use Eclipse\Core\Services\PluginRegistry;
+use Eclipse\Core\Services\Registry;
 use Eclipse\World\EclipseWorld;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -150,7 +150,7 @@ class AdminPanelProvider extends PanelProvider
             ->unsavedChangesAlerts();
 
         // Add plugins from the plugin registry
-        foreach (app(PluginRegistry::class)->getPlugins() as $plugin) {
+        foreach (app(Registry::class)->getPlugins() as $plugin) {
             $panel->plugin($plugin);
         }
 
@@ -177,8 +177,8 @@ class AdminPanelProvider extends PanelProvider
 
         FilamentView::registerRenderHook('panels::body.end', fn (): string => Blade::render("@vite('resources/js/app.js')"));
 
-        $this->app->singleton(PluginRegistry::class, function () {
-            return new PluginRegistry;
+        $this->app->singleton(Registry::class, function () {
+            return new Registry;
         });
     }
 

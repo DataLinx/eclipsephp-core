@@ -2,27 +2,46 @@
 
 namespace Eclipse\Core\Services;
 
+use Eclipse\Core\Models\Site;
 use Filament\Contracts\Plugin;
+use Illuminate\Support\Facades\Context;
 use InvalidArgumentException;
 
 /**
- * Registry for managing Filament plugins in the application.
- *
- * This class serves as a central registry for Filament plugins, allowing them to be:
- * - Registered in the AppServiceProvider during application bootstrap
- * - Retrieved and configured in the AdminPanelProvider for the admin panel setup
- * - Managed as a collection that can be accessed throughout the application
- *
- * The registry supports adding both single plugins and arrays of plugins,
- * ensuring type safety by validating that all registered items implement
- * the Filament\Contracts\Plugin interface.
+ * Class for registering things that can be used in other things :)
  */
-class PluginRegistry
+class Registry
 {
+    private static Site $current_site;
+
     /**
      * @var Plugin[]
      */
     protected array $plugins = [];
+
+    /**
+     * Set current site
+     */
+    public static function setSite(int|Site $site): void
+    {
+        if ($site instanceof Site) {
+            self::$current_site = $site;
+        } else {
+            self::$current_site = Site::find($site);
+        }
+
+        Context::add('site', self::getSite()->id);
+
+        setPermissionsTeamId($site->id);
+    }
+
+    /**
+     * Get current site
+     */
+    public static function getSite(): ?Site
+    {
+        return self::$current_site ?? null;
+    }
 
     /**
      * Add plugin to registry

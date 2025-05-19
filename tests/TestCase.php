@@ -2,9 +2,11 @@
 
 namespace Tests;
 
+use Eclipse\Core\Http\Middleware\SetupSite;
 use Eclipse\Core\Models\Site;
 use Eclipse\Core\Models\User;
 use Filament\Facades\Filament;
+use Illuminate\Contracts\Http\Kernel;
 use Orchestra\Testbench\Concerns\WithWorkbench;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 
@@ -25,6 +27,11 @@ abstract class TestCase extends BaseTestCase
         parent::setUp();
 
         $this->withoutVite();
+
+        // Ensure SetupTenant middleware is applied during tests
+        // This is done here since the "withMiddleware" method in workbench/bootstrap/app.php does not seem to work
+        // $this->withMiddleware(SetupTenant::class) also does not work
+        app(Kernel::class)->pushMiddleware(SetupSite::class);
 
         require_once __DIR__.'/../src/Helpers/helpers.php';
     }
