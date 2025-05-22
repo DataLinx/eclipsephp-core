@@ -25,7 +25,7 @@ Non-opinionated code will be separated into own Filament plugins or other suppor
 * Compatible with standard Laravel and Filament packages
 
 ## Documentation
-Read the documentation [here](docs/Documentation.md).
+Read the documentation [here](https://datalinx.github.io/eclipsephp-app/).
 
 ## Contributing
 If you have some suggestions how to make this package better, please open an issue or even better, submit a pull request.
