@@ -3,6 +3,7 @@
 namespace Eclipse\Core\Filament\Resources;
 
 use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
+use Eclipse\Core\Filament\Exports\TableExport;
 use Eclipse\Core\Filament\Resources;
 use Eclipse\Core\Models\User;
 use Filament\Forms;
@@ -22,6 +23,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Hash;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 
 class UserResource extends Resource implements HasShieldPermissions
 {
@@ -194,6 +196,9 @@ class UserResource extends Resource implements HasShieldPermissions
                             $action->cancel();
                         }
                     }),
+                ]),
+                ExportBulkAction::make()->exports([
+                    TableExport::make('table'),
                 ]),
             ]);
     }
