@@ -35,6 +35,8 @@ use Filament\Support\Enums\VerticalAlignment;
 use Filament\Support\Facades\FilamentView;
 use Filament\Tables\Columns\Column;
 use Filament\Widgets;
+use Hasnayeen\Themes\Http\Middleware\SetTheme;
+use Hasnayeen\Themes\ThemesPlugin;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -95,6 +97,7 @@ class AdminPanelProvider extends PanelProvider
             ->tenantDomain('{tenant:domain}')
             ->tenantMiddleware([
                 SyncShieldTenant::class,
+                SetTheme::class,
             ], isPersistent: true)
             ->tenantMenu(config('eclipse.multi_site', false))
             ->widgets([
@@ -125,6 +128,7 @@ class AdminPanelProvider extends PanelProvider
                 EclipseWorld::make(),
                 SpatieLaravelTranslatablePlugin::make()
                     ->defaultLocales($localeIds),
+                ThemesPlugin::make(),
             ])
             ->navigationGroups([
                 NavigationGroup::make('Users'),

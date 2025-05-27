@@ -36,6 +36,7 @@ class EclipseServiceProvider extends PackageServiceProvider
                 'permission',
                 'settings',
                 'telescope',
+                'themes',
             ])
             ->hasSettings()
             ->discoversMigrations()

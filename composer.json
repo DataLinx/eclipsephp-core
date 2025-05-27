@@ -51,6 +51,7 @@
         "filament/filament": "^3.3",
         "filament/spatie-laravel-media-library-plugin": "^3.2",
         "filament/spatie-laravel-translatable-plugin": "^3.2",
+        "hasnayeen/themes": "^3.0",
         "laravel/framework": "^11.0",
         "laravel/horizon": "^5.31",
         "laravel/telescope": "^5.5",
