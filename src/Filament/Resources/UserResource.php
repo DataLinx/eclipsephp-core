@@ -24,6 +24,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Hash;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
+use STS\FilamentImpersonate\Tables\Actions\Impersonate;
 
 class UserResource extends Resource implements HasShieldPermissions
 {
@@ -173,6 +174,9 @@ class UserResource extends Resource implements HasShieldPermissions
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\ViewAction::make(),
                     Tables\Actions\EditAction::make(),
+                    Impersonate::make()
+                        ->grouped()
+                        ->redirectTo(route('filament.admin.tenant')),
                     Tables\Actions\DeleteAction::make()
                         ->authorize(fn (User $record) => auth()->user()->can('delete_user') && auth()->id() !== $record->id)
                         ->requiresConfirmation(),
@@ -305,6 +309,7 @@ class UserResource extends Resource implements HasShieldPermissions
             'restore_any',
             'force_delete',
             'force_delete_any',
+            'impersonate',
         ];
     }
 }

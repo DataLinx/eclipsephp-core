@@ -3,6 +3,7 @@
 namespace Eclipse\Core\Models;
 
 use Eclipse\Core\Database\Factories\UserFactory;
+use Exception;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasAvatar;
 use Filament\Models\Contracts\HasTenants;
@@ -119,7 +120,7 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, HasMedia,
 
         static::retrieved(function (self $user) {
             if ($user->trashed() && auth()->check() && request()->routeIs('login')) {
-                throw new \Exception('This account has been deactivated.');
+                throw new Exception('This account has been deactivated.');
             }
         });
     }
@@ -139,14 +140,22 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, HasMedia,
     /**
      * Delete the user account, preventing self-deletion.
      *
-     * @throws \Exception If the user attempts to delete their own account.
+     * @throws Exception If the user attempts to delete their own account.
      */
     public function delete(): ?bool
     {
         if ($this->id === auth()->id()) {
-            throw new \Exception('You cannot delete your own account.');
+            throw new Exception('You cannot delete your own account.');
         }
 
         return parent::delete();
+    }
+
+    /**
+     * Determine if the user can impersonate other users.
+     */
+    public function canImpersonate(): bool
+    {
+        return $this->can('impersonate', User::class);
     }
 }

@@ -92,4 +92,12 @@ class UserPolicy
     {
         return $user->can('force_delete_any_user');
     }
+
+    /**
+     * Determine whether the user can impersonate other users.
+     */
+    public function impersonate(User $user): bool
+    {
+        return $user->can('impersonate_user');
+    }
 }
