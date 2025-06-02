@@ -2,7 +2,6 @@
 
 namespace Eclipse\Core\Providers;
 
-use BezhanSalleh\FilamentLanguageSwitch\LanguageSwitch;
 use BezhanSalleh\FilamentShield\Facades\FilamentShield;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use BezhanSalleh\FilamentShield\Middleware\SyncShieldTenant;
@@ -12,9 +11,6 @@ use Eclipse\Core\Filament\Pages\EditProfile;
 use Eclipse\Core\Models\Locale;
 use Eclipse\Core\Models\Site;
 use Eclipse\Core\Models\User;
-use Eclipse\Core\Models\User\Permission;
-use Eclipse\Core\Models\User\Role;
-use Eclipse\Core\Policies\User\RolePolicy;
 use Eclipse\Core\Services\Registry;
 use Eclipse\World\EclipseWorld;
 use Filament\Http\Middleware\Authenticate;
@@ -26,14 +22,12 @@ use Filament\Notifications\Livewire\Notifications;
 use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
-use Filament\Resources\Resource;
 use Filament\SpatieLaravelTranslatablePlugin;
 use Filament\Support\Colors\Color;
 use Filament\Support\Enums\Alignment;
 use Filament\Support\Enums\Platform;
 use Filament\Support\Enums\VerticalAlignment;
 use Filament\Support\Facades\FilamentView;
-use Filament\Tables\Columns\Column;
 use Filament\Widgets;
 use Hasnayeen\Themes\Http\Middleware\SetTheme;
 use Hasnayeen\Themes\ThemesPlugin;
@@ -44,8 +38,6 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\Blade;
-use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use pxlrbt\FilamentEnvironmentIndicator\EnvironmentIndicatorPlugin;
@@ -76,6 +68,7 @@ class AdminPanelProvider extends PanelProvider
                 'gray' => Color::Slate,
             ])
             ->topNavigation()
+            ->brandName(fn () => Registry::getSite()->name)
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverResources(in: $package_src.'Filament/Resources', for: 'Eclipse\\Core\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
@@ -186,10 +179,6 @@ class AdminPanelProvider extends PanelProvider
         parent::register();
 
         FilamentView::registerRenderHook('panels::body.end', fn (): string => Blade::render("@vite('resources/js/app.js')"));
-
-        $this->app->singleton(Registry::class, function () {
-            return new Registry;
-        });
     }
 
     /**
@@ -197,43 +186,10 @@ class AdminPanelProvider extends PanelProvider
      */
     public function boot(): void
     {
-        // For unit tests...
-        if (app()->runningUnitTests()) {
-            // Set the correct user model in auth config
-            Config::set('auth.providers.users.model', User::class);
-        }
-
-        // Set up Spatie Laravel permissions
-        app(\Spatie\Permission\PermissionRegistrar::class)
-            ->setPermissionClass(Permission::class)
-            ->setRoleClass(Role::class);
-
-        // Set common settings for Filament table columns
-        Column::configureUsing(function (Column $column) {
-            $column
-                ->toggleable()
-                ->sortable();
-        });
-
         // Prohibit Filament Shield's destructive commands in production
         FilamentShield::prohibitDestructiveCommands($this->app->isProduction());
 
         // Load customized translations for Filament Shield
         $this->loadTranslationsFrom(__DIR__.'/../../resources/lang/vendor/filament-shield', 'filament-shield');
-
-        // Configure language switcher
-        LanguageSwitch::configureUsing(function (LanguageSwitch $switch) {
-            $availableLocales = Locale::getAvailableLocales();
-
-            $switch
-                ->locales($availableLocales->pluck('id')->toArray())
-                ->labels($availableLocales->pluck('native_name', 'id')->toArray());
-        });
-
-        // Set tenancy to off for all resources by default
-        Resource::scopeToTenant(false);
-
-        // Register policies for classes that can't be guessed automatically
-        Gate::policy(Role::class, RolePolicy::class);
     }
 }

@@ -2,20 +2,31 @@
 
 namespace Eclipse\Core;
 
+use BezhanSalleh\FilamentLanguageSwitch\LanguageSwitch;
 use Eclipse\Common\Foundation\Providers\PackageServiceProvider;
 use Eclipse\Common\Package;
 use Eclipse\Core\Console\Commands\ClearCommand;
 use Eclipse\Core\Console\Commands\DeployCommand;
 use Eclipse\Core\Console\Commands\PostComposerUpdate;
+use Eclipse\Core\Models\Locale;
 use Eclipse\Core\Models\User;
+use Eclipse\Core\Models\User\Permission;
+use Eclipse\Core\Models\User\Role;
+use Eclipse\Core\Policies\User\RolePolicy;
 use Eclipse\Core\Providers\AdminPanelProvider;
 use Eclipse\Core\Providers\HorizonServiceProvider;
 use Eclipse\Core\Providers\TelescopeServiceProvider;
+use Eclipse\Core\Services\Registry;
+use Filament\Resources\Resource;
+use Filament\Tables\Columns\Column;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Gate;
 use Spatie\LaravelPackageTools\Package as SpatiePackage;
+use Spatie\Permission\PermissionRegistrar;
 
 class EclipseServiceProvider extends PackageServiceProvider
 {
@@ -65,6 +76,10 @@ class EclipseServiceProvider extends PackageServiceProvider
 
         $this->app->register(HorizonServiceProvider::class);
 
+        $this->app->singleton(Registry::class, function () {
+            return new Registry;
+        });
+
         return $this;
     }
 
@@ -72,10 +87,43 @@ class EclipseServiceProvider extends PackageServiceProvider
     {
         parent::boot();
 
+        // For unit tests...
+        if (app()->runningUnitTests()) {
+            // Set the correct user model in auth config
+            Config::set('auth.providers.users.model', User::class);
+        }
+
         // Enable Model strictness when not in production
         Model::shouldBeStrict(! app()->isProduction());
 
         // Do not allow destructive DB commands in production
         DB::prohibitDestructiveCommands(app()->isProduction());
+
+        // Set tenancy to off for all resources by default
+        Resource::scopeToTenant(false);
+
+        // Set up Spatie Laravel permissions
+        app(PermissionRegistrar::class)
+            ->setPermissionClass(Permission::class)
+            ->setRoleClass(Role::class);
+
+        // Register policies for classes that can't be guessed automatically
+        Gate::policy(Role::class, RolePolicy::class);
+
+        // Set common settings for Filament table columns
+        Column::configureUsing(function (Column $column) {
+            $column
+                ->toggleable()
+                ->sortable();
+        });
+
+        // Configure language switcher
+        LanguageSwitch::configureUsing(function (LanguageSwitch $switch) {
+            $availableLocales = Locale::getAvailableLocales();
+
+            $switch
+                ->locales($availableLocales->pluck('id')->toArray())
+                ->labels($availableLocales->pluck('native_name', 'id')->toArray());
+        });
     }
 }
