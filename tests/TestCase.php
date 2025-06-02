@@ -28,7 +28,7 @@ abstract class TestCase extends BaseTestCase
 
         $this->withoutVite();
 
-        // Ensure SetupTenant middleware is applied during tests
+        // Ensure SetupSite middleware is applied during tests
         // This is done here since the "withMiddleware" method in workbench/bootstrap/app.php does not seem to work
         // $this->withMiddleware(SetupTenant::class) also does not work
         app(Kernel::class)->pushMiddleware(SetupSite::class);
