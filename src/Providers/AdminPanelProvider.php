@@ -8,6 +8,7 @@ use BezhanSalleh\FilamentShield\Middleware\SyncShieldTenant;
 use DutchCodingCompany\FilamentDeveloperLogins\FilamentDeveloperLoginsPlugin;
 use Eclipse\Common\Providers\GlobalSearchProvider;
 use Eclipse\Core\Filament\Pages\EditProfile;
+use Eclipse\Core\Filament\Pages\Tools\HealthCheckResults;
 use Eclipse\Core\Models\Locale;
 use Eclipse\Core\Models\Site;
 use Eclipse\Core\Models\User;
@@ -41,6 +42,7 @@ use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use pxlrbt\FilamentEnvironmentIndicator\EnvironmentIndicatorPlugin;
+use ShuvroRoy\FilamentSpatieLaravelHealth\FilamentSpatieLaravelHealthPlugin;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -122,6 +124,9 @@ class AdminPanelProvider extends PanelProvider
                 SpatieLaravelTranslatablePlugin::make()
                     ->defaultLocales($localeIds),
                 ThemesPlugin::make(),
+                FilamentSpatieLaravelHealthPlugin::make()
+                    ->usingPage(HealthCheckResults::class)
+                    ->authorize(fn (): bool => auth()->user()->hasRole('super_admin')),
             ])
             ->navigationGroups([
                 NavigationGroup::make('Users'),
