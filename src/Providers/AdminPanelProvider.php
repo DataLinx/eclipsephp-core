@@ -42,6 +42,7 @@ use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use pxlrbt\FilamentEnvironmentIndicator\EnvironmentIndicatorPlugin;
+use pxlrbt\FilamentSpotlight\SpotlightPlugin;
 use ShuvroRoy\FilamentSpatieLaravelHealth\FilamentSpatieLaravelHealthPlugin;
 
 class AdminPanelProvider extends PanelProvider
@@ -127,6 +128,7 @@ class AdminPanelProvider extends PanelProvider
                 FilamentSpatieLaravelHealthPlugin::make()
                     ->usingPage(HealthCheckResults::class)
                     ->authorize(fn (): bool => auth()->user()->hasRole('super_admin')),
+                SpotlightPlugin::make(),
             ])
             ->navigationGroups([
                 NavigationGroup::make('Users'),
