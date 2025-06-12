@@ -27,8 +27,18 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
+use Spatie\Health\Checks\Checks\CacheCheck;
+use Spatie\Health\Checks\Checks\DebugModeCheck;
+use Spatie\Health\Checks\Checks\EnvironmentCheck;
+use Spatie\Health\Checks\Checks\HorizonCheck;
+use Spatie\Health\Checks\Checks\OptimizedAppCheck;
+use Spatie\Health\Checks\Checks\RedisCheck;
+use Spatie\Health\Checks\Checks\ScheduleCheck;
+use Spatie\Health\Checks\Checks\UsedDiskSpaceCheck;
+use Spatie\Health\Facades\Health;
 use Spatie\LaravelPackageTools\Package as SpatiePackage;
 use Spatie\Permission\PermissionRegistrar;
+use Spatie\SecurityAdvisoriesHealthCheck\SecurityAdvisoriesCheck;
 
 class EclipseServiceProvider extends PackageServiceProvider
 {
@@ -54,7 +64,8 @@ class EclipseServiceProvider extends PackageServiceProvider
             ->hasSettings()
             ->discoversMigrations()
             ->runsMigrations()
-            ->hasTranslations();
+            ->hasTranslations()
+            ->hasRoute('console');
     }
 
     public function register(): self
@@ -140,5 +151,20 @@ class EclipseServiceProvider extends PackageServiceProvider
                 ->locales($availableLocales->pluck('id')->toArray())
                 ->labels($availableLocales->pluck('native_name', 'id')->toArray());
         });
+
+        // Register health checks
+        Health::checks([
+            OptimizedAppCheck::new(),
+            DebugModeCheck::new(),
+            EnvironmentCheck::new(),
+            UsedDiskSpaceCheck::new()
+                ->warnWhenUsedSpaceIsAbovePercentage(70)
+                ->failWhenUsedSpaceIsAbovePercentage(90),
+            CacheCheck::new(),
+            HorizonCheck::new(),
+            RedisCheck::new(),
+            ScheduleCheck::new(),
+            SecurityAdvisoriesCheck::new(),
+        ]);
     }
 }
