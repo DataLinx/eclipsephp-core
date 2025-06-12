@@ -9,7 +9,7 @@ return [
 
     'column.name' => 'Name',
     'column.guard_name' => 'Guard Name',
-    'column.team' => 'Team',
+    'column.team' => 'Site',
     'column.roles' => 'Roles',
     'column.permissions' => 'Permissions',
     'column.updated_at' => 'Updated At',

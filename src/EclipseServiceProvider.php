@@ -17,6 +17,8 @@ use Eclipse\Core\Providers\AdminPanelProvider;
 use Eclipse\Core\Providers\HorizonServiceProvider;
 use Eclipse\Core\Providers\TelescopeServiceProvider;
 use Eclipse\Core\Services\Registry;
+use Filament\Forms\Components\Field;
+use Filament\Infolists\Components\Entry;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\Column;
 use Illuminate\Auth\Events\Login;
@@ -59,7 +61,7 @@ class EclipseServiceProvider extends PackageServiceProvider
     {
         parent::register();
 
-        require_once __DIR__.'/Helpers/helpers.php';
+        require_once __DIR__ . '/Helpers/helpers.php';
 
         Event::listen(Login::class, function ($event) {
             if ($event->user instanceof User) {
@@ -94,7 +96,7 @@ class EclipseServiceProvider extends PackageServiceProvider
         }
 
         // Enable Model strictness when not in production
-        Model::shouldBeStrict(! app()->isProduction());
+        Model::shouldBeStrict(!app()->isProduction());
 
         // Do not allow destructive DB commands in production
         DB::prohibitDestructiveCommands(app()->isProduction());
@@ -110,9 +112,22 @@ class EclipseServiceProvider extends PackageServiceProvider
         // Register policies for classes that can't be guessed automatically
         Gate::policy(Role::class, RolePolicy::class);
 
+        // Set common settings for Filament form
+        Field::configureUsing(function (Field $field) {
+            $field
+                ->translateLabel();
+        });
+
+        // Set common settings for Filament infolist
+        Entry::configureUsing(function (Entry $entry) {
+            $entry
+                ->translateLabel();
+        });
+
         // Set common settings for Filament table columns
         Column::configureUsing(function (Column $column) {
             $column
+                ->translateLabel()
                 ->toggleable()
                 ->sortable();
         });

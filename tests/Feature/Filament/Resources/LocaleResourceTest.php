@@ -14,6 +14,9 @@ test('unauthorized access can be prevented', function () {
     // Create regular user with no permissions
     $this->set_up_common_user_and_tenant();
 
+    $this->user->syncRoles([]);
+    $this->user->syncPermissions([]);
+
     // Create test locale
     $locale = Locale::factory()->create();
 
@@ -79,7 +82,7 @@ test('new locale can be created', function () {
     expect($locale)->toBeObject();
 
     foreach ($data as $key => $val) {
-        expect($locale->$key)->toEqual($val, "Failed asserting that attribute $key value ".$locale->$key.' is equal to '.$val);
+        expect($locale->$key)->toEqual($val, "Failed asserting that attribute $key value " . $locale->$key . ' is equal to ' . $val);
     }
 });
 

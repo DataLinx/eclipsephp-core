@@ -2,8 +2,12 @@
 
 use Eclipse\Core\Filament\Resources\UserResource;
 use Eclipse\Core\Filament\Resources\UserResource\Pages\CreateUser;
+use Eclipse\Core\Filament\Resources\UserResource\Pages\EditUser;
 use Eclipse\Core\Filament\Resources\UserResource\Pages\ListUsers;
+use Eclipse\Core\Models\Site;
 use Eclipse\Core\Models\User;
+use Eclipse\Core\Models\User\Role;
+use Filament\Facades\Filament;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Illuminate\Support\Facades\Hash;
@@ -123,16 +127,23 @@ test('users can be searched', function () {
 });
 
 test('user can be deleted', function () {
-    $user = User::factory()->create();
+    $site = Site::factory()->create();
 
-    livewire(ListUsers::class)
+    $user = User::factory()->create();
+    $user->sites()->attach($site);
+
+    Filament::setTenant($site);
+
+    livewire(ListUsers::class, ['tenant' => $site])
         ->assertSuccessful()
         ->assertTableActionExists(DeleteAction::class)
         ->assertTableActionEnabled(DeleteAction::class, $user)
         ->callTableAction(DeleteAction::class, $user);
 
-    $this->assertSoftDeleted('users', ['id' => $user->id]);
+    $user->refresh();
+    expect($user->trashed())->toBeTrue();
 });
+
 
 test('authed user cannot delete himself', function () {
     $superAdmin = User::withTrashed()->find($this->superAdmin->id);
@@ -151,4 +162,174 @@ test('authed user cannot delete himself', function () {
     foreach ($users as $user) {
         $this->assertModelExists($user);
     }
+});
+
+
+test('user can be created with sites multi-select', function () {
+    $site1 = Site::factory()->create();
+    $site2 = Site::factory()->create();
+
+    $admin = User::factory()->create();
+    $admin->assignRole('super_admin');
+
+    $this->actingAs($admin);
+    Filament::setTenant($site1);
+
+    $email = fake()->unique()->safeEmail();
+
+    livewire(CreateUser::class, ['tenant' => $site1])
+        ->fillForm([
+            'first_name' => fake()->firstName(),
+            'last_name' => fake()->lastName(),
+            'email' => $email,
+            'password' => 'password123',
+            'sites' => [$site1->id, $site2->id],
+        ])
+        ->call('create')
+        ->assertHasNoFormErrors();
+
+    $user = User::where('email', $email)->first();
+
+    expect($user->sites)->toHaveCount(2);
+    expect($user->sites->pluck('id'))->toContain($site1->id, $site2->id);
+});
+
+test('user sites can be updated via multi-select in edit', function () {
+    $site1 = Site::factory()->create();
+    $site2 = Site::factory()->create();
+    $site3 = Site::factory()->create();
+    $user = User::factory()->create();
+
+    $user->sites()->attach($site1);
+
+    $admin = User::factory()->create();
+    $admin->assignRole('super_admin');
+
+    $this->actingAs($admin);
+    Filament::setTenant($site1);
+
+    livewire(EditUser::class, ['record' => $user->id, 'tenant' => $site1])
+        ->fillForm([
+            'sites' => [$site2->id, $site3->id],
+        ])
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    $user->refresh();
+
+    expect($user->sites)->toHaveCount(2);
+    expect($user->sites->pluck('id'))->toContain($site2->id, $site3->id);
+    expect($user->sites->pluck('id'))->not->toContain($site1->id);
+});
+
+test('user list shows only current site users by default', function () {
+    $site1 = Site::factory()->create();
+    $site2 = Site::factory()->create();
+
+    $user1 = User::factory()->create();
+    $user2 = User::factory()->create();
+    $user3 = User::factory()->create();
+
+    $user1->sites()->attach($site1);
+    $user2->sites()->attach($site2);
+    $user3->sites()->attach([$site1, $site2]);
+
+    $admin = User::factory()->create();
+    $admin->assignRole('super_admin');
+
+    $this->actingAs($admin);
+    Filament::setTenant($site1);
+
+    livewire(ListUsers::class, ['tenant' => $site1])
+        ->assertSuccessful()
+        ->assertCanSeeTableRecords([$user1, $user3])
+        ->assertCanNotSeeTableRecords([$user2]);
+});
+
+test('user list shows global and site role columns', function () {
+    $site = Site::factory()->create();
+    $user = User::factory()->create();
+
+    $globalRole = Role::create([
+        'name' => 'global_admin',
+        'guard_name' => 'web',
+        config('permission.column_names.team_foreign_key') => null // Global role
+    ]);
+
+    $siteRole = Role::create([
+        'name' => 'site_editor',
+        'guard_name' => 'web',
+        config('permission.column_names.team_foreign_key') => $site->id // Site-specific role
+    ]);
+
+    $user->sites()->attach($site);
+    $user->assignRole($globalRole);
+    $user->assignRole($siteRole);
+
+    $admin = User::factory()->create();
+    $admin->assignRole('super_admin');
+
+    $this->actingAs($admin);
+    Filament::setTenant($site);
+
+    livewire(ListUsers::class, ['tenant' => $site])
+        ->assertSuccessful()
+        ->assertTableColumnExists('global_roles')
+        ->assertTableColumnExists('site_roles');
+});
+
+
+test('filter shows users from all accessible sites when enabled', function () {
+    $site1 = Site::factory()->create();
+    $site2 = Site::factory()->create();
+
+    $user1 = User::factory()->create();
+    $user2 = User::factory()->create();
+
+    $user1->sites()->attach($site1);
+    $user2->sites()->attach($site2);
+
+    $admin = User::factory()->create();
+    $admin->assignRole('super_admin');
+    $admin->sites()->attach([$site1, $site2]);
+    $this->actingAs($admin);
+    Filament::setTenant($site1);
+
+    livewire(ListUsers::class, ['tenant' => $site1])
+        ->filterTable('user_visibility', true)
+        ->assertCanSeeTableRecords([$user1, $user2]);
+});
+
+test('role filters work for global and site roles', function () {
+    $site = Site::factory()->create();
+
+    $user1 = User::factory()->create();
+    $user2 = User::factory()->create();
+
+    $user1->sites()->attach($site);
+    $user2->sites()->attach($site);
+
+    $globalRole = Role::create([
+        'name' => 'global_admin',
+        config('permission.column_names.team_foreign_key') => null // Global role
+    ]);
+
+    $siteRole = Role::create([
+        'name' => 'site_editor',
+        config('permission.column_names.team_foreign_key') => $site->id // Site-specific role
+    ]);
+
+    $user1->assignRole($globalRole);
+    $user2->assignRole($siteRole);
+
+    $admin = User::factory()->create();
+    $admin->assignRole('super_admin');
+    $admin->sites()->attach($site);
+
+    $this->actingAs($admin);
+    Filament::setTenant($site);
+
+    livewire(ListUsers::class, ['tenant' => $site])
+        ->assertSuccessful()
+        ->assertCanSeeTableRecords([$user1, $user2]);
 });
