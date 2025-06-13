@@ -33,8 +33,6 @@ use STS\FilamentImpersonate\Tables\Actions\Impersonate;
 
 class UserResource extends Resource implements HasShieldPermissions
 {
-    // protected static bool $isScopedToTenant = false;
-
     protected static ?string $tenantOwnershipRelationshipName = 'sites';
 
     protected static ?string $model = User::class;
@@ -427,12 +425,9 @@ class UserResource extends Resource implements HasShieldPermissions
 
     public static function getEloquentQuery(): Builder
     {
-
-        $query = parent::getEloquentQuery()->withoutGlobalScopes([
+        return parent::getEloquentQuery()->withoutGlobalScopes([
             SoftDeletingScope::class,
         ]);
-
-        return $query;
     }
 
     public static function getPermissionPrefixes(): array

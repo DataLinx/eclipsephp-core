@@ -24,7 +24,7 @@ return [
     'field.guard_name' => 'Guard Name',
     'field.permissions' => 'Permissions',
     'field.team' => 'Site',
-    'field.team.placeholder' => 'Select a site ...',
+    'field.team.placeholder' => 'Global (all sites)',
     'field.select_all.name' => 'Select All',
     'field.select_all.message' => 'Enables/Disables all Permissions for this role',
 
