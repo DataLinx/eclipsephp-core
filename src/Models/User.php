@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\Permission\Traits\HasRoles;
@@ -162,9 +163,23 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, HasMedia,
         return parent::delete();
     }
 
-    /**
-     * Determine if the user can impersonate other users.
-     */
+    public function hasRoleGlobally($roles): bool
+    {
+        $roles = is_array($roles) ? $roles : [$roles];
+
+        $modelHasRolesTable = config('permission.table_names.model_has_roles', 'model_has_roles');
+        $rolesTable = config('permission.table_names.roles', 'roles');
+        $modelMorphKey = config('permission.column_names.model_morph_key', 'model_id');
+        $rolePivotKey = config('permission.column_names.role_pivot_key', 'role_id') ?: 'role_id';
+
+        return DB::table($modelHasRolesTable)
+            ->join($rolesTable, "{$rolesTable}.id", '=', "{$modelHasRolesTable}.{$rolePivotKey}")
+            ->where("{$modelHasRolesTable}.{$modelMorphKey}", $this->id)
+            ->where("{$modelHasRolesTable}.model_type", static::class)
+            ->whereIn("{$rolesTable}.name", $roles)
+            ->exists();
+    }
+
     public function canImpersonate(): bool
     {
         return $this->can('impersonate', User::class);

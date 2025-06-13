@@ -3,9 +3,11 @@
 use Eclipse\Core\Models\Site;
 use Eclipse\Core\Models\User;
 
-test('new user automatically gets panel_user role', function () {});
+test('new user automatically gets panel_user role', function () {
+    $user = User::factory()->create();
 
-test('user from seeder gets panel_user role', function () {});
+    expect($user->hasRoleGlobally('panel_user'))->toBeTrue();
+});
 
 test('user can only access sites they belong to', function () {
     $site1 = Site::factory()->create();
