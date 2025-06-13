@@ -82,7 +82,7 @@ test('new locale can be created', function () {
     expect($locale)->toBeObject();
 
     foreach ($data as $key => $val) {
-        expect($locale->$key)->toEqual($val, "Failed asserting that attribute $key value " . $locale->$key . ' is equal to ' . $val);
+        expect($locale->$key)->toEqual($val, "Failed asserting that attribute $key value ".$locale->$key.' is equal to '.$val);
     }
 });
 

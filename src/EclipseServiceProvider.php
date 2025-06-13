@@ -72,7 +72,7 @@ class EclipseServiceProvider extends PackageServiceProvider
     {
         parent::register();
 
-        require_once __DIR__ . '/Helpers/helpers.php';
+        require_once __DIR__.'/Helpers/helpers.php';
 
         Event::listen(Login::class, function ($event) {
             if ($event->user instanceof User) {
@@ -107,7 +107,7 @@ class EclipseServiceProvider extends PackageServiceProvider
         }
 
         // Enable Model strictness when not in production
-        Model::shouldBeStrict(!app()->isProduction());
+        Model::shouldBeStrict(! app()->isProduction());
 
         // Do not allow destructive DB commands in production
         DB::prohibitDestructiveCommands(app()->isProduction());

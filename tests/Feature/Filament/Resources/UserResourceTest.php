@@ -144,7 +144,6 @@ test('user can be deleted', function () {
     expect($user->trashed())->toBeTrue();
 });
 
-
 test('authed user cannot delete himself', function () {
     $superAdmin = User::withTrashed()->find($this->superAdmin->id);
 
@@ -163,7 +162,6 @@ test('authed user cannot delete himself', function () {
         $this->assertModelExists($user);
     }
 });
-
 
 test('user can be created with sites multi-select', function () {
     $site1 = Site::factory()->create();
@@ -253,13 +251,13 @@ test('user list shows global and site role columns', function () {
     $globalRole = Role::create([
         'name' => 'global_admin',
         'guard_name' => 'web',
-        config('permission.column_names.team_foreign_key') => null // Global role
+        config('permission.column_names.team_foreign_key') => null, // Global role
     ]);
 
     $siteRole = Role::create([
         'name' => 'site_editor',
         'guard_name' => 'web',
-        config('permission.column_names.team_foreign_key') => $site->id // Site-specific role
+        config('permission.column_names.team_foreign_key') => $site->id, // Site-specific role
     ]);
 
     $user->sites()->attach($site);
@@ -277,7 +275,6 @@ test('user list shows global and site role columns', function () {
         ->assertTableColumnExists('global_roles')
         ->assertTableColumnExists('site_roles');
 });
-
 
 test('filter shows users from all accessible sites when enabled', function () {
     $site1 = Site::factory()->create();
@@ -311,12 +308,12 @@ test('role filters work for global and site roles', function () {
 
     $globalRole = Role::create([
         'name' => 'global_admin',
-        config('permission.column_names.team_foreign_key') => null // Global role
+        config('permission.column_names.team_foreign_key') => null, // Global role
     ]);
 
     $siteRole = Role::create([
         'name' => 'site_editor',
-        config('permission.column_names.team_foreign_key') => $site->id // Site-specific role
+        config('permission.column_names.team_foreign_key') => $site->id, // Site-specific role
     ]);
 
     $user1->assignRole($globalRole);

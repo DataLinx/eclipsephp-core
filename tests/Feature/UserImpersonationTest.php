@@ -36,7 +36,7 @@ beforeEach(function () {
 test('non-authorized user cannot impersonate other users', function () {
     $this->unauthorizedUser->syncRoles([]);
     $this->unauthorizedUser->syncPermissions([]);
-    
+
     // Login as unauthorized user
     Auth::login($this->unauthorizedUser);
 
@@ -53,7 +53,7 @@ test('non-authorized user cannot impersonate other users', function () {
 test('non-authorized user cannot see and trigger the impersonate table and page action', function () {
     $this->unauthorizedUser->syncRoles([]);
     $this->unauthorizedUser->syncPermissions([]);
-    
+
     // Login as unauthorized user
     Auth::login($this->unauthorizedUser);
 

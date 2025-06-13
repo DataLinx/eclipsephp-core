@@ -4,9 +4,9 @@ namespace Eclipse\Core\Filament\Resources;
 
 use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
 use BezhanSalleh\FilamentShield\Forms\ShieldSelectAllToggle;
-use Eclipse\Core\Filament\Resources\RoleResource\Pages;
 use BezhanSalleh\FilamentShield\Support\Utils;
 use BezhanSalleh\FilamentShield\Traits\HasShieldFormComponents;
+use Eclipse\Core\Filament\Resources\RoleResource\Pages;
 use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Forms\Form;

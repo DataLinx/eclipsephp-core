@@ -2,8 +2,8 @@
 
 namespace Eclipse\Core\Models;
 
-use Eclipse\Core\Models\User\Role;
 use Eclipse\Core\Database\Factories\UserFactory;
+use Eclipse\Core\Models\User\Role;
 use Exception;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasAvatar;

@@ -18,8 +18,8 @@ class Role extends SpatieRole
         return $this->belongsTo(Site::class);
     }
 
-    protected function name(): Attribute {
-
+    protected function name(): Attribute
+    {
 
         return Attribute::make(
             get: fn (string $value) => Str::headline($value)

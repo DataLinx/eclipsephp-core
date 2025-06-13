@@ -2,8 +2,8 @@
 
 namespace Eclipse\Core\Filament\Resources\RoleResource\Pages;
 
-use Eclipse\Core\Filament\Resources\RoleResource;
 use BezhanSalleh\FilamentShield\Support\Utils;
+use Eclipse\Core\Filament\Resources\RoleResource;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
