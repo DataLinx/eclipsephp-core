@@ -66,7 +66,7 @@ test('log viewer is accessible for super admin users', function () {
     $user->assignRole('super_admin');
 
     // Assert the user has super_admin role
-    $this->assertTrue($user->hasRole('super_admin'));
+    $this->assertTrue($user->hasRoleGlobally('super_admin'));
 
     // Test access
     $this->actingAs($user);
