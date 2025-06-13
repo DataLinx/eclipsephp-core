@@ -63,14 +63,26 @@ class RoleResource extends Resource implements HasShieldPermissions
                                 Forms\Components\TextInput::make(config('permission.column_names.team_foreign_key'))
                                     ->label(__('filament-shield::filament-shield.field.team'))
                                     ->placeholder(__('filament-shield::filament-shield.field.team.placeholder'))
-                                    ->visibleOn('view'),
+                                    ->visible(function ($state, $context): bool {
+                                        if (empty($state) && $context === 'view') {
+                                            return true;
+                                        }
+
+                                        return false;
+                                    }),
 
                                 Forms\Components\Select::make(config('permission.column_names.team_foreign_key'))
                                     ->label(__('filament-shield::filament-shield.field.team'))
                                     ->placeholder(__('filament-shield::filament-shield.field.team.placeholder'))
                                     /** @phpstan-ignore-next-line */
                                     ->default([Filament::getTenant()?->id])
-                                    ->visibleOn(['create', 'edit'])
+                                    ->visible(function ($state, $context): bool {
+                                        if (empty($state) && $context === 'view') {
+                                            return false;
+                                        }
+
+                                        return true;
+                                    })
                                     ->options(fn (): Arrayable => Utils::getTenantModel() ? Utils::getTenantModel()::pluck('name', 'id') : collect())
                                     ->dehydrated(fn (): bool => ! (static::shield()->isCentralApp() && Utils::isTenancyEnabled())),
                                 ShieldSelectAllToggle::make('select_all')
