@@ -6,6 +6,7 @@ use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
 use Eclipse\Core\Filament\Exports\TableExport;
 use Eclipse\Core\Filament\Resources;
 use Eclipse\Core\Models\User;
+use Eclipse\Core\Models\User\Role;
 use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -24,7 +25,6 @@ use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Tables\Filters\QueryBuilder\Constraints\TextConstraint;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Hash;
@@ -74,13 +74,8 @@ class UserResource extends Resource implements HasShieldPermissions
             Forms\Components\Section::make(__('Access Control'))
                 ->compact()
                 ->schema([
-                    Forms\Components\Select::make('sites')
-                        ->relationship('sites', 'name')
-                        ->getOptionLabelFromRecordUsing(fn (Model $record): string => "{$record->name} ({$record->domain})")
-                        ->multiple()
-                        ->preload(),
-
                     Forms\Components\Select::make('roles')
+                        ->hiddenLabel()
                         ->relationship('roles', 'name')
                         ->getOptionLabelFromRecordUsing(function ($record): string {
                             $suffix = $record->site_id ? ' (Site-Specific)' : ' (Global)';
@@ -88,6 +83,13 @@ class UserResource extends Resource implements HasShieldPermissions
                             return "{$record->name}{$suffix}";
                         })
                         ->saveRelationshipsUsing(function (User $record, $state) {
+                            $siteIDs = Role::whereIn('id', $state)
+                                ->whereNotNull('site_id')
+                                ->pluck('site_id')
+                                ->toArray();
+
+                            $record->sites()->sync($siteIDs);
+
                             $record->roles()->syncWithPivotValues($state, [config('permission.column_names.team_foreign_key') => getPermissionsTeamId()]);
                         })
                         ->multiple()

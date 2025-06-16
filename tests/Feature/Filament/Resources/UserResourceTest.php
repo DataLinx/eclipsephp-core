@@ -2,7 +2,6 @@
 
 use Eclipse\Core\Filament\Resources\UserResource;
 use Eclipse\Core\Filament\Resources\UserResource\Pages\CreateUser;
-use Eclipse\Core\Filament\Resources\UserResource\Pages\EditUser;
 use Eclipse\Core\Filament\Resources\UserResource\Pages\ListUsers;
 use Eclipse\Core\Models\Site;
 use Eclipse\Core\Models\User;
@@ -161,63 +160,6 @@ test('authed user cannot delete himself', function () {
     foreach ($users as $user) {
         $this->assertModelExists($user);
     }
-});
-
-test('user can be created with sites multi-select', function () {
-    $site1 = Site::factory()->create();
-    $site2 = Site::factory()->create();
-
-    $admin = User::factory()->create();
-    $admin->assignRole('super_admin');
-
-    $this->actingAs($admin);
-    Filament::setTenant($site1);
-
-    $email = fake()->unique()->safeEmail();
-
-    livewire(CreateUser::class, ['tenant' => $site1])
-        ->fillForm([
-            'first_name' => fake()->firstName(),
-            'last_name' => fake()->lastName(),
-            'email' => $email,
-            'password' => 'password123',
-            'sites' => [$site1->id, $site2->id],
-        ])
-        ->call('create')
-        ->assertHasNoFormErrors();
-
-    $user = User::where('email', $email)->first();
-
-    expect($user->sites)->toHaveCount(2);
-    expect($user->sites->pluck('id'))->toContain($site1->id, $site2->id);
-});
-
-test('user sites can be updated via multi-select in edit', function () {
-    $site1 = Site::factory()->create();
-    $site2 = Site::factory()->create();
-    $site3 = Site::factory()->create();
-    $user = User::factory()->create();
-
-    $user->sites()->attach($site1);
-
-    $admin = User::factory()->create();
-    $admin->assignRole('super_admin');
-
-    $this->actingAs($admin);
-    Filament::setTenant($site1);
-
-    livewire(EditUser::class, ['record' => $user->id, 'tenant' => $site1])
-        ->fillForm([
-            'sites' => [$site2->id, $site3->id],
-        ])
-        ->call('save')
-        ->assertHasNoFormErrors();
-
-    $user->refresh();
-
-    expect($user->sites)->toHaveCount(2);
-    expect($user->sites->pluck('id'))->toContain($site2->id, $site3->id);
-    expect($user->sites->pluck('id'))->not->toContain($site1->id);
 });
 
 test('user list shows only current site users by default', function () {
