@@ -9,7 +9,9 @@ use Eclipse\Core\Models\User;
 use Eclipse\Core\Models\User\Role;
 use Filament\Facades\Filament;
 use Filament\Forms;
+use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Form;
+use Filament\Forms\Set;
 use Filament\Infolists\Components\Group;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\SpatieMediaLibraryImageEntry;
@@ -69,7 +71,16 @@ class UserResource extends Resource implements HasShieldPermissions
                         ->dehydrateStateUsing(fn ($state) => Hash::make($state))
                         ->dehydrated(fn ($state) => filled($state))
                         ->required(fn (string $context): bool => $context === 'create')
-                        ->label(fn (string $context): string => $context === 'create' ? 'Password' : 'Set new password'),
+                        ->label(fn (string $context): string => $context === 'create' ? 'Password' : 'Set new password')
+                        ->suffixAction(
+                            Action::make('randomPassword')
+                                ->icon('heroicon-s-arrow-path')
+                                ->tooltip(__('Random password generator'))
+                                ->color('gray')
+                                ->action(
+                                    fn (Set $set) => $set('password', Str::password(16))
+                                )
+                        ),
                 ]),
 
             Forms\Components\Section::make(__('Access Control'))
