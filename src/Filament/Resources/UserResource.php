@@ -28,6 +28,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 use STS\FilamentImpersonate\Tables\Actions\Impersonate;
 
@@ -166,6 +167,7 @@ class UserResource extends Resource implements HasShieldPermissions
                     ->roles()
                     ->whereNull('roles.'.config('permission.column_names.team_foreign_key'))
                     ->pluck('name')
+                    ->map(fn ($roleName) => Str::headline($roleName))
             )
             ->sortable(false)
             ->placeholder('No global roles')
@@ -183,7 +185,8 @@ class UserResource extends Resource implements HasShieldPermissions
 
                 return $record->roles()
                     ->where('roles.'.config('permission.column_names.team_foreign_key'), Filament::getTenant()->id)
-                    ->pluck('name');
+                    ->pluck('name')
+                    ->map(fn ($roleName) => Str::headline($roleName));
             })
             ->sortable(false)
             ->placeholder('No site roles')
@@ -366,8 +369,9 @@ class UserResource extends Resource implements HasShieldPermissions
                         ->placeholder(__('No roles assigned'))
                         ->formatStateUsing(function ($state): string {
                             $suffix = $state->site_id ? ' (Site-Specific)' : ' (Global)';
+                            $roleName = Str::headline($state->name);
 
-                            return "✓ {$state->name}{$suffix}";
+                            return "✓ {$roleName}{$suffix}";
                         }),
 
                 ]),

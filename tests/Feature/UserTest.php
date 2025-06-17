@@ -6,7 +6,9 @@ use Eclipse\Core\Models\User;
 test('new user automatically gets panel_user role', function () {
     $user = User::factory()->create();
 
-    expect($user->hasRoleGlobally('panel_user'))->toBeTrue();
+    $this->actingAs($user);
+
+    expect($user->hasRole('panel_user'))->toBeTrue();
 });
 
 test('user can only access sites they belong to', function () {
