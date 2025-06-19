@@ -128,7 +128,6 @@ class AdminPanelProvider extends PanelProvider
                 FilamentSpatieLaravelHealthPlugin::make()
                     ->usingPage(HealthCheckResults::class)
                     ->authorize(fn (): bool => auth()->user()->hasRole('super_admin')),
-                SpotlightPlugin::make(),
             ])
             ->navigationGroups([
                 NavigationGroup::make('Users'),
@@ -158,6 +157,19 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->databaseNotifications()
             ->unsavedChangesAlerts();
+
+        // If the Pro version of the Spotlight plugin is installed, use that, otherwise use the free version
+        if (class_exists(\pxlrbt\FilamentSpotlightPro\SpotlightPlugin::class)) {
+            /** @noinspection PhpFullyQualifiedNameUsageInspection */
+            $panel->plugin(\pxlrbt\FilamentSpotlightPro\SpotlightPlugin::make()
+                ->registerItems([
+                    \pxlrbt\FilamentSpotlightPro\SpotlightProviders\RegisterResources::make(),
+                ])
+                ->hotkeys(['¸'])
+            );
+        } else {
+            $panel->plugin(SpotlightPlugin::make());
+        }
 
         // Add plugins from the plugin registry
         foreach (app(Registry::class)->getPlugins() as $plugin) {
