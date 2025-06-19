@@ -5,6 +5,7 @@ namespace Eclipse\Core\Filament\Resources;
 use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
 use Eclipse\Core\Filament\Exports\TableExport;
 use Eclipse\Core\Filament\Resources;
+use Eclipse\Core\Filament\Resources\UserResource\RelationManagers\AddressesRelationManager;
 use Eclipse\Core\Models\User;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -240,7 +241,7 @@ class UserResource extends Resource implements HasShieldPermissions
     public static function getRelations(): array
     {
         return [
-            //
+            AddressesRelationManager::class,
         ];
     }
 
