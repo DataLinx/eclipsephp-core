@@ -26,7 +26,6 @@ class AddressesRelationManager extends RelationManager
             Forms\Components\CheckboxList::make('type')
                 ->live()
                 ->default([AddressType::DEFAULT_ADDRESS->value])
-                ->required()
                 ->options(AddressType::class)
                 ->columns(2),
             Forms\Components\TextInput::make('recipient')
