@@ -132,17 +132,25 @@ class AddressesRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('recipient')
                     ->weight(FontWeight::Bold)
                     ->description(function ($record) {
-                        $streetAddresses = implode('<br/> ', $record->street_address);
-                        $companyName = $record->company_name;
-                        $countryInfo = "{$record->country->flag} {$record->country->name}";
+                        $recipient = [];
 
-                        return new HtmlString("{$companyName} <br/> {$streetAddresses} <br/> {$countryInfo}");
+                        if ($record->company_name) {
+                            $recipient[] = $record->company_name;
+                        }
+
+                        $recipient[] = implode('<br/>', $record->street_address);
+
+                        $recipient[] = "{$record->country->flag} {$record->country->name}";
+
+                        return new HtmlString(implode('<br/>', $recipient));
                     })
                     ->searchable(['recipient', 'company_name', 'street_address', 'country_id']),
                 Tables\Columns\TextColumn::make('company_vat_id')
+                    ->placeholder('-')
                     ->label('Company VAT ID'),
                 Tables\Columns\TextColumn::make('type')
                     ->badge()
+                    ->placeholder('-')
                     ->formatStateUsing(fn ($state) => self::formatAddressTypeLabels($state)),
             ])
             ->filters([
