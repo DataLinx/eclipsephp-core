@@ -21,7 +21,7 @@ return new class extends Migration
             $table->json('street_address');
             $table->string('postal_code', 50);
             $table->string('city', 100);
-            $table->json('type');
+            $table->json('type')->nullable();
             $table->string('country_id', 2);
             $table->foreignId('user_id')
                 ->constrained('users')

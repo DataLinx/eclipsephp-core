@@ -138,18 +138,18 @@ class EclipseServiceProvider extends PackageServiceProvider
         });
 
         // Register health checks
-        Health::checks([
-            OptimizedAppCheck::new(),
-            DebugModeCheck::new(),
-            EnvironmentCheck::new(),
-            UsedDiskSpaceCheck::new()
-                ->warnWhenUsedSpaceIsAbovePercentage(70)
-                ->failWhenUsedSpaceIsAbovePercentage(90),
-            CacheCheck::new(),
-            HorizonCheck::new(),
-            RedisCheck::new(),
-            ScheduleCheck::new(),
-            SecurityAdvisoriesCheck::new(),
-        ]);
+        // Health::checks([
+        //     OptimizedAppCheck::new(),
+        //     DebugModeCheck::new(),
+        //     EnvironmentCheck::new(),
+        //     UsedDiskSpaceCheck::new()
+        //         ->warnWhenUsedSpaceIsAbovePercentage(70)
+        //         ->failWhenUsedSpaceIsAbovePercentage(90),
+        //     CacheCheck::new(),
+        //     HorizonCheck::new(),
+        //     RedisCheck::new(),
+        //     ScheduleCheck::new(),
+        //     SecurityAdvisoriesCheck::new(),
+        // ]);
     }
 }

@@ -133,11 +133,14 @@ class AddressesRelationManager extends RelationManager
                     ->weight(FontWeight::Bold)
                     ->description(function ($record) {
                         $streetAddresses = implode('<br/> ', $record->street_address);
+                        $companyName = $record->company_name;
                         $countryInfo = "{$record->country->flag} {$record->country->name}";
 
-                        return new HtmlString("{$streetAddresses} <br/> {$countryInfo}");
+                        return new HtmlString("{$companyName} <br/> {$streetAddresses} <br/> {$countryInfo}");
                     })
-                    ->searchable(['recipient', 'street_address', 'country_id']),
+                    ->searchable(['recipient', 'company_name', 'street_address', 'country_id']),
+                Tables\Columns\TextColumn::make('company_vat_id')
+                    ->label('Company VAT ID'),
                 Tables\Columns\TextColumn::make('type')
                     ->badge()
                     ->formatStateUsing(fn ($state) => self::formatAddressTypeLabels($state)),

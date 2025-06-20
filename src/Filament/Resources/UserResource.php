@@ -7,6 +7,7 @@ use Eclipse\Core\Filament\Exports\TableExport;
 use Eclipse\Core\Filament\Resources;
 use Eclipse\Core\Filament\Resources\UserResource\RelationManagers\AddressesRelationManager;
 use Eclipse\Core\Models\User;
+use Eclipse\Core\Settings\EclipseSettings;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Infolists\Components\Group;
@@ -240,9 +241,15 @@ class UserResource extends Resource implements HasShieldPermissions
 
     public static function getRelations(): array
     {
-        return [
-            AddressesRelationManager::class,
-        ];
+        $isAddressBookEnabled = app(EclipseSettings::class)->address_book ?? false;
+
+        $relationManagers = [];
+
+        if ($isAddressBookEnabled) {
+            $relationManagers[] = AddressesRelationManager::class;
+        }
+
+        return $relationManagers;
     }
 
     public static function getPages(): array
