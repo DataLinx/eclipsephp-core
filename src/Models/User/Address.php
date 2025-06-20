@@ -3,7 +3,6 @@
 namespace Eclipse\Core\Models\User;
 
 use Eclipse\Core\Database\Factories\AddressFactory;
-use Eclipse\Core\Enums\AddressType;
 use Eclipse\Core\Models\User;
 use Eclipse\World\Models\Country;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -41,7 +40,7 @@ class Address extends Model
     {
         return [
             'street_address' => 'array',
-            'type' => AddressType::class,
+            'type' => 'array',
             'user_id' => 'integer',
         ];
     }

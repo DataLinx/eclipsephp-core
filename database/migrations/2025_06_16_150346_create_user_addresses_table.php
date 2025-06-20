@@ -21,14 +21,16 @@ return new class extends Migration
             $table->json('street_address');
             $table->string('postal_code', 50);
             $table->string('city', 100);
-            $table->enum('type', ['default_address', 'company_address'])
-                ->default('default_address');
+            $table->json('type');
             $table->string('country_id', 2);
             $table->foreignId('user_id')
                 ->constrained('users')
                 ->cascadeOnDelete();
             $table->softDeletes();
             $table->timestamps();
+            $table->foreign('country_id')
+                ->references('id')
+                ->on('world_countries');
         });
     }
 

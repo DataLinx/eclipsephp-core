@@ -23,21 +23,22 @@ class AddressesRelationManager extends RelationManager
     public static function getAddressForm(): array
     {
         return [
-            Forms\Components\Radio::make('type')
+            Forms\Components\CheckboxList::make('type')
                 ->live()
-                ->default(AddressType::DEFAULT_ADDRESS)
+                ->default([AddressType::DEFAULT_ADDRESS->value])
                 ->required()
-                ->options(AddressType::class),
+                ->options(AddressType::class)
+                ->columns(2),
             Forms\Components\TextInput::make('recipient')
                 ->maxLength(100)
                 ->label('Full name')
                 ->required(),
             Forms\Components\TextInput::make('company_name')
-                ->visible(fn (Get $get): bool => ($get('type') === AddressType::COMPANY_ADDRESS->value))
+                ->visible(fn (Get $get): bool => in_array(AddressType::COMPANY_ADDRESS->value, $get('type') ?? []))
                 ->required()
                 ->maxLength(100),
             Forms\Components\TextInput::make('company_vat_id')
-                ->visible(fn (Get $get): bool => ($get('type') === AddressType::COMPANY_ADDRESS->value))
+                ->visible(fn (Get $get): bool => in_array(AddressType::COMPANY_ADDRESS->value, $get('type') ?? []))
                 ->label('Company VAT ID')
                 ->maxLength(50),
             Forms\Components\Repeater::make('street_address')
@@ -48,7 +49,8 @@ class AddressesRelationManager extends RelationManager
                     Forms\Components\TextInput::make('street_address')
                         ->maxLength(255)
                         ->required()
-                ),
+                )
+                ->addActionLabel(__('Add address line')),
             Forms\Components\Split::make([
                 Forms\Components\TextInput::make('postal_code')
                     ->required()
@@ -68,12 +70,13 @@ class AddressesRelationManager extends RelationManager
         return [
             Infolists\Components\Grid::make()->schema([
                 Infolists\Components\TextEntry::make('type')
-                    ->badge(),
+                    ->badge()
+                    ->formatStateUsing(fn ($state) => self::formatAddressTypeLabels($state)),
                 Infolists\Components\TextEntry::make('recipient'),
                 Infolists\Components\TextEntry::make('company_name')
-                    ->visible(fn ($record): bool => ($record->type === AddressType::COMPANY_ADDRESS->value)),
+                    ->visible(fn ($record): bool => self::hasCompanyAddress($record->type)),
                 Infolists\Components\TextEntry::make('company_vat_id')
-                    ->visible(fn ($record): bool => ($record->type === AddressType::COMPANY_ADDRESS->value))
+                    ->visible(fn ($record): bool => self::hasCompanyAddress($record->type))
                     ->default('-')
                     ->label('Company VAT ID'),
                 Infolists\Components\TextEntry::make('street_address')
@@ -81,11 +84,44 @@ class AddressesRelationManager extends RelationManager
                 Infolists\Components\TextEntry::make('country')
                     ->formatStateUsing(fn ($state) => "{$state->name} {$state->flag}"),
                 Infolists\Components\Split::make([
-                    Infolists\Components\TextEntry::make('postal_code'),
+                    Infolists\Components\TextEntry::make('postal_code')
+                        ->badge()
+                        ->color('warning'),
                     Infolists\Components\TextEntry::make('city'),
                 ])->columnSpanFull(),
             ]),
         ];
+    }
+
+    private static function hasCompanyAddress($types): bool
+    {
+        if (! is_array($types)) {
+            return false;
+        }
+
+        return collect($types)->contains(function ($type) {
+            return ($type instanceof AddressType && $type === AddressType::COMPANY_ADDRESS) ||
+                $type === AddressType::COMPANY_ADDRESS->value;
+        });
+    }
+
+    private static function formatAddressTypeLabels($state): string
+    {
+        if (is_array($state)) {
+            return collect($state)->map(function ($type) {
+                if (is_string($type)) {
+                    return AddressType::from($type)->getLabel();
+                }
+
+                return $type->getLabel();
+            })->join(', ');
+        }
+
+        if (is_string($state)) {
+            return AddressType::from($state)->getLabel();
+        }
+
+        return $state->getLabel();
     }
 
     public function table(Table $table): Table
@@ -103,11 +139,19 @@ class AddressesRelationManager extends RelationManager
                     })
                     ->searchable(['recipient', 'street_address', 'country_id']),
                 Tables\Columns\TextColumn::make('type')
-                    ->badge(),
+                    ->badge()
+                    ->formatStateUsing(fn ($state) => self::formatAddressTypeLabels($state)),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('type')
-                    ->options(AddressType::class),
+                    ->options(AddressType::class)
+                    ->query(function (Builder $query, array $data): Builder {
+                        if (filled($data['value'])) {
+                            return $query->whereJsonContains('type', $data['value']);
+                        }
+
+                        return $query;
+                    }),
                 Tables\Filters\TrashedFilter::make(),
             ])
             ->actions([
@@ -115,6 +159,7 @@ class AddressesRelationManager extends RelationManager
                     ->infolist(self::getAddressInfolist()),
                 Tables\Actions\EditAction::make()
                     ->form(self::getAddressForm()),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
