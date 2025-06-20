@@ -5,7 +5,9 @@ namespace Eclipse\Core\Filament\Resources;
 use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
 use Eclipse\Core\Filament\Exports\TableExport;
 use Eclipse\Core\Filament\Resources;
+use Eclipse\Core\Filament\Resources\UserResource\RelationManagers\AddressesRelationManager;
 use Eclipse\Core\Models\User;
+use Eclipse\Core\Settings\EclipseSettings;
 use Filament\Forms;
 use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Form;
@@ -251,9 +253,15 @@ class UserResource extends Resource implements HasShieldPermissions
 
     public static function getRelations(): array
     {
-        return [
-            //
-        ];
+        $isAddressBookEnabled = app(EclipseSettings::class)->address_book ?? false;
+
+        $relationManagers = [];
+
+        if ($isAddressBookEnabled) {
+            $relationManagers[] = AddressesRelationManager::class;
+        }
+
+        return $relationManagers;
     }
 
     public static function getPages(): array
