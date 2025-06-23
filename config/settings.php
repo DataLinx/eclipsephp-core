@@ -35,7 +35,7 @@ return [
      */
     'repositories' => [
         'database' => [
-            'type' => \Eclipse\Core\SettingsRepositories\SiteSettingsRepository::class,
+            'type' => \Eclipse\Core\Settings\Repositories\SiteSettingsRepository::class,
             'model' => null,
             'table' => null,
             'connection' => null,
@@ -75,7 +75,7 @@ return [
         DateTimeInterface::class => Spatie\LaravelSettings\SettingsCasts\DateTimeInterfaceCast::class,
         DateTimeZone::class => Spatie\LaravelSettings\SettingsCasts\DateTimeZoneCast::class,
         // Spatie\DataTransferObject\DataTransferObject::class => Spatie\LaravelSettings\SettingsCasts\DtoCast::class,
-        Spatie\LaravelData\Data::class => Spatie\LaravelSettings\SettingsCasts\DataCast::class,
+        // Spatie\LaravelData\Data::class => Spatie\LaravelSettings\SettingsCasts\DataCast::class,
     ],
 
     /*
