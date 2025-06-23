@@ -94,7 +94,7 @@
         "setup": [
             "npm install",
             "@php vendor/bin/testbench eclipse:post-composer-update",
-            "@php vendor/bin/testbench vendor:publish --tag=eclipse-config",
+            "@php vendor/bin/testbench vendor:publish --tag=eclipse-config --force",
             "@php vendor/bin/testbench package:sync-skeleton"
         ]
     },
