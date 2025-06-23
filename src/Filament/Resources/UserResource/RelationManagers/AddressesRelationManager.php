@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Eclipse\Core\Filament\Resources\UserResource\RelationManagers;
 
 use Eclipse\Core\Enums\AddressType;
+use Eclipse\Core\Settings\EclipseSettings;
 use Filament\Forms;
 use Filament\Forms\Get;
 use Filament\Infolists;
@@ -14,11 +15,19 @@ use Filament\Tables;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\HtmlString;
 
 class AddressesRelationManager extends RelationManager
 {
     protected static string $relationship = 'addresses';
+
+    public static function canViewForRecord(Model $ownerRecord, string $pageClass): bool
+    {
+        $isAddressBookEnabled = app(EclipseSettings::class)->address_book ?? false;
+
+        return $isAddressBookEnabled;
+    }
 
     public static function getAddressForm(): array
     {

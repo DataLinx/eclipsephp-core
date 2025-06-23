@@ -7,7 +7,6 @@ use Eclipse\Core\Filament\Exports\TableExport;
 use Eclipse\Core\Filament\Resources;
 use Eclipse\Core\Filament\Resources\UserResource\RelationManagers\AddressesRelationManager;
 use Eclipse\Core\Models\User;
-use Eclipse\Core\Settings\EclipseSettings;
 use Filament\Forms;
 use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Form;
@@ -27,7 +26,6 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 use STS\FilamentImpersonate\Tables\Actions\Impersonate;
@@ -254,20 +252,9 @@ class UserResource extends Resource implements HasShieldPermissions
 
     public static function getRelations(): array
     {
-        // Temporary Fix: getRelations is being accessed before migrations is running in test
-        if (! Schema::hasTable('settings')) {
-            return [];
-        }
-
-        $isAddressBookEnabled = app(EclipseSettings::class)->address_book ?? false;
-
-        $relationManagers = [];
-
-        if ($isAddressBookEnabled) {
-            $relationManagers[] = AddressesRelationManager::class;
-        }
-
-        return $relationManagers;
+        return [
+            AddressesRelationManager::class,
+        ];
     }
 
     public static function getPages(): array
