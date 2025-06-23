@@ -1,6 +1,6 @@
 <?php
 
-namespace Eclipse\Core\SettingsRepositories;
+namespace Eclipse\Core\Settings\Repositories;
 
 use Filament\Facades\Filament;
 use Illuminate\Database\Eloquent\Builder;
