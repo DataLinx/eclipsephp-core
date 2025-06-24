@@ -3,8 +3,12 @@
 namespace Eclipse\Core\Models;
 
 use Eclipse\Core\Database\Factories\SiteFactory;
+use Eclipse\Core\Models\User\Role;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Site extends Model
 {
@@ -32,8 +36,40 @@ class Site extends Model
         ];
     }
 
+    public function site(): BelongsTo
+    {
+        return $this->belongsTo(Site::class);
+    }
+
+    public function users(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'site_has_user');
+    }
+
+    // protected static function booted(): void
+    // {
+    //     static::created(function ($site): void {
+    //         $allUserIDs = Role::whereNull('site_id')
+    //             ->with('users')
+    //             ->get()
+    //             ->pluck('users.*.id')
+    //             ->flatten()
+    //             ->unique();
+
+    //         if ($allUserIDs->isNotEmpty()) {
+    //             $site->users()->syncWithoutDetaching($allUserIDs);
+    //         }
+    //     });
+    // }
+
     protected static function newFactory(): SiteFactory
     {
         return SiteFactory::new();
+    }
+
+    /** @return HasMany<\Eclipse\Core\Models\User\Role, self> */
+    public function roles(): HasMany
+    {
+        return $this->hasMany(\Eclipse\Core\Models\User\Role::class);
     }
 }

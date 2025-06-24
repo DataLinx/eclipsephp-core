@@ -21,6 +21,10 @@ test('authorized user with permission can trash another user', function () {
 test('non-authorized user cannot trash another user', function () {
     $user = User::factory()->create();
     $targetUser = User::factory()->create();
+
+    $user->syncRoles([]);
+    $user->syncPermissions([]);
+
     Auth::login($user);
     $this->assertFalse($user->hasPermissionTo('delete_user'));
     $this->assertFalse($user->can('delete', $targetUser));
@@ -66,6 +70,10 @@ test('non-authorized user cannot restore another user', function () {
     $userToTrash = User::factory()->create();
     $userToTrash->delete();
     $nonAuthorizedUser = User::factory()->create();
+
+    $nonAuthorizedUser->syncRoles([]);
+    $nonAuthorizedUser->syncPermissions([]);
+
     Auth::login($nonAuthorizedUser);
     $this->assertFalse($nonAuthorizedUser->hasPermissionTo('restore_user'));
     $this->assertFalse($nonAuthorizedUser->can('restore', $userToTrash));
@@ -101,6 +109,10 @@ test('non-authorized user cannot force delete a trashed user', function () {
     $userToTrash = User::factory()->create();
     $userToTrash->delete();
     $nonAuthorizedUser = User::factory()->create();
+
+    $nonAuthorizedUser->syncRoles([]);
+    $nonAuthorizedUser->syncPermissions([]);
+
     Auth::login($nonAuthorizedUser);
     $this->assertFalse($nonAuthorizedUser->hasPermissionTo('force_delete_user'));
     $this->assertFalse($nonAuthorizedUser->can('forceDelete', $userToTrash));

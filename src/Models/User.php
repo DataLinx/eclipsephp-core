@@ -3,6 +3,7 @@
 namespace Eclipse\Core\Models;
 
 use Eclipse\Core\Database\Factories\UserFactory;
+use Eclipse\Core\Models\User\Role;
 use Exception;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasAvatar;
@@ -123,6 +124,16 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, HasMedia,
                 throw new Exception('This account has been deactivated.');
             }
         });
+
+        static::created(function (self $user) {
+            $panelUserRole = Role::firstOrCreate(['name' => 'panel_user']);
+            if (app()->bound('filament') && filament()->getTenant()) {
+                $tenant = filament()->getTenant();
+                $user->assignRole($panelUserRole, $tenant->getKey());
+            } else {
+                $user->assignRole($panelUserRole);
+            }
+        });
     }
 
     /**
@@ -151,11 +162,18 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, HasMedia,
         return parent::delete();
     }
 
-    /**
-     * Determine if the user can impersonate other users.
-     */
     public function canImpersonate(): bool
     {
         return $this->can('impersonate', User::class);
+    }
+
+    public function hasSiteRole(Site $site, string $role): bool
+    {
+        return $this->roles()
+            ->where('name', $role)
+            ->where(function ($query) use ($site) {
+                $query->where('model_has_roles.' . config('permission.column_names.team_foreign_key'), $site->id);
+            })
+            ->exists();
     }
 }
