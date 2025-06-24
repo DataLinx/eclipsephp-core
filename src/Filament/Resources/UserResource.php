@@ -5,6 +5,7 @@ namespace Eclipse\Core\Filament\Resources;
 use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
 use Eclipse\Core\Filament\Exports\TableExport;
 use Eclipse\Core\Filament\Resources;
+use Eclipse\Core\Models\Site;
 use Eclipse\Core\Models\User;
 use Eclipse\Core\Models\User\Role;
 use Filament\Facades\Filament;
@@ -29,7 +30,9 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 use STS\FilamentImpersonate\Tables\Actions\Impersonate;
@@ -49,9 +52,8 @@ class UserResource extends Resource implements HasShieldPermissions
     public static function form(Form $form): Form
     {
         return $form->schema([
-            Forms\Components\Section::make(__('Personal Information'))
+            Forms\Components\Section::make(__('Personal Info.'))
                 ->columns(2)
-                ->compact()
                 ->schema([
                     Forms\Components\SpatieMediaLibraryFileUpload::make('avatar')
                         ->collection('avatars')
@@ -68,46 +70,83 @@ class UserResource extends Resource implements HasShieldPermissions
                     Forms\Components\TextInput::make('password')
                         ->password()
                         ->revealable()
-                        ->dehydrateStateUsing(fn ($state) => Hash::make($state))
-                        ->dehydrated(fn ($state) => filled($state))
-                        ->required(fn (string $context): bool => $context === 'create')
-                        ->label(fn (string $context): string => $context === 'create' ? 'Password' : 'Set new password')
+                        ->dehydrateStateUsing(fn($state) => Hash::make($state))
+                        ->dehydrated(fn($state) => filled($state))
+                        ->required(fn(string $context): bool => $context === 'create')
+                        ->label(fn(string $context): string => $context === 'create' ? 'Password' : 'Set new password')
                         ->suffixAction(
                             Action::make('randomPassword')
                                 ->icon('heroicon-s-arrow-path')
                                 ->tooltip(__('Random password generator'))
                                 ->color('gray')
                                 ->action(
-                                    fn (Set $set) => $set('password', Str::password(16))
+                                    fn(Set $set) => $set('password', Str::password(16))
                                 )
                         ),
                 ]),
-
-            Forms\Components\Section::make(__('Access Control'))
-                ->compact()
+            Forms\Components\Section::make(__('Global Roles'))
                 ->schema([
-                    Forms\Components\Select::make('roles')
+                    Forms\Components\CheckboxList::make('global_roles')
                         ->hiddenLabel()
-                        ->relationship('roles', 'name')
-                        ->getOptionLabelFromRecordUsing(function ($record): string {
-                            $suffix = $record->site_id ? ' (Site-Specific)' : ' (Global)';
-
-                            return "{$record->name}{$suffix}";
-                        })
-                        ->saveRelationshipsUsing(function (User $record, $state) {
-                            $siteIDs = Role::whereIn('id', $state)
-                                ->whereNotNull('site_id')
-                                ->pluck('site_id')
-                                ->toArray();
-
-                            $record->sites()->sync($siteIDs);
-
-                            $record->roles()->syncWithPivotValues($state, [config('permission.column_names.team_foreign_key') => getPermissionsTeamId()]);
-                        })
-                        ->multiple()
-                        ->preload()
-                        ->searchable(),
+                        ->columnSpanFull()
+                        ->columns([
+                            'sm' => 2,
+                            'md' => 3,
+                            'lg' => 4,
+                            'xl' => 5,
+                        ])
+                        ->options(fn() => Role::pluck('name', 'id')->mapWithKeys(
+                            fn($name, $key) => [$key => Str::headline($name)]
+                        ))
+                        ->afterStateHydrated(function ($component, $record) {
+                            if ($record) {
+                                $roles = DB::table('model_has_roles')
+                                    ->where('model_id', $record->id)
+                                    ->where('model_type', get_class($record))
+                                    ->where('is_global', true)
+                                    ->pluck('role_id')
+                                    ->toArray();
+                                $component->state($roles);
+                            }
+                        }),
                 ]),
+
+            Forms\Components\Tabs::make()
+                ->columnSpanFull()
+                ->tabs(function (): array {
+                    $tabs = [];
+                    foreach (Site::all() as $site) {
+                        $tabs[] = Forms\Components\Tabs\Tab::make($site->name)
+                            ->schema([
+                                Forms\Components\CheckboxList::make("site_{$site->id}")
+                                    ->label('Roles')
+                                    ->columns(3)
+                                    ->options(fn() => Role::pluck('name', 'id')->mapWithKeys(
+                                        fn($name, $key) => [$key => Str::headline($name)]
+                                    ))
+                                    ->afterStateHydrated(function ($component, $record) use ($site) {
+                                        if ($record) {
+                                            $roles = DB::table('model_has_roles')
+                                                ->where('model_id', $record->id)
+                                                ->where('model_type', get_class($record))
+                                                ->where(function ($query) use ($site) {
+                                                    $query->where('is_global', true)
+                                                        ->orWhere(function ($q) use ($site) {
+                                                            $q->where('is_global', false)
+                                                                ->where(config('permission.column_names.team_foreign_key'), $site->id);
+                                                        });
+                                                })
+                                                ->pluck('role_id')
+                                                ->unique()
+                                                ->toArray();
+                                            $component->state($roles);
+                                        }
+                                    }),
+                            ]);
+                    }
+
+                    return $tabs;
+                }),
         ]);
     }
 
@@ -119,7 +158,7 @@ class UserResource extends Resource implements HasShieldPermissions
                 ->toggleable()
                 ->size(50)
                 ->circular()
-                ->defaultImageUrl(fn (User $user) => 'https://ui-avatars.com/api/?name='.urlencode($user->name)),
+                ->defaultImageUrl(fn(User $user) => 'https://ui-avatars.com/api/?name=' . urlencode($user->name)),
             Tables\Columns\TextColumn::make('first_name')
                 ->searchable()
                 ->sortable()
@@ -142,7 +181,7 @@ class UserResource extends Resource implements HasShieldPermissions
                 ->label('Total Logins')
                 ->sortable()
                 ->numeric()
-                ->formatStateUsing(fn (?int $state) => $state ?? 0),
+                ->formatStateUsing(fn(?int $state) => $state ?? 0),
         ];
 
         if (config('eclipse.email_verification')) {
@@ -150,9 +189,9 @@ class UserResource extends Resource implements HasShieldPermissions
                 ->searchable()
                 ->sortable()
                 ->width(150)
-                ->icon(fn (User $user) => $user->email_verified_at ? 'heroicon-s-check-circle' : 'heroicon-s-x-circle')
-                ->iconColor(fn (User $user) => $user->email_verified_at ? Color::Green : Color::Red)
-                ->tooltip(fn (User $user) => $user->email_verified_at ? 'Verified' : 'Not verified');
+                ->icon(fn(User $user) => $user->email_verified_at ? 'heroicon-s-check-circle' : 'heroicon-s-x-circle')
+                ->iconColor(fn(User $user) => $user->email_verified_at ? Color::Green : Color::Red)
+                ->tooltip(fn(User $user) => $user->email_verified_at ? 'Verified' : 'Not verified');
         } else {
             $columns[] = Tables\Columns\TextColumn::make('email')
                 ->searchable()
@@ -174,11 +213,11 @@ class UserResource extends Resource implements HasShieldPermissions
             ->translateLabel()
             ->badge()
             ->getStateUsing(
-                fn (User $record): Collection => $record
+                fn(User $record): Collection => $record
                     ->roles()
-                    ->whereNull('roles.'.config('permission.column_names.team_foreign_key'))
+                    ->whereNull('roles.' . config('permission.column_names.team_foreign_key'))
                     ->pluck('name')
-                    ->map(fn ($roleName) => Str::headline($roleName))
+                    ->map(fn($roleName) => Str::headline($roleName))
             )
             ->sortable(false)
             ->placeholder('No global roles')
@@ -190,14 +229,14 @@ class UserResource extends Resource implements HasShieldPermissions
             ->badge()
             ->color('warning')
             ->getStateUsing(function (User $record) {
-                if (! Filament::getTenant()) {
+                if (!Filament::getTenant()) {
                     return 'No site context';
                 }
 
                 return $record->roles()
-                    ->where('roles.'.config('permission.column_names.team_foreign_key'), Filament::getTenant()->id)
+                    ->where('roles.' . config('permission.column_names.team_foreign_key'), Filament::getTenant()->id)
                     ->pluck('name')
-                    ->map(fn ($roleName) => Str::headline($roleName));
+                    ->map(fn($roleName) => Str::headline($roleName));
             })
             ->sortable(false)
             ->placeholder('No site roles')
@@ -227,10 +266,10 @@ class UserResource extends Resource implements HasShieldPermissions
                         ->grouped()
                         ->redirectTo(route('filament.admin.tenant')),
                     Tables\Actions\DeleteAction::make()
-                        ->authorize(fn (User $record) => auth()->user()->can('delete_user') && auth()->id() !== $record->id)
+                        ->authorize(fn(User $record) => auth()->user()->can('delete_user') && auth()->id() !== $record->id)
                         ->requiresConfirmation(),
                     Tables\Actions\RestoreAction::make()
-                        ->visible(fn (User $user) => $user->trashed() && auth()->user()->can('restore_user'))
+                        ->visible(fn(User $user) => $user->trashed() && auth()->user()->can('restore_user'))
                         ->requiresConfirmation(),
                 ]),
             ])
@@ -286,7 +325,7 @@ class UserResource extends Resource implements HasShieldPermissions
                 ->label('Global Roles')
                 ->relationship('roles', 'name', function (Builder $query): void {
                     $query
-                        ->whereNull('roles.'.config('permission.column_names.team_foreign_key'));
+                        ->whereNull('roles.' . config('permission.column_names.team_foreign_key'));
                 })
                 ->multiple()
                 ->searchable()
@@ -296,13 +335,13 @@ class UserResource extends Resource implements HasShieldPermissions
                 ->label('Site Roles')
                 ->relationship('roles', 'name', function (Builder $query): void {
                     if (Filament::getTenant()) {
-                        $query->where('roles.'.config('permission.column_names.team_foreign_key'), Filament::getTenant()->id);
+                        $query->where('roles.' . config('permission.column_names.team_foreign_key'), Filament::getTenant()->id);
                     }
                 })
                 ->multiple()
                 ->searchable()
                 ->preload()
-                ->visible(fn () => Filament::getTenant() !== null),
+                ->visible(fn() => Filament::getTenant() !== null),
 
             Tables\Filters\TernaryFilter::make('email_verified_at')
                 ->label('Email verification')
@@ -311,9 +350,9 @@ class UserResource extends Resource implements HasShieldPermissions
                 ->trueLabel('Verified')
                 ->falseLabel('Not verified')
                 ->queries(
-                    true: fn (Builder $query) => $query->whereNotNull('email_verified_at'),
-                    false: fn (Builder $query) => $query->whereNull('email_verified_at'),
-                    blank: fn (Builder $query) => $query,
+                    true: fn(Builder $query) => $query->whereNotNull('email_verified_at'),
+                    false: fn(Builder $query) => $query->whereNull('email_verified_at'),
+                    blank: fn(Builder $query) => $query,
                 )
                 ->visible(config('eclipse.email_verification')),
             Tables\Filters\QueryBuilder::make()
@@ -352,39 +391,80 @@ class UserResource extends Resource implements HasShieldPermissions
                 ->schema([
                     SpatieMediaLibraryImageEntry::make('avatar')
                         ->collection('avatars')
-                        ->defaultImageUrl(fn (User $user) => 'https://ui-avatars.com/api/?name='.urlencode($user->name))
+                        ->defaultImageUrl(fn(User $user) => 'https://ui-avatars.com/api/?name=' . urlencode($user->name))
                         ->circular(),
                     Group::make()
                         ->schema([
                             TextEntry::make('name')
                                 ->label('Full name'),
                             TextEntry::make('email')
-                                ->icon(config('eclipse.email_verification') ? fn (User $user) => $user->email_verified_at ? 'heroicon-s-check-circle' : 'heroicon-s-x-circle' : null)
-                                ->iconColor(fn (User $user) => $user->email_verified_at ? Color::Green : Color::Red),
+                                ->icon(config('eclipse.email_verification') ? fn(User $user) => $user->email_verified_at ? 'heroicon-s-check-circle' : 'heroicon-s-x-circle' : null)
+                                ->iconColor(fn(User $user) => $user->email_verified_at ? Color::Green : Color::Red),
                         ]),
                 ]),
-            Section::make(__('Access Information'))
+            Section::make()
                 ->compact()
                 ->columns(2)
                 ->schema([
                     TextEntry::make('sites')
-                        ->label('Accessable Sites')
+                        ->label('Accessible Sites')
                         ->weight(FontWeight::Medium)
                         ->listWithLineBreaks()
-                        ->placeholder(__(' No sites accessible'))
-                        ->formatStateUsing(fn ($state) => "✓ {$state->name} ({$state->domain})"),
+                        ->placeholder(__('No sites accessible'))
+                        ->formatStateUsing(fn($state) => "✓ {$state->name} ({$state->domain})"),
 
-                    TextEntry::make('roles')
-                        ->listWithLineBreaks()
+                    TextEntry::make('global_roles')
+                        ->label('Global Roles')
                         ->weight(FontWeight::Medium)
-                        ->placeholder(__('No roles assigned'))
-                        ->formatStateUsing(function ($state): string {
-                            $suffix = $state->site_id ? ' (Site-Specific)' : ' (Global)';
-                            $roleName = Str::headline($state->name);
+                        ->listWithLineBreaks()
+                        ->placeholder(__('No global roles assigned'))
+                        ->getStateUsing(function ($record): Collection {
+                            if (!$record)
+                                return collect();
 
-                            return "✓ {$roleName}{$suffix}";
+                            $globalRoles = DB::table('model_has_roles')
+                                ->join('roles', 'roles.id', '=', 'model_has_roles.role_id')
+                                ->where('model_has_roles.model_id', $record->id)
+                                ->where('model_has_roles.model_type', get_class($record))
+                                ->where('model_has_roles.is_global', true)
+                                ->pluck('roles.name');
+
+                            return $globalRoles->map(fn($name) => "✓ " . Str::headline($name));
                         }),
 
+                    TextEntry::make('site_roles_breakdown')
+                        ->label('Site Roles')
+                        ->columnSpanFull()
+                        ->getStateUsing(function ($record): string {
+                            if (!$record)
+                                return 'No site roles assigned';
+
+                            $breakdown = [];
+
+                            foreach (Site::all() as $site) {
+                                $roles = DB::table('model_has_roles')
+                                    ->join('roles', 'roles.id', '=', 'model_has_roles.role_id')
+                                    ->where('model_has_roles.model_id', $record->id)
+                                    ->where('model_has_roles.model_type', get_class($record))
+                                    ->where(function ($query) use ($site) {
+                                    $query->where('model_has_roles.is_global', true)
+                                        ->orWhere(function ($q) use ($site) {
+                                            $q->where('model_has_roles.is_global', false)
+                                                ->where('model_has_roles.' . config('permission.column_names.team_foreign_key'), $site->id);
+                                        });
+                                })
+                                    ->pluck('roles.name')
+                                    ->unique();
+
+                                if ($roles->isNotEmpty()) {
+                                    $roleList = $roles->map(fn($name) => "✓ " . Str::headline($name))->join(', ');
+                                    $breakdown[] = "<strong>{$site->name}:</strong> {$roleList}";
+                                }
+                            }
+
+                            return $breakdown ? implode('<br>', $breakdown) : 'No site access';
+                        })
+                        ->formatStateUsing(fn($state) => new HtmlString($state)),
                 ]),
         ]);
     }
@@ -445,6 +525,11 @@ class UserResource extends Resource implements HasShieldPermissions
         return parent::getEloquentQuery()->withoutGlobalScopes([
             SoftDeletingScope::class,
         ]);
+    }
+
+    private static function getSites(): Collection
+    {
+        return Site::get();
     }
 
     public static function getPermissionPrefixes(): array

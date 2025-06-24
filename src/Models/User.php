@@ -166,4 +166,14 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, HasMedia,
     {
         return $this->can('impersonate', User::class);
     }
+
+    public function hasSiteRole(Site $site, string $role): bool
+    {
+        return $this->roles()
+            ->where('name', $role)
+            ->where(function ($query) use ($site) {
+                $query->where('model_has_roles.' . config('permission.column_names.team_foreign_key'), $site->id);
+            })
+            ->exists();
+    }
 }

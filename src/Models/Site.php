@@ -46,21 +46,21 @@ class Site extends Model
         return $this->belongsToMany(User::class, 'site_has_user');
     }
 
-    protected static function booted(): void
-    {
-        static::created(function ($site): void {
-            $allUserIDs = Role::whereNull('site_id')
-                ->with('users')
-                ->get()
-                ->pluck('users.*.id')
-                ->flatten()
-                ->unique();
+    // protected static function booted(): void
+    // {
+    //     static::created(function ($site): void {
+    //         $allUserIDs = Role::whereNull('site_id')
+    //             ->with('users')
+    //             ->get()
+    //             ->pluck('users.*.id')
+    //             ->flatten()
+    //             ->unique();
 
-            if ($allUserIDs->isNotEmpty()) {
-                $site->users()->syncWithoutDetaching($allUserIDs);
-            }
-        });
-    }
+    //         if ($allUserIDs->isNotEmpty()) {
+    //             $site->users()->syncWithoutDetaching($allUserIDs);
+    //         }
+    //     });
+    // }
 
     protected static function newFactory(): SiteFactory
     {
