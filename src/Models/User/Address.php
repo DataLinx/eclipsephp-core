@@ -63,11 +63,24 @@ class Address extends Model
 
     protected static function booted()
     {
-        static::saving(function (self $address) {
+        static::saving(function (self $address): void {
             $hasDefaultAddress = self::where('user_id', $address->user_id)->whereJsonContains('type', AddressType::DEFAULT_ADDRESS->value)->exists();
 
             if ($hasDefaultAddress) {
                 $address->type = array_diff($address->type, [AddressType::DEFAULT_ADDRESS->value]);
+            }
+        });
+
+        static::deleted(function (self $address): void {
+            if (in_array(AddressType::DEFAULT_ADDRESS->value, $address->type)) {
+                $oldestAddress = self::where('user_id', $address->user_id)
+                    ->orderBy('created_at', 'asc')
+                    ->first();
+
+                if ($oldestAddress) {
+                    $oldestAddress->type = array_merge($oldestAddress->type, [AddressType::DEFAULT_ADDRESS->value]);
+                    $oldestAddress->saveQuietly();
+                }
             }
         });
     }
