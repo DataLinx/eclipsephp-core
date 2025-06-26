@@ -17,19 +17,18 @@ trait IsUserSiteScoped
     /**
      * Get settings for a specific user
      *
-     * @param int $userId The ID of the user to get settings for
-     * @return static
+     * @param  int  $userId  The ID of the user to get settings for
      */
     public static function forUser(int $userId): static
     {
         // Create a new instance of UserSettings
-        $settings = new static();
+        $settings = new static;
 
         // Get the repository from the settings instance
         $repository = $settings->getRepository();
 
         // Make sure it's a UserSettingsRepository
-        if (!$repository instanceof UserSiteSettingsRepository) {
+        if (! $repository instanceof UserSiteSettingsRepository) {
             throw new RuntimeException('Repository must be an instance of UserSiteSettingsRepository');
         }
 

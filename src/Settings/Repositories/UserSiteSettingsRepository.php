@@ -34,6 +34,7 @@ class UserSiteSettingsRepository extends DatabaseSettingsRepository
     {
         $clone = clone $this;
         $clone->userId = $userId;
+
         return $clone;
     }
 
@@ -47,29 +48,29 @@ class UserSiteSettingsRepository extends DatabaseSettingsRepository
             $table = $this->table ?? (new SettingsProperty)->getTable();
             $builder
                 ->where(function (Builder $query) use ($table, $userId) {
-                $query
-                    ->where(function (Builder $query) use ($table, $userId) {
-                        $query
-                            // ... where site_id matches
-                            ->where('site_id', Filament::getTenant()?->id)
-                            // ... where user_id matches
-                            ->where('user_id', $userId);
-                    })
-                    // ... or where site_id is null and a record with a matching site_id does not exist
-                    ->orWhere(function (Builder $query) use ($table, $userId) {
-                        $query
-                            ->whereNull('site_id')
-                            ->whereNull('user_id')
-                            ->whereNotExists(function (QueryBuilder $query) use ($table, $userId) {
-                                $query->select(DB::raw(1))
-                                    ->from($table, 't2')
-                                    ->where('site_id', Filament::getTenant()?->id)
-                                    ->where('user_id', $userId)
-                                    ->whereColumn('t2.group', $table.'.group')
-                                    ->whereColumn('t2.name', $table.'.name');
-                            });
-                    });
-            });
+                    $query
+                        ->where(function (Builder $query) use ($userId) {
+                            $query
+                                // ... where site_id matches
+                                ->where('site_id', Filament::getTenant()?->id)
+                                // ... where user_id matches
+                                ->where('user_id', $userId);
+                        })
+                        // ... or where site_id is null and a record with a matching site_id does not exist
+                        ->orWhere(function (Builder $query) use ($table, $userId) {
+                            $query
+                                ->whereNull('site_id')
+                                ->whereNull('user_id')
+                                ->whereNotExists(function (QueryBuilder $query) use ($table, $userId) {
+                                    $query->select(DB::raw(1))
+                                        ->from($table, 't2')
+                                        ->where('site_id', Filament::getTenant()?->id)
+                                        ->where('user_id', $userId)
+                                        ->whereColumn('t2.group', $table.'.group')
+                                        ->whereColumn('t2.name', $table.'.name');
+                                });
+                        });
+                });
         } else {
             // Don't use fallback, get only settings with the exact site/user match
             $builder
