@@ -3,6 +3,8 @@
 namespace Eclipse\Core\Models;
 
 use Eclipse\Core\Database\Factories\SiteFactory;
+use Eclipse\Core\Models\User\Role;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -36,4 +38,11 @@ class Site extends Model
     {
         return SiteFactory::new();
     }
+
+    /** @return HasMany<Role, self> */
+    public function roles(): HasMany
+    {
+        return $this->hasMany(Role::class);
+    }
+
 }
