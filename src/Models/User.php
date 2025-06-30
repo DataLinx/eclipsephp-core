@@ -3,8 +3,8 @@
 namespace Eclipse\Core\Models;
 
 use Eclipse\Core\Database\Factories\UserFactory;
-use Eclipse\World\Models\Country;
 use Eclipse\Core\Settings\UserSettings;
+use Eclipse\World\Models\Country;
 use Exception;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasAvatar;
