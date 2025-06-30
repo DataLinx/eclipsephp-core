@@ -51,6 +51,9 @@ class UserResource extends Resource implements HasShieldPermissions
             self::getFirstNameFormComponent(),
             self::getLastNameFormComponent(),
             self::getEmailFormComponent(),
+            Forms\Components\TextInput::make('phone_number')
+                ->label('Phone')
+                ->tel(),
             Forms\Components\DateTimePicker::make('email_verified_at')
                 ->visible(config('eclipse.email_verification'))
                 ->disabled(),
@@ -70,6 +73,15 @@ class UserResource extends Resource implements HasShieldPermissions
                             fn (Set $set) => $set('password', Str::password(16))
                         )
                 ),
+            Forms\Components\Select::make('country_id')
+                ->relationship('country', 'name')
+                ->preload()
+                ->optionsLimit(20)
+                ->searchable(),
+            Forms\Components\DatePicker::make('date_of_birth')
+                ->native(false)
+                ->minDate(now()->subYears(80))
+                ->maxDate(now()),
             Forms\Components\Select::make('roles')
                 ->relationship('roles', 'name')
                 ->saveRelationshipsUsing(function (User $record, $state) {
@@ -130,6 +142,9 @@ class UserResource extends Resource implements HasShieldPermissions
                 ->width(150);
         }
 
+        $columns[] = Tables\Columns\TextColumn::make('phone_number')
+            ->label('Phone');
+
         $columns[] = Tables\Columns\TextColumn::make('email_verified_at')
             ->label('Verified email')
             ->placeholder('Not verified')
@@ -138,6 +153,12 @@ class UserResource extends Resource implements HasShieldPermissions
             ->toggleable()
             ->visible(config('eclipse.email_verification'))
             ->width(150);
+
+        $columns[] = Tables\Columns\TextColumn::make('country.name')
+            ->badge();
+
+        $columns[] = Tables\Columns\TextColumn::make('date_of_birth')
+            ->date('M d, Y');
 
         $columns[] = Tables\Columns\TextColumn::make('created_at')
             ->dateTime()
@@ -164,6 +185,12 @@ class UserResource extends Resource implements HasShieldPermissions
                     blank: fn (Builder $query) => $query,
                 )
                 ->visible(config('eclipse.email_verification')),
+            Tables\Filters\SelectFilter::make('country_id')
+                ->label('Country')
+                ->multiple()
+                ->relationship('country', 'name', fn (Builder $query): Builder => $query->distinct())
+                ->preload()
+                ->optionsLimit(20),
             Tables\Filters\QueryBuilder::make()
                 ->constraints([
                     TextConstraint::make('first_name')
@@ -232,7 +259,7 @@ class UserResource extends Resource implements HasShieldPermissions
                         ->dateTime(),
                 ]),
             Section::make('Personal information')
-                ->columns(3)
+                ->columns(4)
                 ->schema([
                     SpatieMediaLibraryImageEntry::make('avatar')
                         ->collection('avatars')
@@ -246,6 +273,14 @@ class UserResource extends Resource implements HasShieldPermissions
                                 ->icon(config('eclipse.email_verification') ? fn (User $user) => $user->email_verified_at ? 'heroicon-s-check-circle' : 'heroicon-s-x-circle' : null)
                                 ->iconColor(fn (User $user) => $user->email_verified_at ? Color::Green : Color::Red),
                         ]),
+                    Group::make()
+                        ->schema([
+                            TextEntry::make('phone_number')->placeholder('-'),
+                            TextEntry::make('country.name')
+                                ->badge()
+                                ->placeholder('-'),
+                        ]),
+                    TextEntry::make('date_of_birth')->date('M d, Y')->placeholder('-'),
                 ]),
         ]);
     }
