@@ -4,6 +4,7 @@ namespace Eclipse\Core\Models;
 
 use Eclipse\Core\Database\Factories\UserFactory;
 use Eclipse\World\Models\Country;
+use Eclipse\Core\Settings\UserSettings;
 use Exception;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasAvatar;
@@ -16,6 +17,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Collection;
+use Spatie\LaravelSettings\Settings;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\Permission\Traits\HasRoles;
@@ -168,5 +170,10 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, HasMedia,
     public function canImpersonate(): bool
     {
         return $this->can('impersonate', User::class);
+    }
+
+    public function getSettings(string $settingsClass = UserSettings::class): Settings
+    {
+        return $settingsClass::forUser($this->id);
     }
 }
