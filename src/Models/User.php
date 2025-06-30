@@ -3,6 +3,7 @@
 namespace Eclipse\Core\Models;
 
 use Eclipse\Core\Database\Factories\UserFactory;
+use Eclipse\Core\Models\User\Address;
 use Eclipse\Core\Settings\UserSettings;
 use Exception;
 use Filament\Models\Contracts\FilamentUser;
@@ -11,6 +12,7 @@ use Filament\Models\Contracts\HasTenants;
 use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -87,6 +89,11 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, HasMedia,
     public function sites()
     {
         return $this->belongsToMany(Site::class, 'site_has_user');
+    }
+
+    public function addresses(): HasMany
+    {
+        return $this->hasMany(Address::class);
     }
 
     public function getFilamentAvatarUrl(): ?string
