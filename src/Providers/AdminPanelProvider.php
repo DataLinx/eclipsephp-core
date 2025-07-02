@@ -7,6 +7,7 @@ use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use BezhanSalleh\FilamentShield\Middleware\SyncShieldTenant;
 use DutchCodingCompany\FilamentDeveloperLogins\FilamentDeveloperLoginsPlugin;
 use Eclipse\Common\Providers\GlobalSearchProvider;
+use Eclipse\Core\Filament\Pages\Dashboard;
 use Eclipse\Core\Filament\Pages\EditProfile;
 use Eclipse\Core\Filament\Pages\Tools\HealthCheckResults;
 use Eclipse\Core\Models\Locale;
@@ -20,7 +21,6 @@ use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Navigation\NavigationGroup;
 use Filament\Navigation\NavigationItem;
 use Filament\Notifications\Livewire\Notifications;
-use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\SpatieLaravelTranslatablePlugin;
@@ -29,6 +29,7 @@ use Filament\Support\Enums\Alignment;
 use Filament\Support\Enums\Platform;
 use Filament\Support\Enums\VerticalAlignment;
 use Filament\Support\Facades\FilamentView;
+use Filament\View\PanelsRenderHook;
 use Filament\Widgets;
 use Hasnayeen\Themes\Http\Middleware\SetTheme;
 use Hasnayeen\Themes\ThemesPlugin;
@@ -41,6 +42,7 @@ use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use Illuminate\View\View;
 use pxlrbt\FilamentEnvironmentIndicator\EnvironmentIndicatorPlugin;
 use pxlrbt\FilamentSpotlight\SpotlightPlugin;
 use ShuvroRoy\FilamentSpatieLaravelHealth\FilamentSpatieLaravelHealthPlugin;
@@ -58,6 +60,8 @@ class AdminPanelProvider extends PanelProvider
             $localeIds = [config('app.locale', 'en')];
         }
 
+        $hasTenantMenu = config('eclipse.multi_site', false);
+
         $panel
             ->default()
             ->id('admin')
@@ -71,7 +75,9 @@ class AdminPanelProvider extends PanelProvider
                 'gray' => Color::Slate,
             ])
             ->topNavigation()
-            ->brandName(fn () => Registry::getSite()->name)
+            ->brandLogo(
+                fn (): View => view('eclipse::filament.components.brand')
+            )
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverResources(in: $package_src.'Filament/Resources', for: 'Eclipse\\Core\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
@@ -79,7 +85,7 @@ class AdminPanelProvider extends PanelProvider
             ->discoverClusters(in: app_path('Filament/Clusters'), for: 'App\\Filament\\Clusters')
             ->discoverClusters(in: $package_src.'Filament/Clusters', for: 'Eclipse\\Core\\Filament\\Clusters')
             ->pages([
-                Pages\Dashboard::class,
+                Dashboard::class,
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->globalSearch(GlobalSearchProvider::class)
@@ -95,7 +101,8 @@ class AdminPanelProvider extends PanelProvider
                 SyncShieldTenant::class,
                 SetTheme::class,
             ], isPersistent: true)
-            ->tenantMenu(config('eclipse.multi_site', false))
+            // ->tenantMenu(config('eclipse.multi_site', false))
+            ->tenantMenu(false)
             ->widgets([
                 Widgets\AccountWidget::class,
                 Widgets\FilamentInfoWidget::class,
@@ -156,16 +163,28 @@ class AdminPanelProvider extends PanelProvider
                     ->hidden(fn (): bool => ! config('log-viewer.enabled', false) || ! auth()->user()->hasRole('super_admin')),
             ])
             ->databaseNotifications()
-            ->unsavedChangesAlerts();
+            ->unsavedChangesAlerts()
+            ->renderHook(
+                PanelsRenderHook::USER_MENU_PROFILE_AFTER,
+                fn () => view('eclipse::filament.components.my-settings')
+            );
+
+        if ($hasTenantMenu) {
+            $panel->renderHook(
+                PanelsRenderHook::GLOBAL_SEARCH_END,
+                fn () => view('eclipse::filament.components.tenant-menu')
+            );
+        }
 
         // If the Pro version of the Spotlight plugin is installed, use that, otherwise use the free version
         if (class_exists(\pxlrbt\FilamentSpotlightPro\SpotlightPlugin::class)) {
             /** @noinspection PhpFullyQualifiedNameUsageInspection */
-            $panel->plugin(\pxlrbt\FilamentSpotlightPro\SpotlightPlugin::make()
-                ->registerItems([
-                    \pxlrbt\FilamentSpotlightPro\SpotlightProviders\RegisterResources::make(),
-                ])
-                ->hotkeys(['¸'])
+            $panel->plugin(
+                \pxlrbt\FilamentSpotlightPro\SpotlightPlugin::make()
+                    ->registerItems([
+                        \pxlrbt\FilamentSpotlightPro\SpotlightProviders\RegisterResources::make(),
+                    ])
+                    ->hotkeys(['¸'])
             );
         } else {
             $panel->plugin(SpotlightPlugin::make());
