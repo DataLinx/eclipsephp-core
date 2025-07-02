@@ -13,6 +13,8 @@ class ManageUserSettings extends SettingsPage
 
     protected static string $settings = UserSettings::class;
 
+    protected static bool $shouldRegisterNavigation = false;
+
     public function form(Form $form): Form
     {
         return $form
