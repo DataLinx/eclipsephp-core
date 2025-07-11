@@ -3,6 +3,7 @@
 namespace Eclipse\Core\Filament\Resources;
 
 use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
+use Eclipse\Core\Filament\Actions\SendEmailTableAction;
 use Eclipse\Core\Filament\Exports\TableExport;
 use Eclipse\Core\Filament\Resources;
 use Eclipse\Core\Models\User;
@@ -213,6 +214,7 @@ class UserResource extends Resource implements HasShieldPermissions
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\ViewAction::make(),
                     Tables\Actions\EditAction::make(),
+                    SendEmailTableAction::make(),
                     Impersonate::make()
                         ->grouped()
                         ->redirectTo(route('filament.admin.tenant')),
@@ -357,6 +359,7 @@ class UserResource extends Resource implements HasShieldPermissions
             'force_delete',
             'force_delete_any',
             'impersonate',
+            'send_email',
         ];
     }
 }
