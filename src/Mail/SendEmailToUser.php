@@ -3,11 +3,13 @@
 namespace Eclipse\Core\Mail;
 
 use Eclipse\Core\Models\User;
+use Filament\Notifications\Notification;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
+use Illuminate\Mail\Mailables\Headers;
 use Illuminate\Queue\SerializesModels;
 
 class SendEmailToUser extends Mailable implements ShouldQueue
@@ -56,6 +58,20 @@ class SendEmailToUser extends Mailable implements ShouldQueue
     }
 
     /**
+     * Get the message headers.
+     */
+    public function headers(): Headers
+    {
+        return new Headers(
+            text: [
+                'X-Eclipse-Email-Type' => 'SendEmailToUser',
+                'X-Eclipse-Sender-ID' => $this->sender?->id ?? '',
+                'X-Eclipse-Recipient-Email' => $this->recipient->email,
+            ]
+        );
+    }
+
+    /**
      * Get the message content definition.
      */
     public function content(): Content
@@ -79,5 +95,22 @@ class SendEmailToUser extends Mailable implements ShouldQueue
     public function attachments(): array
     {
         return [];
+    }
+
+    /**
+     * Handle a job failure.
+     */
+    public function failed(\Throwable $exception): void
+    {
+        if ($this->sender) {
+            Notification::make()
+                ->title(__('eclipse::email.error'))
+                ->body(__('eclipse::email.send_error_message', [
+                    'error' => $exception->getMessage(),
+                ]))
+                ->danger()
+                ->sendToDatabase($this->sender)
+                ->broadcast([$this->sender]);
+        }
     }
 }

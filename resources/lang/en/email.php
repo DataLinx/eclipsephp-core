@@ -15,6 +15,8 @@ return [
     'message_placeholder' => 'Enter message content...',
     'send' => 'Send',
     'cancel' => 'Cancel',
+    'email_queued' => 'Email queued',
+    'email_queued_to' => 'Email to :email has been queued for sending.',
     'email_sent' => 'Email sent',
     'email_sent_to' => 'Email to :email has been successfully sent.',
     'permission_denied' => 'Permission denied',

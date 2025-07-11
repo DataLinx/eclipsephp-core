@@ -106,8 +106,8 @@ trait SendEmailActionTrait
                 ));
 
                 Notification::make()
-                    ->title(__('eclipse::email.email_sent'))
-                    ->body(__('eclipse::email.email_sent_to', ['email' => $recipient->email]))
+                    ->title(__('eclipse::email.email_queued'))
+                    ->body(__('eclipse::email.email_queued_to', ['email' => $recipient->email]))
                     ->success()
                     ->sendToDatabase(auth()->user())
                     ->broadcast([auth()->user()]);

@@ -15,6 +15,8 @@ return [
     'message_placeholder' => 'Unesite sadržaj poruke...',
     'send' => 'Pošaljite',
     'cancel' => 'Otkaži',
+    'email_queued' => 'E-mail je u redu za slanje',
+    'email_queued_to' => 'E-mail za :email je dodan u red za slanje.',
     'email_sent' => 'E-mail poslan',
     'email_sent_to' => 'E-mail poslan na :email je uspješno poslan.',
     'permission_denied' => 'Dozvola odbijena',

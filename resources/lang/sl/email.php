@@ -15,6 +15,8 @@ return [
     'message_placeholder' => 'Vnesite vsebino sporočila...',
     'send' => 'Pošlji',
     'cancel' => 'Prekliči',
+    'email_queued' => 'E-pošta v čakalni vrsti',
+    'email_queued_to' => 'E-pošta za :email je dodana v čakalno vrsto za pošiljanje.',
     'email_sent' => 'E-pošta poslana',
     'email_sent_to' => 'E-pošta je bila uspešno poslana na :email.',
     'permission_denied' => 'Dostop zavrnjen',

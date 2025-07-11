@@ -8,6 +8,7 @@ use Eclipse\Common\Package;
 use Eclipse\Core\Console\Commands\ClearCommand;
 use Eclipse\Core\Console\Commands\DeployCommand;
 use Eclipse\Core\Console\Commands\PostComposerUpdate;
+use Eclipse\Core\Listeners\SendEmailSuccessNotification;
 use Eclipse\Core\Models\Locale;
 use Eclipse\Core\Models\User;
 use Eclipse\Core\Models\User\Permission;
@@ -21,6 +22,7 @@ use Filament\Resources\Resource;
 use Filament\Tables\Columns\Column;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Mail\Events\MessageSent;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
@@ -78,6 +80,8 @@ class EclipseServiceProvider extends PackageServiceProvider
                 $event->user->updateLoginTracking();
             }
         });
+
+        Event::listen(MessageSent::class, SendEmailSuccessNotification::class);
 
         $this->app->register(AdminPanelProvider::class);
 
