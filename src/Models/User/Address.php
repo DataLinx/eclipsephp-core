@@ -68,16 +68,22 @@ class Address extends Model
                 return;
             }
 
-            self::where('user_id', $address->user_id)
+            $otherAddresses = self::where('user_id', $address->user_id)
                 ->where('id', '!=', $address->id ?? 0)
-                ->whereJsonContains('type', AddressType::DEFAULT_ADDRESS->value)
-                ->get(['id', 'type'])
-                ->each(function ($existingAddress) {
-                    $existingAddress->timestamps = false;
-                    $existingAddress->updateQuietly([
-                        'type' => array_values(array_diff($existingAddress->type, [AddressType::DEFAULT_ADDRESS->value])),
-                    ]);
-                });
+                ->get(['id', 'type']);
+
+            $addressesToUpdate = $otherAddresses->filter(
+                fn (Model $existingAddress): bool => in_array(AddressType::DEFAULT_ADDRESS->value, $existingAddress->type ?? [])
+            );
+
+            $addressesToUpdate->each(function (Model $existingAddress): void {
+                $newType = array_values(array_diff($existingAddress->type, [AddressType::DEFAULT_ADDRESS->value]));
+
+                $existingAddress->timestamps = false;
+                $existingAddress->updateQuietly([
+                    'type' => $newType,
+                ]);
+            });
         });
 
         static::deleted(function (self $address): void {
