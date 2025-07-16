@@ -85,7 +85,7 @@
 
         <div class="content">
             <h2>{{ __('eclipse::email.message') }}:</h2>
-            <div class="message-content">{{ $messageContent }}</div>
+            <div class="message-content">{!! $messageContent !!}</div>
         </div>
 
         <div class="footer">

@@ -4,6 +4,8 @@ namespace Eclipse\Core\Mail;
 
 use Eclipse\Core\Models\User;
 use Filament\Notifications\Notification;
+use HTMLPurifier;
+use HTMLPurifier_Config;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -27,7 +29,20 @@ class SendEmailToUser extends Mailable implements ShouldQueue
         public ?string $bccEmails = null,
         public ?User $sender = null
     ) {
-        //
+        $this->emailMessage = $this->purifyHtml($this->emailMessage);
+    }
+
+    /**
+     * Purify HTML content to prevent XSS attacks and clean up malicious code.
+     */
+    protected function purifyHtml(string $html): string
+    {
+        $config = HTMLPurifier_Config::createDefault();
+        $config->set('HTML.Trusted', true);
+        $config->set('Core.Encoding', 'UTF-8');
+        $purifier = new HTMLPurifier($config);
+
+        return $purifier->purify($html);
     }
 
     /**
@@ -39,6 +54,10 @@ class SendEmailToUser extends Mailable implements ShouldQueue
             subject: $this->emailSubject,
             to: [$this->recipient->email]
         );
+
+        if ($this->sender && $this->sender->email) {
+            $envelope = $envelope->replyTo($this->sender->email, $this->sender->name);
+        }
 
         if ($this->ccEmails) {
             $ccEmailsArray = array_filter(array_map('trim', explode(',', $this->ccEmails)));
