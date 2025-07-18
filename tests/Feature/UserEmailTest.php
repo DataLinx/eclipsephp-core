@@ -58,7 +58,7 @@ test('send email action requires authorization', function () {
     expect($this->unauthorizedUser->can('sendEmail', User::class))->toBeFalse();
 
     // Test that action is properly configured
-    $action = \Eclipse\Core\Filament\Actions\SendEmailTableAction::make();
+    $action = \Eclipse\Core\Filament\Actions\SendEmailTableAction::makeAction();
     expect($action->getName())->toBe('sendEmail');
     expect($action->getIcon())->toBe('heroicon-o-envelope');
 });
@@ -67,7 +67,7 @@ test('send email action visibility rules', function () {
     $this->actingAs($this->authorizedUser);
 
     // Test that action has the proper visibility configuration
-    $action = \Eclipse\Core\Filament\Actions\SendEmailTableAction::make();
+    $action = \Eclipse\Core\Filament\Actions\SendEmailTableAction::makeAction();
 
     // Action should be properly configured
     expect($action)->not->toBeNull();

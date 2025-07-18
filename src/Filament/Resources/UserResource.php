@@ -214,7 +214,7 @@ class UserResource extends Resource implements HasShieldPermissions
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\ViewAction::make(),
                     Tables\Actions\EditAction::make(),
-                    SendEmailTableAction::make(),
+                    SendEmailTableAction::makeAction(),
                     Impersonate::make()
                         ->grouped()
                         ->redirectTo(route('filament.admin.tenant')),

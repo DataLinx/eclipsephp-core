@@ -3,15 +3,14 @@
 namespace Eclipse\Core\Filament\Actions;
 
 use Eclipse\Core\Models\User;
-use Filament\Actions\Action;
-use Filament\Tables\Actions\Action as TableAction;
+use Filament\Tables\Actions\Action;
 
 class SendEmailTableAction extends SendEmailAction
 {
-    public static function make(): Action
+    public static function makeAction(): Action
     {
         return static::configureEmailAction(
-            TableAction::make('sendEmail')
+            Action::make('sendEmail')
                 ->authorize(fn () => auth()->user()->can('sendEmail', User::class))
                 ->visible(fn ($record) => ! $record->trashed())
         );
