@@ -20,17 +20,17 @@ use Illuminate\Support\Str;
  * This replaces the need to run `php artisan install:broadcasting` for new projects,
  * ensuring Reverb is configured out-of-the-box.
  *
- * @example php artisan eclipse:generate-reverb-credentials
- * @example php artisan eclipse:generate-reverb-credentials --force
+ * @example php artisan eclipse:setup:reverb
+ * @example php artisan eclipse:setup:reverb --force
  */
-class GenerateReverbCredentialsCommand extends Command
+class SetupReverb extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'eclipse:generate-reverb-credentials 
+    protected $signature = 'eclipse:setup:reverb 
                             {--force : Force overwrite existing credentials}';
 
     /**

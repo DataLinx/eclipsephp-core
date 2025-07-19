@@ -7,8 +7,8 @@ use Eclipse\Common\Foundation\Providers\PackageServiceProvider;
 use Eclipse\Common\Package;
 use Eclipse\Core\Console\Commands\ClearCommand;
 use Eclipse\Core\Console\Commands\DeployCommand;
-use Eclipse\Core\Console\Commands\GenerateReverbCredentialsCommand;
 use Eclipse\Core\Console\Commands\PostComposerUpdate;
+use Eclipse\Core\Console\Commands\SetupReverb;
 use Eclipse\Core\Health\Checks\ReverbCheck;
 use Eclipse\Core\Models\Locale;
 use Eclipse\Core\Models\User;
@@ -48,7 +48,7 @@ class EclipseServiceProvider extends PackageServiceProvider
             ->hasCommands([
                 ClearCommand::class,
                 DeployCommand::class,
-                GenerateReverbCredentialsCommand::class,
+                SetupReverb::class,
                 PostComposerUpdate::class,
             ])
             ->hasConfigFile([
@@ -61,6 +61,7 @@ class EclipseServiceProvider extends PackageServiceProvider
                 'settings',
                 'telescope',
                 'themes',
+                'health',
             ])
             ->hasViews()
             ->hasSettings()
