@@ -22,6 +22,8 @@ class ManageEclipse extends SettingsPage
             ->schema([
                 Forms\Components\Toggle::make('email_verification')
                     ->label('Enable user email verification'),
+                Forms\Components\Toggle::make('address_book')
+                    ->label('Enable address book'),
             ]);
     }
 

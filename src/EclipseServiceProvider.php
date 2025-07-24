@@ -9,6 +9,8 @@ use Eclipse\Core\Console\Commands\ClearCommand;
 use Eclipse\Core\Console\Commands\DeployCommand;
 use Eclipse\Core\Console\Commands\PostComposerUpdate;
 use Eclipse\Core\Listeners\SendEmailSuccessNotification;
+use Eclipse\Core\Console\Commands\SetupReverb;
+use Eclipse\Core\Health\Checks\ReverbCheck;
 use Eclipse\Core\Models\Locale;
 use Eclipse\Core\Models\User;
 use Eclipse\Core\Models\User\Permission;
@@ -48,6 +50,7 @@ class EclipseServiceProvider extends PackageServiceProvider
             ->hasCommands([
                 ClearCommand::class,
                 DeployCommand::class,
+                SetupReverb::class,
                 PostComposerUpdate::class,
             ])
             ->hasConfigFile([
@@ -60,6 +63,7 @@ class EclipseServiceProvider extends PackageServiceProvider
                 'settings',
                 'telescope',
                 'themes',
+                'health',
             ])
             ->hasViews()
             ->hasSettings()
@@ -152,6 +156,7 @@ class EclipseServiceProvider extends PackageServiceProvider
                 ->failWhenUsedSpaceIsAbovePercentage(90),
             CacheCheck::new(),
             HorizonCheck::new(),
+            ReverbCheck::new(),
             RedisCheck::new(),
             ScheduleCheck::new(),
             SecurityAdvisoriesCheck::new(),
