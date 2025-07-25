@@ -8,9 +8,10 @@ use Eclipse\Common\Package;
 use Eclipse\Core\Console\Commands\ClearCommand;
 use Eclipse\Core\Console\Commands\DeployCommand;
 use Eclipse\Core\Console\Commands\PostComposerUpdate;
-use Eclipse\Core\Listeners\SendEmailSuccessNotification;
 use Eclipse\Core\Console\Commands\SetupReverb;
 use Eclipse\Core\Health\Checks\ReverbCheck;
+use Eclipse\Core\Listeners\LogEmailToDatabase;
+use Eclipse\Core\Listeners\SendEmailSuccessNotification;
 use Eclipse\Core\Models\Locale;
 use Eclipse\Core\Models\User;
 use Eclipse\Core\Models\User\Permission;
@@ -86,6 +87,7 @@ class EclipseServiceProvider extends PackageServiceProvider
         });
 
         Event::listen(MessageSent::class, SendEmailSuccessNotification::class);
+        Event::listen(MessageSent::class, LogEmailToDatabase::class);
 
         $this->app->register(AdminPanelProvider::class);
 

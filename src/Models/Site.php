@@ -44,4 +44,10 @@ class Site extends Model
     {
         return $this->hasMany(Role::class);
     }
+
+    /** @return HasMany<MailLog, self> */
+    public function mailLogs(): HasMany
+    {
+        return $this->hasMany(MailLog::class);
+    }
 }

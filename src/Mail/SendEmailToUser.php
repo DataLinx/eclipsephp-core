@@ -3,6 +3,7 @@
 namespace Eclipse\Core\Mail;
 
 use Eclipse\Core\Models\User;
+use Eclipse\Core\Services\Registry;
 use Filament\Notifications\Notification;
 use HTMLPurifier;
 use HTMLPurifier_Config;
@@ -27,26 +28,27 @@ class SendEmailToUser extends Mailable implements ShouldQueue
         public string $emailMessage,
         public ?string $ccEmails = null,
         public ?string $bccEmails = null,
-        public ?User $sender = null
+        public ?User $sender = null,
+        public ?int $siteId = null
     ) {
         $this->emailMessage = $this->purifyHtml($this->emailMessage);
+        $this->siteId = $this->siteId ?? Registry::getSite()?->id;
     }
 
     /**
-     * Purify HTML content to prevent XSS attacks and clean up malicious code.
+     * Purify the HTML content.
      */
     protected function purifyHtml(string $html): string
     {
         $config = HTMLPurifier_Config::createDefault();
         $config->set('HTML.Trusted', true);
         $config->set('Core.Encoding', 'UTF-8');
-        $purifier = new HTMLPurifier($config);
 
-        return $purifier->purify($html);
+        return (new HTMLPurifier($config))->purify($html);
     }
 
     /**
-     * Get the message envelope.
+     * Get the envelope for the email.
      */
     public function envelope(): Envelope
     {
@@ -55,43 +57,49 @@ class SendEmailToUser extends Mailable implements ShouldQueue
             to: [$this->recipient->email]
         );
 
-        if ($this->sender && $this->sender->email) {
+        if ($this->sender?->email) {
             $envelope = $envelope->replyTo($this->sender->email, $this->sender->name);
         }
 
-        if ($this->ccEmails) {
-            $ccEmailsArray = array_filter(array_map('trim', explode(',', $this->ccEmails)));
-            if (! empty($ccEmailsArray)) {
-                $envelope = $envelope->cc($ccEmailsArray);
-            }
+        if ($ccEmails = $this->parseEmailList($this->ccEmails)) {
+            $envelope = $envelope->cc($ccEmails);
         }
 
-        if ($this->bccEmails) {
-            $bccEmailsArray = array_filter(array_map('trim', explode(',', $this->bccEmails)));
-            if (! empty($bccEmailsArray)) {
-                $envelope = $envelope->bcc($bccEmailsArray);
-            }
+        if ($bccEmails = $this->parseEmailList($this->bccEmails)) {
+            $envelope = $envelope->bcc($bccEmails);
         }
 
         return $envelope;
     }
 
     /**
-     * Get the message headers.
+     * Parse the email list.
      */
-    public function headers(): Headers
+    protected function parseEmailList(?string $emails): array
     {
-        return new Headers(
-            text: [
-                'X-Eclipse-Email-Type' => 'SendEmailToUser',
-                'X-Eclipse-Sender-ID' => $this->sender?->id ?? '',
-                'X-Eclipse-Recipient-Email' => $this->recipient->email,
-            ]
-        );
+        if (! $emails) {
+            return [];
+        }
+
+        return array_filter(array_map('trim', explode(',', $emails)));
     }
 
     /**
-     * Get the message content definition.
+     * Get the headers for the email.
+     */
+    public function headers(): Headers
+    {
+        return new Headers(text: [
+            'X-Eclipse-Email-Type' => 'SendEmailToUser',
+            'X-Eclipse-Sender-ID' => (string) ($this->sender?->id ?? ''),
+            'X-Eclipse-Recipient-ID' => (string) $this->recipient->id,
+            'X-Eclipse-Recipient-Email' => $this->recipient->email,
+            'X-Eclipse-Site-ID' => (string) ($this->siteId ?? ''),
+        ]);
+    }
+
+    /**
+     * Get the content for the email.
      */
     public function content(): Content
     {
@@ -107,9 +115,7 @@ class SendEmailToUser extends Mailable implements ShouldQueue
     }
 
     /**
-     * Get the attachments for the message.
-     *
-     * @return array<int, \Illuminate\Mail\Mailables\Attachment>
+     * Get the attachments for the email.
      */
     public function attachments(): array
     {
@@ -117,19 +123,19 @@ class SendEmailToUser extends Mailable implements ShouldQueue
     }
 
     /**
-     * Handle a job failure.
+     * Handle the failed event.
      */
     public function failed(\Throwable $exception): void
     {
-        if ($this->sender) {
-            Notification::make()
-                ->title(__('eclipse::email.error'))
-                ->body(__('eclipse::email.send_error_message', [
-                    'error' => $exception->getMessage(),
-                ]))
-                ->danger()
-                ->sendToDatabase($this->sender)
-                ->broadcast([$this->sender]);
+        if (! $this->sender) {
+            return;
         }
+
+        Notification::make()
+            ->title(__('eclipse::email.error'))
+            ->body(__('eclipse::email.send_error_message', ['error' => $exception->getMessage()]))
+            ->danger()
+            ->sendToDatabase($this->sender)
+            ->broadcast([$this->sender]);
     }
 }
