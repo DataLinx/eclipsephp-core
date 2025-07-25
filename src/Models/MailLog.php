@@ -2,11 +2,15 @@
 
 namespace Eclipse\Core\Models;
 
+use Eclipse\Core\Database\Factories\MailLogFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class MailLog extends Model
 {
+    use HasFactory;
+
     /**
      * The attributes that are mass assignable.
      *
@@ -72,5 +76,13 @@ class MailLog extends Model
     public function recipient(): BelongsTo
     {
         return $this->belongsTo(User::class, 'recipient_id');
+    }
+
+    /**
+     * Get the factory for the model.
+     */
+    protected static function newFactory()
+    {
+        return MailLogFactory::new();
     }
 }
