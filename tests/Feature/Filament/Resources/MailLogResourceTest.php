@@ -96,3 +96,30 @@ test('mail logs table shows empty state when no records', function () {
         ->assertSuccessful()
         ->assertSee('No emails found');
 });
+
+test('mail log view action shows headers in modal', function () {
+    $mailLog = MailLog::factory()->create([
+        'headers' => [
+            'From' => 'sender@example.com',
+            'To' => 'recipient@example.com',
+            'Subject' => 'Test Subject',
+        ],
+    ]);
+
+    livewire(ListMailLogs::class)
+        ->callTableAction(ViewAction::class, $mailLog)
+        ->assertSee('From')
+        ->assertSee('To')
+        ->assertSee('Subject');
+});
+
+test('mail log view action modal has correct heading', function () {
+    $mailLog = MailLog::factory()->create([
+        'subject' => 'Test Email Subject',
+    ]);
+
+    livewire(ListMailLogs::class)
+        ->callTableAction(ViewAction::class, $mailLog)
+        ->assertSee(__('eclipse::email.view_email'))
+        ->assertSee('Test Email Subject');
+});
