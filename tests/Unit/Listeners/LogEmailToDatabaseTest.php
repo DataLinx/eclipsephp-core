@@ -2,19 +2,19 @@
 
 namespace Tests\Unit\Listeners;
 
-use Illuminate\Mail\Events\MessageSent;
-use Illuminate\Mail\SentMessage as LaravelSentMessage;
 use Eclipse\Core\Listeners\LogEmailToDatabase;
 use Eclipse\Core\Models\MailLog;
+use Illuminate\Mail\Events\MessageSent;
+use Illuminate\Mail\SentMessage as LaravelSentMessage;
+use Mockery;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Header\IdentificationHeader;
-use Mockery;
 
 // Tests for the LogEmailToDatabase listener
 
 test('it logs email to database when MessageSent event is handled', function () {
     // Create a Symfony Email instance with body and recipients
-    $email = (new Email())
+    $email = (new Email)
         ->subject('Hello World')
         ->text('Plain text body')
         ->html('<p>HTML body</p>')
@@ -38,7 +38,7 @@ test('it logs email to database when MessageSent event is handled', function () 
     $sentMessage->shouldReceive('getOriginalMessage')->andReturn($email);
 
     // Invoke the listener with the MessageSent event
-    (new LogEmailToDatabase())->handle(new MessageSent($sentMessage, []));
+    (new LogEmailToDatabase)->handle(new MessageSent($sentMessage, []));
 
     $log = MailLog::first();
 
@@ -59,10 +59,9 @@ test('it logs email to database when MessageSent event is handled', function () 
     expect($log->sent_at)->not()->toBeNull();
 });
 
-
 test('it handles missing headers gracefully and still logs minimum fields', function () {
     // Create Email with only required From/To
-    $email = (new Email())
+    $email = (new Email)
         ->subject('No Headers')
         ->html('<p>Body only</p>')
         ->from('foo@example.com')
@@ -73,7 +72,7 @@ test('it handles missing headers gracefully and still logs minimum fields', func
     $sentMessage = Mockery::mock(LaravelSentMessage::class);
     $sentMessage->shouldReceive('getOriginalMessage')->andReturn($email);
 
-    (new LogEmailToDatabase())->handle(new MessageSent($sentMessage, []));
+    (new LogEmailToDatabase)->handle(new MessageSent($sentMessage, []));
 
     $log = MailLog::first();
 
