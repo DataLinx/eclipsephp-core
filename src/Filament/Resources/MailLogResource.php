@@ -18,9 +18,9 @@ class MailLogResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-envelope';
 
-    protected static ?string $navigationGroup = 'Communication';
+    protected static ?string $navigationGroup = 'Tools';
 
-    protected static ?int $navigationSort = 10;
+    protected static ?int $navigationSort = 2;
 
     public static function getNavigationLabel(): string
     {
@@ -91,6 +91,17 @@ class MailLogResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('id')
+                    ->label('ID')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+
+                Tables\Columns\TextColumn::make('message_id')
+                    ->label(__('eclipse::email.message_id'))
+                    ->limit(20)
+                    ->tooltip(fn (MailLog $record): ?string => $record->message_id)
+                    ->toggleable(isToggledHiddenByDefault: true),
+
                 Tables\Columns\TextColumn::make('sent_at')
                     ->label(__('eclipse::email.sent_at'))
                     ->dateTime()
@@ -106,6 +117,18 @@ class MailLogResource extends Resource
                     ->limit(30)
                     ->tooltip(fn (MailLog $record): ?string => $record->to),
 
+                Tables\Columns\TextColumn::make('cc')
+                    ->label(__('eclipse::email.cc'))
+                    ->limit(30)
+                    ->tooltip(fn (MailLog $record): ?string => $record->cc)
+                    ->toggleable(isToggledHiddenByDefault: true),
+
+                Tables\Columns\TextColumn::make('bcc')
+                    ->label(__('eclipse::email.bcc'))
+                    ->limit(30)
+                    ->tooltip(fn (MailLog $record): ?string => $record->bcc)
+                    ->toggleable(isToggledHiddenByDefault: true),
+
                 Tables\Columns\TextColumn::make('subject')
                     ->label(__('eclipse::email.subject'))
                     ->limit(50)
@@ -120,6 +143,58 @@ class MailLogResource extends Resource
                         'failed' => 'danger',
                         default => 'gray',
                     }),
+
+                Tables\Columns\TextColumn::make('sender.name')
+                    ->label('Sender')
+                    ->toggleable(isToggledHiddenByDefault: true),
+
+                Tables\Columns\TextColumn::make('recipient.name')
+                    ->label('Recipient')
+                    ->toggleable(isToggledHiddenByDefault: true),
+
+                Tables\Columns\IconColumn::make('opened')
+                    ->label('Opened')
+                    ->boolean()
+                    ->trueIcon('heroicon-o-eye')
+                    ->falseIcon('heroicon-o-eye-slash')
+                    ->toggleable(isToggledHiddenByDefault: true),
+
+                Tables\Columns\IconColumn::make('delivered')
+                    ->label('Delivered')
+                    ->boolean()
+                    ->trueIcon('heroicon-o-check-circle')
+                    ->falseIcon('heroicon-o-x-circle')
+                    ->toggleable(isToggledHiddenByDefault: true),
+
+                Tables\Columns\IconColumn::make('complaint')
+                    ->label('Complaint')
+                    ->boolean()
+                    ->trueIcon('heroicon-o-exclamation-triangle')
+                    ->falseIcon('heroicon-o-check')
+                    ->toggleable(isToggledHiddenByDefault: true),
+
+                Tables\Columns\IconColumn::make('bounced')
+                    ->label('Bounced')
+                    ->boolean()
+                    ->trueIcon('heroicon-o-arrow-uturn-left')
+                    ->falseIcon('heroicon-o-check')
+                    ->toggleable(isToggledHiddenByDefault: true),
+
+                Tables\Columns\TextColumn::make('site.name')
+                    ->label('Site')
+                    ->toggleable(isToggledHiddenByDefault: true),
+
+                Tables\Columns\TextColumn::make('created_at')
+                    ->label('Created At')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+
+                Tables\Columns\TextColumn::make('updated_at')
+                    ->label('Updated At')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('status')

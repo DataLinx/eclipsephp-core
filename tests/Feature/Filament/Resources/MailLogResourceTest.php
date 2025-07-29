@@ -16,6 +16,14 @@ test('authorized access can be allowed', function () {
         ->assertOk();
 });
 
+test('unauthenticated users cannot access mail log index', function () {
+    // Clear any authenticated user
+    auth()->logout();
+
+    $this->get(MailLogResource::getUrl())
+        ->assertRedirect(); // Should redirect to login
+});
+
 test('mail logs table page can be rendered', function () {
     livewire(ListMailLogs::class)->assertSuccessful();
 });
