@@ -100,4 +100,12 @@ class UserPolicy
     {
         return $user->can('impersonate_user');
     }
+
+    /**
+     * Determine whether the user can send emails to other users.
+     */
+    public function sendEmail(User $user): bool
+    {
+        return $user->can('send_email_user');
+    }
 }

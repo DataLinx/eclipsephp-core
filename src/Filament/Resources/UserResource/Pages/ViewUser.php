@@ -2,6 +2,7 @@
 
 namespace Eclipse\Core\Filament\Resources\UserResource\Pages;
 
+use Eclipse\Core\Filament\Actions\SendEmailAction;
 use Eclipse\Core\Filament\Resources\UserResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
@@ -25,6 +26,7 @@ class ViewUser extends ViewRecord
     {
         return [
             Actions\EditAction::make(),
+            SendEmailAction::make(),
             Impersonate::make()
                 ->record($this->getRecord())
                 ->redirectTo(route('filament.admin.tenant')),
