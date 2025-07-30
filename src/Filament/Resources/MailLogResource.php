@@ -2,6 +2,7 @@
 
 namespace Eclipse\Core\Filament\Resources;
 
+use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
 use Eclipse\Core\Models\MailLog;
 use Eclipse\Core\Services\Registry;
 use Filament\Forms;
@@ -12,7 +13,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\HtmlString;
 
-class MailLogResource extends Resource
+class MailLogResource extends Resource implements HasShieldPermissions
 {
     protected static ?string $model = MailLog::class;
 
@@ -279,5 +280,13 @@ class MailLogResource extends Resource
         }
 
         return $query;
+    }
+
+    public static function getPermissionPrefixes(): array
+    {
+        return [
+            'view_any',
+            'view',
+        ];
     }
 }
