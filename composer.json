@@ -65,6 +65,8 @@
         "spatie/laravel-translatable": "^6.11",
         "spatie/security-advisories-health-check": "^1.2",
         "stechstudio/filament-impersonate": "^3.16",
+        "symfony/http-client": "^7.3",
+        "symfony/mailgun-mailer": "^7.3",
         "tangodev-it/filament-emoji-picker": "^1.0",
         "typesense/typesense-php": "^5.0"
     },
