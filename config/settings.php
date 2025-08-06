@@ -40,6 +40,12 @@ return [
             'table' => null,
             'connection' => null,
         ],
+        'user_tenant' => [
+            'type' => \Eclipse\Core\Settings\Repositories\UserSiteSettingsRepository::class,
+            'model' => null,
+            'table' => 'user_site_settings',
+            'connection' => null,
+        ],
         'redis' => [
             'type' => Spatie\LaravelSettings\SettingsRepositories\RedisSettingsRepository::class,
             'connection' => null,

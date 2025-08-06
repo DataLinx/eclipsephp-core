@@ -67,9 +67,21 @@ class Site extends Model
         return SiteFactory::new();
     }
 
-    /** @return HasMany<\Eclipse\Core\Models\User\Role, self> */
+    /** @return HasMany<Role, self> */
     public function roles(): HasMany
     {
-        return $this->hasMany(\Eclipse\Core\Models\User\Role::class);
+        return $this->hasMany(Role::class);
+    }
+
+    /** @return HasMany<\Eclipse\Cms\Models\Section, self> */
+    public function sections(): HasMany
+    {
+        return $this->hasMany(\Eclipse\Cms\Models\Section::class);
+    }
+
+    /** @return HasMany<\Eclipse\Cms\Models\Page, self> */
+    public function pages(): HasMany
+    {
+        return $this->hasMany(\Eclipse\Cms\Models\Page::class);
     }
 }

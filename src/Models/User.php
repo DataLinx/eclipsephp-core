@@ -4,6 +4,8 @@ namespace Eclipse\Core\Models;
 
 use Eclipse\Core\Database\Factories\UserFactory;
 use Eclipse\Core\Models\User\Role;
+use Eclipse\Core\Settings\UserSettings;
+use Eclipse\World\Models\Country;
 use Exception;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasAvatar;
@@ -11,10 +13,12 @@ use Filament\Models\Contracts\HasTenants;
 use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Collection;
+use Spatie\LaravelSettings\Settings;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\Permission\Traits\HasRoles;
@@ -49,7 +53,10 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, HasMedia,
         'first_name',
         'last_name',
         'email',
+        'phone_number',
         'password',
+        'country_id',
+        'date_of_birth',
         'last_login_at',
         'login_count',
     ];
@@ -74,6 +81,7 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, HasMedia,
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'date_of_birth' => 'date',
             'last_login_at' => 'datetime',
         ];
     }
@@ -86,6 +94,11 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, HasMedia,
     public function sites()
     {
         return $this->belongsToMany(Site::class, 'site_has_user');
+    }
+
+    public function country(): BelongsTo
+    {
+        return $this->belongsTo(Country::class);
     }
 
     public function getFilamentAvatarUrl(): ?string
@@ -172,8 +185,13 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, HasMedia,
         return $this->roles()
             ->where('name', $role)
             ->where(function ($query) use ($site) {
-                $query->where('model_has_roles.' . config('permission.column_names.team_foreign_key'), $site->id);
+                $query->where('model_has_roles.'.config('permission.column_names.team_foreign_key'), $site->id);
             })
             ->exists();
+    }
+
+    public function getSettings(string $settingsClass = UserSettings::class): Settings
+    {
+        return $settingsClass::forUser($this->id);
     }
 }

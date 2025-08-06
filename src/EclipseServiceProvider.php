@@ -61,6 +61,7 @@ class EclipseServiceProvider extends PackageServiceProvider
                 'telescope',
                 'themes',
             ])
+            ->hasViews()
             ->hasSettings()
             ->discoversMigrations()
             ->runsMigrations()

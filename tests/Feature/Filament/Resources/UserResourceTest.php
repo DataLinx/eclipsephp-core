@@ -48,7 +48,7 @@ test('user form validation works', function () {
         'email' => 'john@doe.com',
         'password' => 'password',
         'global_roles' => [],
-        'site_1' => []
+        'site_1' => [],
     ])->call('create')
         ->assertHasNoFormErrors();
 });
