@@ -22,7 +22,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+          # Checkout the actual branch, not a specific commit
+          ref: ${{ github.head_ref || github.ref_name }}
+          # Fetch the full history to avoid shallow clone issues
+          fetch-depth: 0
 
       - name: Run Laravel Pint
         uses: aglipanci/laravel-pint-action@latest
