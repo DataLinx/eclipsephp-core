@@ -43,5 +43,4 @@ class ManageEclipse extends SettingsPage
     {
         return $this->getNavigationLabel();
     }
-
 }
