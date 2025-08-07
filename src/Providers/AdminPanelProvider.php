@@ -19,7 +19,6 @@ use Eclipse\World\EclipseWorld;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use Filament\Navigation\NavigationGroup;
 use Filament\Navigation\NavigationItem;
 use Filament\Notifications\Livewire\Notifications;
 use Filament\Panel;
