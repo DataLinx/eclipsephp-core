@@ -4,7 +4,9 @@ namespace Eclipse\Core\Models;
 
 use Eclipse\Core\Database\Factories\UserFactory;
 use Eclipse\Core\Models\User\Address;
+use Eclipse\Core\Models\User\Role;
 use Eclipse\Core\Settings\UserSettings;
+use Eclipse\Core\Traits\HasSiteRoles;
 use Eclipse\World\Models\Country;
 use Exception;
 use Filament\Models\Contracts\FilamentUser;
@@ -39,7 +41,7 @@ use Spatie\Permission\Traits\HasRoles;
  */
 class User extends Authenticatable implements FilamentUser, HasAvatar, HasMedia, HasTenants
 {
-    use HasFactory, HasRoles, InteractsWithMedia, Notifiable, SoftDeletes;
+    use HasFactory, HasRoles, HasSiteRoles, InteractsWithMedia, Notifiable, SoftDeletes;
 
     protected $table = 'users';
 
@@ -141,6 +143,16 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, HasMedia,
         static::retrieved(function (self $user) {
             if ($user->trashed() && auth()->check() && request()->routeIs('login')) {
                 throw new Exception('This account has been deactivated.');
+            }
+        });
+
+        static::created(function (self $user) {
+            $panelUserRole = Role::firstOrCreate(['name' => 'panel_user']);
+            if (app()->bound('filament') && filament()->getTenant()) {
+                $tenant = filament()->getTenant();
+                $user->assignRole($panelUserRole, $tenant->getKey());
+            } else {
+                $user->assignRole($panelUserRole);
             }
         });
     }

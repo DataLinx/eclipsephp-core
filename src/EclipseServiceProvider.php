@@ -21,6 +21,8 @@ use Eclipse\Core\Providers\AdminPanelProvider;
 use Eclipse\Core\Providers\HorizonServiceProvider;
 use Eclipse\Core\Providers\TelescopeServiceProvider;
 use Eclipse\Core\Services\Registry;
+use Filament\Forms\Components\Field;
+use Filament\Infolists\Components\Entry;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\Column;
 use Illuminate\Auth\Events\Login;
@@ -132,9 +134,22 @@ class EclipseServiceProvider extends PackageServiceProvider
         // Register policies for classes that can't be guessed automatically
         Gate::policy(Role::class, RolePolicy::class);
 
+        // Set common settings for Filament form
+        Field::configureUsing(function (Field $field) {
+            $field
+                ->translateLabel();
+        });
+
+        // Set common settings for Filament infolist
+        Entry::configureUsing(function (Entry $entry) {
+            $entry
+                ->translateLabel();
+        });
+
         // Set common settings for Filament table columns
         Column::configureUsing(function (Column $column) {
             $column
+                ->translateLabel()
                 ->toggleable()
                 ->sortable();
         });
