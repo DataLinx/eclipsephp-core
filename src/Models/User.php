@@ -183,6 +183,9 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, HasMedia,
         return parent::delete();
     }
 
+    /**
+     * Determine if the user can impersonate other users.
+     */
     public function canImpersonate(): bool
     {
         return $this->can('impersonate', User::class);

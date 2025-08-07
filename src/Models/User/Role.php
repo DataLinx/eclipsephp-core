@@ -12,14 +12,14 @@ class Role extends SpatieRole
 {
     use HasFactory;
 
-    protected static function newFactory()
-    {
-        return RoleFactory::new();
-    }
-
     /** @return BelongsTo<Site, self> */
     public function site(): BelongsTo
     {
         return $this->belongsTo(Site::class);
+    }
+
+    protected static function newFactory()
+    {
+        return RoleFactory::new();
     }
 }
