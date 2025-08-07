@@ -26,11 +26,11 @@ beforeEach(function () {
     $site = \Eclipse\Core\Models\Site::first();
 
     $this->authorizedUser = User::factory()->create();
-    $this->authorizedUser->syncRoles([$this->emailRole]); // Use syncRoles to replace all roles
+    $this->authorizedUser->syncRoles([$this->emailRole]);
     $this->authorizedUser->sites()->attach($site);
 
     $this->unauthorizedUser = User::factory()->create();
-    $this->unauthorizedUser->syncRoles([$this->regularRole]); // Use syncRoles to replace all roles
+    $this->unauthorizedUser->syncRoles([$this->regularRole]);
     $this->unauthorizedUser->sites()->attach($site);
 
     $this->recipientUser = User::factory()->create();
