@@ -3,10 +3,12 @@
 namespace Eclipse\Core\Filament\Pages;
 
 use BezhanSalleh\FilamentShield\Traits\HasPageShield;
+use Eclipse\Common\CommonPlugin;
 use Eclipse\Core\Settings\EclipseSettings;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Pages\SettingsPage;
+use Illuminate\Contracts\Support\Htmlable;
 
 class ManageEclipse extends SettingsPage
 {
@@ -27,13 +29,19 @@ class ManageEclipse extends SettingsPage
             ]);
     }
 
-    public static function getNavigationGroup(): ?string
+    public static function getCluster(): ?string
     {
-        return 'Configuration';
+        return app(CommonPlugin::class)->getSettingsCluster();
     }
 
     public static function getNavigationLabel(): string
     {
         return 'System';
     }
+
+    public function getTitle(): string|Htmlable
+    {
+        return $this->getNavigationLabel();
+    }
+
 }

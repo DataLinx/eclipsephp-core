@@ -6,6 +6,7 @@ use BezhanSalleh\FilamentShield\Facades\FilamentShield;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use BezhanSalleh\FilamentShield\Middleware\SyncShieldTenant;
 use DutchCodingCompany\FilamentDeveloperLogins\FilamentDeveloperLoginsPlugin;
+use Eclipse\Common\CommonPlugin;
 use Eclipse\Common\Providers\GlobalSearchProvider;
 use Eclipse\Core\Filament\Pages\Dashboard;
 use Eclipse\Core\Filament\Pages\EditProfile;
@@ -122,6 +123,7 @@ class AdminPanelProvider extends PanelProvider
                 Authenticate::class,
             ])
             ->plugins([
+                CommonPlugin::make(),
                 FilamentShieldPlugin::make(),
                 EnvironmentIndicatorPlugin::make(),
                 FilamentDeveloperLoginsPlugin::make()
