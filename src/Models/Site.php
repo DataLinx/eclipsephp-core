@@ -46,22 +46,6 @@ class Site extends Model
         return $this->belongsToMany(User::class, 'site_has_user');
     }
 
-    // protected static function booted(): void
-    // {
-    //     static::created(function ($site): void {
-    //         $allUserIDs = Role::whereNull('site_id')
-    //             ->with('users')
-    //             ->get()
-    //             ->pluck('users.*.id')
-    //             ->flatten()
-    //             ->unique();
-
-    //         if ($allUserIDs->isNotEmpty()) {
-    //             $site->users()->syncWithoutDetaching($allUserIDs);
-    //         }
-    //     });
-    // }
-
     protected static function newFactory(): SiteFactory
     {
         return SiteFactory::new();
@@ -83,5 +67,17 @@ class Site extends Model
     public function pages(): HasMany
     {
         return $this->hasMany(\Eclipse\Cms\Models\Page::class);
+    }
+
+    /** @return HasMany<\Eclipse\Catalogue\Models\Category, self> */
+    public function categories(): HasMany
+    {
+        return $this->hasMany(\Eclipse\Catalogue\Models\Category::class);
+    }
+
+    /** @return HasMany<\Eclipse\Catalogue\Models\TaxClass, self> */
+    public function taxClasses(): HasMany
+    {
+        return $this->hasMany(\Eclipse\Catalogue\Models\TaxClass::class);
     }
 }

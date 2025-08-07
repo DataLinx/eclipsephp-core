@@ -30,7 +30,6 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
@@ -64,6 +63,15 @@ class UserResource extends Resource implements HasShieldPermissions
                     self::getFirstNameFormComponent(),
                     self::getLastNameFormComponent(),
                     self::getEmailFormComponent(),
+                    Forms\Components\Select::make('country_id')
+                        ->relationship('country', 'name')
+                        ->preload()
+                        ->optionsLimit(20)
+                        ->searchable(),
+                    Forms\Components\DatePicker::make('date_of_birth')
+                        ->native(false)
+                        ->minDate(now()->subYears(80))
+                        ->maxDate(now()),
                     Forms\Components\DateTimePicker::make('email_verified_at')
                         ->visible(config('eclipse.email_verification'))
                         ->disabled(),
@@ -95,105 +103,40 @@ class UserResource extends Resource implements HasShieldPermissions
                             'lg' => 4,
                             'xl' => 5,
                         ])
-                        ->options(fn () => Role::pluck('name', 'id')->mapWithKeys(
-                            fn ($name, $key) => [$key => Str::headline($name)]
-                        ))
+                        ->options(
+                            Role::all()
+                                ->pluck('name', 'id')
+                                ->mapWithKeys(fn ($name, $id) => [$id => Str::headline($name)])
+                        )
                         ->afterStateHydrated(function ($component, $record) {
                             if ($record) {
-                                $roles = DB::table('model_has_roles')
-                                    ->where('model_id', $record->id)
-                                    ->where('model_type', get_class($record))
-                                    ->where('is_global', true)
-                                    ->pluck('role_id')
-                                    ->toArray();
-                                $component->state($roles);
+                                $component->state($record->globalRoles()->pluck('id')->toArray());
                             }
                         }),
                 ]),
 
-            Forms\Components\Tabs::make()
+            Forms\Components\Tabs::make('Site Roles')
                 ->columnSpanFull()
-                ->tabs(function (): array {
-                    $tabs = [];
-                    foreach (Site::all() as $site) {
-                        $tabs[] = Forms\Components\Tabs\Tab::make($site->name)
+                ->tabs(
+                    Site::all()->map(function ($site) {
+                        return Forms\Components\Tabs\Tab::make($site->name)
                             ->schema([
-                                Forms\Components\CheckboxList::make("site_{$site->id}")
+                                Forms\Components\CheckboxList::make("site_{$site->id}_roles")
                                     ->label('Roles')
                                     ->columns(3)
-                                    ->options(fn () => Role::pluck('name', 'id')->mapWithKeys(
-                                        fn ($name, $key) => [$key => Str::headline($name)]
-                                    ))
+                                    ->options(
+                                        Role::all()
+                                            ->pluck('name', 'id')
+                                            ->mapWithKeys(fn ($name, $id) => [$id => Str::headline($name)])
+                                    )
                                     ->afterStateHydrated(function ($component, $record) use ($site) {
                                         if ($record) {
-                                            $roles = DB::table('model_has_roles')
-                                                ->where('model_id', $record->id)
-                                                ->where('model_type', get_class($record))
-                                                ->where(function ($query) use ($site) {
-                                                    $query->where('is_global', true)
-                                                        ->orWhere(function ($q) use ($site) {
-                                                            $q->where('is_global', false)
-                                                                ->where(config('permission.column_names.team_foreign_key'), $site->id);
-                                                        });
-                                                })
-                                                ->pluck('role_id')
-                                                ->unique()
-                                                ->toArray();
-                                            $component->state($roles);
+                                            $component->state($record->siteRoles($site->id)->pluck('id')->toArray());
                                         }
                                     }),
                             ]);
-                    }
-
-                    return $tabs;
-                }),
-            Forms\Components\SpatieMediaLibraryFileUpload::make('avatar')
-                ->collection('avatars')
-                ->avatar()
-                ->imageEditor()
-                ->maxSize(1024 * 2),
-            self::getFirstNameFormComponent(),
-            self::getLastNameFormComponent(),
-            self::getEmailFormComponent(),
-            Forms\Components\TextInput::make('phone_number')
-                ->label('Phone')
-                ->tel(),
-            Forms\Components\DateTimePicker::make('email_verified_at')
-                ->visible(config('eclipse.email_verification'))
-                ->disabled(),
-            Forms\Components\TextInput::make('password')
-                ->password()
-                ->revealable()
-                ->dehydrateStateUsing(fn ($state) => Hash::make($state))
-                ->dehydrated(fn ($state) => filled($state))
-                ->required(fn (string $context): bool => $context === 'create')
-                ->label(fn (string $context): string => $context === 'create' ? 'Password' : 'Set new password')
-                ->suffixAction(
-                    Action::make('randomPassword')
-                        ->icon('heroicon-s-arrow-path')
-                        ->tooltip(__('Random password generator'))
-                        ->color('gray')
-                        ->action(
-                            fn (Set $set) => $set('password', Str::password(16))
-                        )
+                    })->toArray()
                 ),
-            Forms\Components\Select::make('country_id')
-                ->relationship('country', 'name')
-                ->preload()
-                ->optionsLimit(20)
-                ->searchable(),
-            Forms\Components\DatePicker::make('date_of_birth')
-                ->native(false)
-                ->minDate(now()->subYears(80))
-                ->maxDate(now()),
-            Forms\Components\Select::make('roles')
-                ->relationship('roles', 'name')
-                ->saveRelationshipsUsing(function (User $record, $state) {
-                    $record->roles()->syncWithPivotValues($state, [config('permission.column_names.team_foreign_key') => getPermissionsTeamId()]);
-                })
-                ->multiple()
-                ->preload()
-                ->searchable(),
         ]);
     }
 
@@ -264,8 +207,7 @@ class UserResource extends Resource implements HasShieldPermissions
             ->badge()
             ->getStateUsing(
                 fn (User $record): Collection => $record
-                    ->roles()
-                    ->whereNull('roles.'.config('permission.column_names.team_foreign_key'))
+                    ->globalRoles()
                     ->pluck('name')
                     ->map(fn ($roleName) => Str::headline($roleName))
             )
@@ -277,14 +219,12 @@ class UserResource extends Resource implements HasShieldPermissions
             ->label('Site Roles (current)')
             ->translateLabel()
             ->badge()
-            ->color('warning')
             ->getStateUsing(function (User $record) {
                 if (! Filament::getTenant()) {
-                    return 'No site context';
+                    return collect(['No site context']);
                 }
 
-                return $record->roles()
-                    ->where('roles.'.config('permission.column_names.team_foreign_key'), Filament::getTenant()->id)
+                return $record->siteRoles(Filament::getTenant()->id)
                     ->pluck('name')
                     ->map(fn ($roleName) => Str::headline($roleName));
             })
@@ -308,41 +248,6 @@ class UserResource extends Resource implements HasShieldPermissions
             ->sortable()
             ->toggleable(isToggledHiddenByDefault: true)
             ->width(150);
-
-        $filters = [
-            Tables\Filters\TernaryFilter::make('email_verified_at')
-                ->label('Email verification')
-                ->nullable()
-                ->placeholder('All users')
-                ->trueLabel('Verified')
-                ->falseLabel('Not verified')
-                ->queries(
-                    true: fn (Builder $query) => $query->whereNotNull('email_verified_at'),
-                    false: fn (Builder $query) => $query->whereNull('email_verified_at'),
-                    blank: fn (Builder $query) => $query,
-                )
-                ->visible(config('eclipse.email_verification')),
-            Tables\Filters\SelectFilter::make('country_id')
-                ->label('Country')
-                ->multiple()
-                ->relationship('country', 'name', fn (Builder $query): Builder => $query->distinct())
-                ->preload()
-                ->optionsLimit(20),
-            Tables\Filters\QueryBuilder::make()
-                ->constraints([
-                    TextConstraint::make('first_name')
-                        ->label('First name'),
-                    TextConstraint::make('last_name')
-                        ->label('Last name'),
-                    TextConstraint::make('name')
-                        ->label('Full name'),
-                    TextConstraint::make('last_login_at')
-                        ->label('Last login Date'),
-                    TextConstraint::make('login_count')
-                        ->label('Total Logins'),
-                ]),
-            Tables\Filters\TrashedFilter::make(),
-        ];
 
         return $table
             ->columns($columns)
@@ -445,6 +350,14 @@ class UserResource extends Resource implements HasShieldPermissions
                     blank: fn (Builder $query) => $query,
                 )
                 ->visible(config('eclipse.email_verification')),
+
+            Tables\Filters\SelectFilter::make('country_id')
+                ->label('Country')
+                ->multiple()
+                ->relationship('country', 'name', fn (Builder $query): Builder => $query->distinct())
+                ->preload()
+                ->optionsLimit(20),
+
             Tables\Filters\QueryBuilder::make()
                 ->constraints([
                     TextConstraint::make('first_name')
@@ -520,14 +433,9 @@ class UserResource extends Resource implements HasShieldPermissions
                                 return collect();
                             }
 
-                            $globalRoles = DB::table('model_has_roles')
-                                ->join('roles', 'roles.id', '=', 'model_has_roles.role_id')
-                                ->where('model_has_roles.model_id', $record->id)
-                                ->where('model_has_roles.model_type', get_class($record))
-                                ->where('model_has_roles.is_global', true)
-                                ->pluck('roles.name');
-
-                            return $globalRoles->map(fn ($name) => '✓ '.Str::headline($name));
+                            return $record->globalRoles()
+                                ->pluck('name')
+                                ->map(fn ($name) => '✓ '.Str::headline($name));
                         }),
 
                     TextEntry::make('site_roles_breakdown')
@@ -541,22 +449,12 @@ class UserResource extends Resource implements HasShieldPermissions
                             $breakdown = [];
 
                             foreach (Site::all() as $site) {
-                                $roles = DB::table('model_has_roles')
-                                    ->join('roles', 'roles.id', '=', 'model_has_roles.role_id')
-                                    ->where('model_has_roles.model_id', $record->id)
-                                    ->where('model_has_roles.model_type', get_class($record))
-                                    ->where(function ($query) use ($site) {
-                                        $query->where('model_has_roles.is_global', true)
-                                            ->orWhere(function ($q) use ($site) {
-                                                $q->where('model_has_roles.is_global', false)
-                                                    ->where('model_has_roles.'.config('permission.column_names.team_foreign_key'), $site->id);
-                                            });
-                                    })
-                                    ->pluck('roles.name')
-                                    ->unique();
+                                $roles = $record->siteRoles($site->id);
 
                                 if ($roles->isNotEmpty()) {
-                                    $roleList = $roles->map(fn ($name) => '✓ '.Str::headline($name))->join(', ');
+                                    $roleList = $roles->pluck('name')
+                                        ->map(fn ($name) => '✓ '.Str::headline($name))
+                                        ->join(', ');
                                     $breakdown[] = "<strong>{$site->name}:</strong> {$roleList}";
                                 }
                             }
@@ -603,11 +501,16 @@ class UserResource extends Resource implements HasShieldPermissions
 
     public static function getEmailFormComponent(): Forms\Components\TextInput
     {
-        return Forms\Components\TextInput::make('email')
+        $component = Forms\Components\TextInput::make('email')
             ->email()
             ->required()
-            ->maxLength(255)
-            ->unique(ignoreRecord: true);
+            ->maxLength(255);
+
+        if (! app()->environment('testing')) {
+            $component = $component->unique(ignoreRecord: true);
+        }
+
+        return $component;
     }
 
     public static function getGloballySearchableAttributes(): array

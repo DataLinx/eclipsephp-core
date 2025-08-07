@@ -41,37 +41,52 @@ test('user form validation works', function () {
             'password' => 'required',
         ]);
 
-    // Test with valid data
+    $site = Site::first();
+    $uniqueEmail = fake()->unique()->email();
+
+    User::where('email', $uniqueEmail)->delete();
+
     $component->fillForm([
         'first_name' => 'John',
         'last_name' => 'Doe',
-        'email' => 'john@doe.com',
+        'email' => $uniqueEmail,
         'password' => 'password',
         'global_roles' => [],
-        'site_1' => [],
+        "site_{$site->id}_roles" => [],
     ])->call('create')
         ->assertHasNoFormErrors();
 });
 
 test('new user can be created', function () {
+    $uniqueEmail = fake()->unique()->email();
+
+    User::where('email', $uniqueEmail)->delete();
+
     $data = [
         'first_name' => 'John',
         'last_name' => 'Doe',
-        'email' => 'john@doe.net',
+        'email' => $uniqueEmail,
         'password' => 'johndoe',
+        'global_roles' => [],
     ];
+
+    foreach (Site::all() as $site) {
+        $data["site_{$site->id}_roles"] = [];
+    }
 
     livewire(CreateUser::class)
         ->fillForm($data)
         ->call('create')
         ->assertHasNoFormErrors();
 
-    $user = User::where('email', 'john@doe.net')->first();
+    $user = User::where('email', $data['email'])->first();
     expect($user)->toBeObject();
 
     foreach ($data as $key => $val) {
         if ($key === 'password') {
             expect(Hash::check($val, $user->password))->toBeTrue('Hashed password differs from plain-text!');
+        } elseif ($key === 'global_roles' || str_starts_with($key, 'site_')) {
+            continue;
         } else {
             expect($user->$key)->toEqual($val);
         }
