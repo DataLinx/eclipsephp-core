@@ -80,4 +80,10 @@ class Site extends Model
     {
         return $this->hasMany(\Eclipse\Catalogue\Models\TaxClass::class);
     }
+
+    /** @return HasMany<\Eclipse\Core\Models\MailLog, self> */
+    public function mailLogs(): HasMany
+    {
+        return $this->hasMany(\Eclipse\Core\Models\MailLog::class);
+    }
 }
