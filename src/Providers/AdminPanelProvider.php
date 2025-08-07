@@ -139,9 +139,9 @@ class AdminPanelProvider extends PanelProvider
                     ->authorize(fn (): bool => auth()->user()->hasRole('super_admin')),
             ])
             ->navigationGroups([
-                NavigationGroup::make('Users'),
-                NavigationGroup::make('Configuration'),
-                NavigationGroup::make('Tools'),
+                'Users',
+                __('eclipse-common::nav.configuration'),
+                'Tools',
             ])
             ->navigationItems([
                 NavigationItem::make('Telescope')

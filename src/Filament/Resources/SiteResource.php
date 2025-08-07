@@ -93,7 +93,7 @@ class SiteResource extends Resource implements HasShieldPermissions
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Configuration';
+        return __('eclipse-common::nav.configuration');
     }
 
     public static function getPermissionPrefixes(): array
