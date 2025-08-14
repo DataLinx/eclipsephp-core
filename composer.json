@@ -68,7 +68,8 @@
         "symfony/http-client": "^7.3",
         "symfony/mailgun-mailer": "^7.3",
         "tangodev-it/filament-emoji-picker": "^1.0",
-        "typesense/typesense-php": "^5.0"
+        "typesense/typesense-php": "^5.0",
+        "nben/filament-record-nav": "^1.0"
     },
     "require-dev": {
         "laravel/pint": "^1.21",
