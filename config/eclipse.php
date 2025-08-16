@@ -133,6 +133,7 @@ return [
     */
     'tools' => [
         'phpmyadmin' => env('PHPMYADMIN_URL'),
+        'typesense_dashboard' => env('TYPESENSE_DASHBOARD_URL'),
     ],
 
 ];
