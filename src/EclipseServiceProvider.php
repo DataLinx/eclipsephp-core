@@ -150,6 +150,7 @@ class EclipseServiceProvider extends PackageServiceProvider
                 ->labels($availableLocales->pluck('native_name', 'id')->toArray());
         });
 
+        // Register tenant and user IDs in Filament script data
         FilamentAsset::registerScriptData([
             'user' => ['id' => auth()->id()],
             'tenant' => ['id' => Filament::getTenant()?->getKey()],
