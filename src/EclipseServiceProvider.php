@@ -21,6 +21,7 @@ use Eclipse\Core\Providers\AdminPanelProvider;
 use Eclipse\Core\Providers\HorizonServiceProvider;
 use Eclipse\Core\Providers\TelescopeServiceProvider;
 use Eclipse\Core\Services\Registry;
+use Filament\Facades\Filament;
 use Filament\Resources\Resource;
 use Filament\Support\Facades\FilamentAsset;
 use Filament\Tables\Columns\Column;
