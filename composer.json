@@ -53,7 +53,7 @@
         "filament/spatie-laravel-media-library-plugin": "^3.2",
         "filament/spatie-laravel-translatable-plugin": "^3.2",
         "hasnayeen/themes": "^3.0",
-        "laravel/framework": "^11.0",
+        "laravel/framework": "^12.0",
         "laravel/horizon": "^5.31",
         "laravel/telescope": "^5.5",
         "laravel/tinker": "^2.10",
@@ -74,7 +74,7 @@
     },
     "require-dev": {
         "laravel/pint": "^1.21",
-        "orchestra/testbench": "^9.10",
+        "orchestra/testbench": "^10.0",
         "pestphp/pest": "^3.7",
         "pestphp/pest-plugin-livewire": "^3.0"
     },
