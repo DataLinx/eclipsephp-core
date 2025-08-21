@@ -189,12 +189,9 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, HasMedia,
      */
     public function receivesBroadcastNotificationsOn(): string
     {
-        if ($host = request()?->getHost()) {
-            $tenantId = Site::query()->where('domain', $host)->value('id');
+        $host = request()?->getHost();
+        $tenantId = Site::query()->where('domain', $host)->value('id');
 
-            return "Eclipse.Core.Models.User.{$this->id}.tenant.{$tenantId}";
-        }
-
-        return "Eclipse.Core.Models.User.{$this->id}";
+        return "Eclipse.Core.Models.User.{$this->id}.tenant.{$tenantId}";
     }
 }
