@@ -21,7 +21,9 @@ use Eclipse\Core\Providers\AdminPanelProvider;
 use Eclipse\Core\Providers\HorizonServiceProvider;
 use Eclipse\Core\Providers\TelescopeServiceProvider;
 use Eclipse\Core\Services\Registry;
+use Filament\Facades\Filament;
 use Filament\Resources\Resource;
+use Filament\Support\Facades\FilamentAsset;
 use Filament\Tables\Columns\Column;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Database\Eloquent\Model;
@@ -147,6 +149,12 @@ class EclipseServiceProvider extends PackageServiceProvider
                 ->locales($availableLocales->pluck('id')->toArray())
                 ->labels($availableLocales->pluck('native_name', 'id')->toArray());
         });
+
+        // Register tenant and user IDs in Filament script data
+        FilamentAsset::registerScriptData([
+            'user' => ['id' => auth()->id()],
+            'tenant' => ['id' => Filament::getTenant()?->getKey()],
+        ]);
 
         // Register health checks
         Health::checks([

@@ -32,7 +32,7 @@ class Registry
 
         Context::add('site', self::getSite()->id);
 
-        setPermissionsTeamId($site->id);
+        setPermissionsTeamId(self::getSite()->id);
     }
 
     /**

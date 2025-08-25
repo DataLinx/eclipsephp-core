@@ -183,4 +183,15 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, HasMedia,
     {
         return $settingsClass::forUser($this->id);
     }
+
+    /**
+     * The channels the user receives notification broadcasts on.
+     */
+    public function receivesBroadcastNotificationsOn(): string
+    {
+        $host = request()?->getHost();
+        $tenantId = Site::query()->where('domain', $host)->value('id');
+
+        return "Eclipse.Core.Models.User.{$this->id}.tenant.{$tenantId}";
+    }
 }
