@@ -207,6 +207,16 @@ class AdminPanelProvider extends PanelProvider
             ]);
         }
 
+        if (config('eclipse.tools.typesense_dashboard')) {
+            $panel->navigationItems([
+                NavigationItem::make('Typesense Dashboard')
+                    ->url(config('eclipse.tools.typesense_dashboard'), shouldOpenInNewTab: true)
+                    ->icon('heroicon-s-arrow-top-right-on-square')
+                    ->group('Tools')
+                    ->sort(910),
+            ]);
+        }
+
         // Configure notifications
         Notifications::alignment(Alignment::Center);
         Notifications::verticalAlignment(VerticalAlignment::End);
