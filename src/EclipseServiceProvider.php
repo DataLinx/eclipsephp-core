@@ -13,14 +13,17 @@ use Eclipse\Core\Health\Checks\ReverbCheck;
 use Eclipse\Core\Listeners\LogEmailToDatabase;
 use Eclipse\Core\Listeners\SendEmailSuccessNotification;
 use Eclipse\Core\Models\Locale;
+use Eclipse\Core\Models\Site;
 use Eclipse\Core\Models\User;
 use Eclipse\Core\Models\User\Permission;
 use Eclipse\Core\Models\User\Role;
+use Eclipse\Core\Notifications\Channels\SiteDatabaseChannel;
 use Eclipse\Core\Policies\User\RolePolicy;
 use Eclipse\Core\Providers\AdminPanelProvider;
 use Eclipse\Core\Providers\HorizonServiceProvider;
 use Eclipse\Core\Providers\TelescopeServiceProvider;
 use Eclipse\Core\Services\Registry;
+use Eclipse\Core\Support\CurrentSite;
 use Filament\Facades\Filament;
 use Filament\Resources\Resource;
 use Filament\Support\Facades\FilamentAsset;
@@ -28,10 +31,14 @@ use Filament\Tables\Columns\Column;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Mail\Events\MessageSent;
+use Illuminate\Notifications\Channels\DatabaseChannel;
+use Illuminate\Queue\Events\JobProcessed;
+use Illuminate\Queue\Events\JobProcessing;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Queue;
 use Spatie\Health\Checks\Checks\CacheCheck;
 use Spatie\Health\Checks\Checks\DebugModeCheck;
 use Spatie\Health\Checks\Checks\EnvironmentCheck;
@@ -104,6 +111,10 @@ class EclipseServiceProvider extends PackageServiceProvider
             return new Registry;
         });
 
+        $this->app->singleton(CurrentSite::class, fn () => new CurrentSite);
+
+        $this->app->bind(DatabaseChannel::class, SiteDatabaseChannel::class);
+
         return $this;
     }
 
@@ -155,6 +166,35 @@ class EclipseServiceProvider extends PackageServiceProvider
             'user' => ['id' => auth()->id()],
             'tenant' => ['id' => Filament::getTenant()?->getKey()],
         ]);
+
+        // Add site_id to every job payload before it is pushed to the queue.
+        // This ensures workers always know which site context the job belongs to.
+        Queue::createPayloadUsing(function () {
+            $current = app(CurrentSite::class)->get();
+            $tenantId = Filament::getTenant()?->getKey();
+            $host = request()?->getHost();
+            $hostResolvedId = $host ? Site::query()->where('domain', $host)->value('id') : null;
+            $siteId = $current ?? $tenantId ?? $hostResolvedId;
+
+            return ['site_id' => $siteId];
+        });
+
+        // When a job starts processing, restore the site_id from its payload
+        // into the global CurrentSite context so models, notifications, and logs
+        // all resolve the correct tenant during execution.
+        Event::listen(JobProcessing::class, function ($event) {
+            $payload = $event->job->payload();
+            $siteId = $payload['site_id'] ?? null;
+            if ($siteId !== null) {
+                app(CurrentSite::class)->set((int) $siteId);
+            }
+        });
+
+        // After a job finishes, clear the CurrentSite context to avoid leaking
+        // the previous job’s tenant into the next one on the same worker.
+        Event::listen(JobProcessed::class, function () {
+            app(CurrentSite::class)->set(null);
+        });
 
         // Register health checks
         Health::checks([
