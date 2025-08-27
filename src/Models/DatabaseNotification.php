@@ -2,10 +2,9 @@
 
 namespace Eclipse\Core\Models;
 
-use Eclipse\Core\Support\CurrentSite;
-use Filament\Facades\Filament;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Notifications\DatabaseNotification as BaseDatabaseNotification;
+use Illuminate\Support\Facades\Context;
 
 class DatabaseNotification extends BaseDatabaseNotification
 {
@@ -25,32 +24,11 @@ class DatabaseNotification extends BaseDatabaseNotification
     protected static function booted(): void
     {
         static::addGlobalScope('site', function (Builder $builder): void {
-            $siteId = static::resolveCurrentSiteId();
+            $siteId = Context::get('site');
 
             if ($siteId !== null) {
                 $builder->where($builder->getModel()->getTable().'.site_id', $siteId);
             }
-
         });
-    }
-
-    protected static function resolveCurrentSiteId(): ?int
-    {
-        // 1) Global context if available
-        if ($id = app(CurrentSite::class)->get()) {
-            return $id;
-        }
-
-        // 2) Filament tenant if available
-        if ($tenantId = Filament::getTenant()?->getKey()) {
-            return $tenantId;
-        }
-
-        // 3) Hostname mapping to a site
-        if ($host = request()?->getHost()) {
-            return Site::query()->where('domain', $host)->value('id');
-        }
-
-        return null;
     }
 }

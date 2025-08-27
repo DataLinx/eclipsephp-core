@@ -18,7 +18,8 @@ return new class extends Migration
             $table->foreignId('site_id')
                 ->nullable()
                 ->constrained('sites')
-                ->nullOnDelete();
+                ->cascadeOnUpdate()
+                ->cascadeOnDelete();
             $table->text('data');
             $table->timestamp('read_at')->nullable();
             $table->timestamps();

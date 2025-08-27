@@ -2,14 +2,12 @@
 
 namespace Eclipse\Core\Notifications\Channels;
 
-use Eclipse\Core\Notifications\Concerns\ResolvesSiteId;
 use Illuminate\Notifications\Channels\DatabaseChannel;
 use Illuminate\Notifications\Notification;
+use Illuminate\Support\Facades\Context;
 
 class SiteDatabaseChannel extends DatabaseChannel
 {
-    use ResolvesSiteId;
-
     /**
      * Build the payload stored in the notifications table and
      * append the current site id so rows are tenant-aware.
@@ -18,7 +16,7 @@ class SiteDatabaseChannel extends DatabaseChannel
     {
         $payload = parent::buildPayload($notifiable, $notification);
         $fromNotification = $this->resolveSiteIdFromNotification($notification);
-        $resolved = $fromNotification ?? $this->resolveSiteId();
+        $resolved = $fromNotification ?? Context::get('site');
         $payload['site_id'] = $resolved;
 
         return $payload;
