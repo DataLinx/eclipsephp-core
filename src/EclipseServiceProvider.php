@@ -32,6 +32,8 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Route;
+use Livewire\Livewire;
 use Spatie\Health\Checks\Checks\CacheCheck;
 use Spatie\Health\Checks\Checks\DebugModeCheck;
 use Spatie\Health\Checks\Checks\EnvironmentCheck;
@@ -91,7 +93,9 @@ class EclipseServiceProvider extends PackageServiceProvider
         Event::listen(MessageSent::class, SendEmailSuccessNotification::class);
         Event::listen(MessageSent::class, LogEmailToDatabase::class);
 
-        $this->app->register(AdminPanelProvider::class);
+        if ($this->app->runningInConsole() || $this->isAdminRequest()) {
+            $this->app->register(AdminPanelProvider::class);
+        }
 
         if ($this->app->environment('local')) {
             $this->app->register(\Laravel\Telescope\TelescopeServiceProvider::class);
@@ -171,5 +175,20 @@ class EclipseServiceProvider extends PackageServiceProvider
             ScheduleCheck::new(),
             SecurityAdvisoriesCheck::new(),
         ]);
+
+        // Set Livewire's update route with admin path
+        if ($this->isAdminRequest()) {
+            Livewire::setUpdateRoute(function ($handle) {
+                return Route::post('/admin/livewire/update', $handle)
+                    ->middleware(['web']);
+            });
+        }
+    }
+
+    private function isAdminRequest(): bool
+    {
+        $uri = trim(request()->getRequestUri(), '/');
+
+        return $uri === 'admin' || str_starts_with($uri, 'admin/');
     }
 }
