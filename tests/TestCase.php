@@ -24,6 +24,9 @@ abstract class TestCase extends BaseTestCase
         ini_set('display_errors', 1);
         error_reporting(E_ALL);
 
+        // Increase memory limit for tests
+        ini_set('memory_limit', '512M');
+
         parent::setUp();
 
         $this->withoutVite();
