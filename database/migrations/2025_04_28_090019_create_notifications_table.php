@@ -15,6 +15,11 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->string('type');
             $table->morphs('notifiable');
+            $table->foreignId('site_id')
+                ->nullable()
+                ->constrained('sites')
+                ->cascadeOnUpdate()
+                ->cascadeOnDelete();
             $table->text('data');
             $table->timestamp('read_at')->nullable();
             $table->timestamps();

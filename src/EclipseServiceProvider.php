@@ -16,6 +16,7 @@ use Eclipse\Core\Models\Locale;
 use Eclipse\Core\Models\User;
 use Eclipse\Core\Models\User\Permission;
 use Eclipse\Core\Models\User\Role;
+use Eclipse\Core\Notifications\Channels\SiteDatabaseChannel;
 use Eclipse\Core\Policies\User\RolePolicy;
 use Eclipse\Core\Providers\AdminPanelProvider;
 use Eclipse\Core\Providers\HorizonServiceProvider;
@@ -28,6 +29,7 @@ use Filament\Tables\Columns\Column;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Mail\Events\MessageSent;
+use Illuminate\Notifications\Channels\DatabaseChannel;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
@@ -107,6 +109,8 @@ class EclipseServiceProvider extends PackageServiceProvider
         $this->app->singleton(Registry::class, function () {
             return new Registry;
         });
+
+        $this->app->bind(DatabaseChannel::class, SiteDatabaseChannel::class);
 
         return $this;
     }

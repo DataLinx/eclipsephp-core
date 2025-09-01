@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -182,6 +183,15 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, HasMedia,
     public function getSettings(string $settingsClass = UserSettings::class): Settings
     {
         return $settingsClass::forUser($this->id);
+    }
+
+    /**
+     * Override notifications relation to use site-aware notification model.
+     */
+    public function notifications(): MorphMany
+    {
+        return $this->morphMany(DatabaseNotification::class, 'notifiable')
+            ->orderBy('created_at', 'desc');
     }
 
     /**
