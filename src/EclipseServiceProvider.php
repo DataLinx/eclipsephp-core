@@ -191,8 +191,8 @@ class EclipseServiceProvider extends PackageServiceProvider
 
     private function isAdminRequest(): bool
     {
-        $uri = trim(request()->getRequestUri(), '/');
+        $uri = explode('/', trim(request()->getRequestUri(), '/'));
 
-        return $uri === 'admin' || str_starts_with($uri, 'admin/');
+        return $uri[0] === 'admin' || $uri[0] === 'filament-developer-logins';
     }
 }
