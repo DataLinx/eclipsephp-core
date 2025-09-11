@@ -6,15 +6,10 @@ use Eclipse\Core\Filament\Actions\SendEmailAction;
 use Eclipse\Core\Filament\Resources\UserResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
-use Nben\FilamentRecordNav\Actions\NextRecordAction;
-use Nben\FilamentRecordNav\Actions\PreviousRecordAction;
-use Nben\FilamentRecordNav\Concerns\WithRecordNavigation;
 use STS\FilamentImpersonate\Pages\Actions\Impersonate;
 
 class ViewUser extends ViewRecord
 {
-    use WithRecordNavigation;
-
     protected static string $resource = UserResource::class;
 
     public function hasCombinedRelationManagerTabsWithContent(): bool
@@ -30,8 +25,6 @@ class ViewUser extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            PreviousRecordAction::make(),
-            NextRecordAction::make(),
             Actions\EditAction::make(),
             SendEmailAction::make(),
             Impersonate::make()

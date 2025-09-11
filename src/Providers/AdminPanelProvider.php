@@ -5,7 +5,7 @@ namespace Eclipse\Core\Providers;
 use BezhanSalleh\FilamentShield\Facades\FilamentShield;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use BezhanSalleh\FilamentShield\Middleware\SyncShieldTenant;
-use BezhanSalleh\PanelSwitch\PanelSwitch;
+use BezhanSalleh\PanelSwitch\Facades\PanelSwitch;
 use DutchCodingCompany\FilamentDeveloperLogins\FilamentDeveloperLoginsPlugin;
 use Eclipse\Common\CommonPlugin;
 use Eclipse\Common\Providers\GlobalSearchProvider;
@@ -77,7 +77,7 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->topNavigation()
             ->brandLogo(
-                fn (): View => view('eclipse::filament.components.brand')
+                fn (): View => view('eclipse::filament.components.brand-with-tenant-switcher')
             )
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverResources(in: $package_src.'Filament/Resources', for: 'Eclipse\\Core\\Filament\\Resources')
@@ -171,13 +171,6 @@ class AdminPanelProvider extends PanelProvider
                 fn () => view('eclipse::filament.components.my-settings')
             );
 
-        if ($hasTenantMenu) {
-            $panel->renderHook(
-                PanelsRenderHook::GLOBAL_SEARCH_END,
-                fn () => view('eclipse::filament.components.tenant-menu')
-            );
-        }
-
         // If the Pro version of the Spotlight plugin is installed, use that, otherwise use the free version
         if (class_exists(\pxlrbt\FilamentSpotlightPro\SpotlightPlugin::class)) {
             /** @noinspection PhpFullyQualifiedNameUsageInspection */
@@ -243,10 +236,8 @@ class AdminPanelProvider extends PanelProvider
         // Load customized translations for Filament Shield
         $this->loadTranslationsFrom(__DIR__.'/../../resources/lang/vendor/filament-shield', 'filament-shield');
 
-        // Configure Panel Switch
-        PanelSwitch::configureUsing(function (PanelSwitch $panelSwitch) {
-            $panelSwitch
-                ->simple()
+        if (class_exists(PanelSwitch::class)) {
+            PanelSwitch::simple()
                 ->icons([
                     'admin' => 'heroicon-s-cog-6-tooth',
                     'frontend' => 'heroicon-s-globe-alt',
@@ -256,6 +247,6 @@ class AdminPanelProvider extends PanelProvider
                     'frontend' => 'Frontend',
                 ])
                 ->visible(fn (): bool => auth()->check());
-        });
+        }
     }
 }
