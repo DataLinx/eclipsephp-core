@@ -2,8 +2,9 @@
 
 namespace Workbench\App\Providers;
 
-use BezhanSalleh\PanelSwitch\PanelSwitchServiceProvider;
 use Eclipse\Common\CommonServiceProvider;
+use Eclipse\Core\Providers\AdminPanelProvider;
+use Eclipse\Frontend\Providers\FrontendPanelProvider;
 use Illuminate\Support\ServiceProvider;
 use Nben\FilamentRecordNav\FilamentRecordNavServiceProvider;
 
@@ -18,15 +19,15 @@ class WorkbenchServiceProvider extends ServiceProvider
             $this->app->register(CommonServiceProvider::class);
         }
 
-        if (class_exists(PanelSwitchServiceProvider::class)) {
-            $this->app->register(PanelSwitchServiceProvider::class);
-        }
-
         if (class_exists(FilamentRecordNavServiceProvider::class)) {
             $this->app->register(FilamentRecordNavServiceProvider::class);
         }
 
-        $this->app->register(\Eclipse\Core\Providers\AdminPanelProvider::class);
+        $this->app->register(AdminPanelProvider::class);
+
+        if (class_exists(FrontendPanelProvider::class)) {
+            $this->app->register(FrontendPanelProvider::class);
+        }
     }
 
     /**

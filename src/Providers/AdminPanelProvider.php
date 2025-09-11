@@ -5,7 +5,6 @@ namespace Eclipse\Core\Providers;
 use BezhanSalleh\FilamentShield\Facades\FilamentShield;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use BezhanSalleh\FilamentShield\Middleware\SyncShieldTenant;
-use BezhanSalleh\PanelSwitch\Facades\PanelSwitch;
 use DutchCodingCompany\FilamentDeveloperLogins\FilamentDeveloperLoginsPlugin;
 use Eclipse\Common\CommonPlugin;
 use Eclipse\Common\Providers\GlobalSearchProvider;
@@ -16,6 +15,7 @@ use Eclipse\Core\Models\Locale;
 use Eclipse\Core\Models\Site;
 use Eclipse\Core\Models\User;
 use Eclipse\Core\Services\Registry;
+use Eclipse\Core\View\Components\BrandWithTenantSwitcher;
 use Eclipse\World\EclipseWorld;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -77,7 +77,7 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->topNavigation()
             ->brandLogo(
-                fn (): View => view('eclipse::filament.components.brand-with-tenant-switcher')
+                fn (): View => app(BrandWithTenantSwitcher::class)->render()
             )
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverResources(in: $package_src.'Filament/Resources', for: 'Eclipse\\Core\\Filament\\Resources')
@@ -235,16 +235,5 @@ class AdminPanelProvider extends PanelProvider
 
         // Load customized translations for Filament Shield
         $this->loadTranslationsFrom(__DIR__.'/../../resources/lang/vendor/filament-shield', 'filament-shield');
-
-        PanelSwitch::simple()
-            ->icons([
-                'admin' => 'heroicon-s-cog-6-tooth',
-                'frontend' => 'heroicon-s-globe-alt',
-            ])
-            ->labels([
-                'admin' => 'Admin Panel',
-                'frontend' => 'Frontend',
-            ])
-            ->visible(fn (): bool => auth()->check());
     }
 }

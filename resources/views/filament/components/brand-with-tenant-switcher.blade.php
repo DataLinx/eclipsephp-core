@@ -1,51 +1,11 @@
-@php
-    use Eclipse\Core\Services\Registry;
-    use Filament\Facades\Filament;
-    use Illuminate\Database\Eloquent\Model;
-    use Eclipse\Core\Filament\Pages\Dashboard;
-
-    $appName = Registry::getSite()->name ?? config('app.name');
-    $hasSpaMode = Filament::getCurrentPanel()->hasSpaMode();
-    $dashboardUrl = '/' . trim(Filament::getCurrentPanel()->getPath(), '/');
-
-    $currentTenant = filament()->getTenant();
-    $currentTenantName = $currentTenant ? filament()->getTenantName($currentTenant) : null;
-
-    $tenants = [];
-    $canSwitchTenants = false;
-
-    if (config('eclipse.multi_site', false) && filament()->auth()->check()) {
-        $tenants = array_filter(
-            filament()->getUserTenants(filament()->auth()->user()),
-            fn(Model $tenant): bool => !$tenant->is($currentTenant),
-        );
-        $canSwitchTenants = count($tenants) > 0;
-    }
-
-    $hasFrontend = collect(filament()->getPanels())->has('frontend');
-    $frontendUrl = config('app.url');
-
-    if ($hasFrontend) {
-        try {
-            if ($currentTenant && $currentTenant->domain) {
-                $frontendUrl = "https://{$currentTenant->domain}";
-            } else {
-                $frontendUrl = Dashboard::getUrl();
-            }
-        } catch (Exception $e) {
-            $frontendUrl = config('app.url');
-        }
-    }
-@endphp
-
-@if ($canSwitchTenants || $hasFrontend)
+@if ($shouldShowDropdown)
     <div class="flex items-center gap-x-2">
-        <a @if ($hasSpaMode) wire:navigate @endif href="{{ $dashboardUrl }}" class="flex-1">
+        <a @if ($hasSpaMode) wire:navigate @endif href="{{ $getDashboardUrl }}" class="flex-1">
             <div class="fi-logo flex text-xl font-bold leading-5 tracking-tight text-gray-950 dark:text-white">
-                {{ $appName }}
-                @if ($currentTenant && $currentTenantName !== $appName)
+                {{ $getAppName }}
+                @if ($getCurrentTenant && $getCurrentTenantName !== $getAppName)
                     <span class="text-gray-500 dark:text-gray-400 text-sm font-normal ml-2">
-                        - {{ $currentTenantName }}
+                        - {{ $getCurrentTenantName }}
                     </span>
                 @endif
             </div>
@@ -62,12 +22,13 @@
 
             <x-filament::dropdown.list>
                 @if ($canSwitchTenants)
-                    @foreach ($tenants as $tenant)
+                    @foreach ($getTenants as $tenant)
                         <x-filament::dropdown.list.item :href="route('filament.admin.pages.dashboard', ['tenant' => $tenant])" :image="filament()->getTenantAvatarUrl($tenant)" tag="a">
                             {{ filament()->getTenantName($tenant) }}
                         </x-filament::dropdown.list.item>
                     @endforeach
                 @endif
+
 
                 @if ($hasFrontend)
                     @if ($canSwitchTenants)
@@ -75,7 +36,7 @@
                             class="border-t border-gray-200 dark:border-gray-700 my-1"></x-filament::dropdown.list.item>
                     @endif
 
-                    <x-filament::dropdown.list.item :href="$frontendUrl" tag="a" target="_blank"
+                    <x-filament::dropdown.list.item :href="$getFrontendUrl" tag="a" target="_blank"
                         class="font-medium">
                         <div class="flex items-center gap-2">
                             <x-filament::icon icon="heroicon-s-globe-alt"
@@ -91,10 +52,10 @@
     </div>
 @else
     <div class="fi-logo flex text-xl font-bold leading-5 tracking-tight text-gray-950 dark:text-white">
-        {{ $appName }}
-        @if ($currentTenant && $currentTenantName !== $appName)
+        {{ $getAppName }}
+        @if ($getCurrentTenant && $getCurrentTenantName !== $getAppName)
             <span class="text-gray-500 dark:text-gray-400 text-sm font-normal ml-2">
-                - {{ $currentTenantName }}
+                - {{ $getCurrentTenantName }}
             </span>
         @endif
     </div>
