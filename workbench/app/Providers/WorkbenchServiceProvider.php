@@ -11,16 +11,6 @@ class WorkbenchServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        // Register Common package service provider
-        if (class_exists(\Eclipse\Common\CommonServiceProvider::class)) {
-            $this->app->register(\Eclipse\Common\CommonServiceProvider::class);
-        }
-
-        // Register PanelSwitch service provider
-        if (class_exists(\BezhanSalleh\PanelSwitch\PanelSwitchServiceProvider::class)) {
-            $this->app->register(\BezhanSalleh\PanelSwitch\PanelSwitchServiceProvider::class);
-        }
-
         $this->app->register(\Eclipse\Core\Providers\AdminPanelProvider::class);
     }
 

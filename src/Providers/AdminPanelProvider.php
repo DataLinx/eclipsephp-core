@@ -5,7 +5,7 @@ namespace Eclipse\Core\Providers;
 use BezhanSalleh\FilamentShield\Facades\FilamentShield;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use BezhanSalleh\FilamentShield\Middleware\SyncShieldTenant;
-use BezhanSalleh\PanelSwitch\Facades\PanelSwitch;
+use BezhanSalleh\PanelSwitch\PanelSwitch;
 use DutchCodingCompany\FilamentDeveloperLogins\FilamentDeveloperLoginsPlugin;
 use Eclipse\Common\CommonPlugin;
 use Eclipse\Common\Providers\GlobalSearchProvider;
@@ -236,17 +236,15 @@ class AdminPanelProvider extends PanelProvider
         // Load customized translations for Filament Shield
         $this->loadTranslationsFrom(__DIR__.'/../../resources/lang/vendor/filament-shield', 'filament-shield');
 
-        if (class_exists(PanelSwitch::class)) {
-            PanelSwitch::simple()
-                ->icons([
-                    'admin' => 'heroicon-s-cog-6-tooth',
-                    'frontend' => 'heroicon-s-globe-alt',
-                ])
-                ->labels([
-                    'admin' => 'Admin Panel',
-                    'frontend' => 'Frontend',
-                ])
-                ->visible(fn (): bool => auth()->check());
-        }
+        PanelSwitch::simple()
+            ->icons([
+                'admin' => 'heroicon-s-cog-6-tooth',
+                'frontend' => 'heroicon-s-globe-alt',
+            ])
+            ->labels([
+                'admin' => 'Admin Panel',
+                'frontend' => 'Frontend',
+            ])
+            ->visible(fn (): bool => auth()->check());
     }
 }
