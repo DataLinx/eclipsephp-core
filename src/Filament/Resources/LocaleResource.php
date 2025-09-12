@@ -3,9 +3,9 @@
 namespace Eclipse\Core\Filament\Resources;
 
 use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
+use Eclipse\Common\Foundation\Models\Scopes\ActiveScope;
 use Eclipse\Core\Filament\Resources;
 use Eclipse\Core\Models\Locale;
-use Eclipse\Core\Models\Scopes\ActiveScope;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
