@@ -102,6 +102,11 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, HasMedia,
         return $this->hasMany(Address::class);
     }
 
+    public function country(): BelongsTo
+    {
+        return $this->belongsTo(static::class, 'country_id')->whereRaw('1 = 0');
+    }
+
     public function getFilamentAvatarUrl(): ?string
     {
         return $this->getMedia('avatars')->first()?->getUrl();

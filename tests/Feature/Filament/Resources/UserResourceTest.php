@@ -2,10 +2,11 @@
 
 use Eclipse\Core\Filament\Resources\UserResource;
 use Eclipse\Core\Filament\Resources\UserResource\Pages\CreateUser;
+use Eclipse\Core\Filament\Resources\UserResource\Pages\EditUser;
 use Eclipse\Core\Filament\Resources\UserResource\Pages\ListUsers;
 use Eclipse\Core\Models\User;
-use Filament\Tables\Actions\DeleteAction;
-use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
 use Illuminate\Support\Facades\Hash;
 
 use function Pest\Livewire\livewire;
@@ -90,7 +91,7 @@ test('existing user can be updated', function () {
         // Without password, since it's not required
     ];
 
-    livewire(\Eclipse\Core\Filament\Resources\UserResource\Pages\EditUser::class, ['record' => $user->id])
+    livewire(EditUser::class, ['record' => $user->id])
         ->fillForm($data)
         ->call('save')
         ->assertHasNoFormErrors();

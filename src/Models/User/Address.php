@@ -50,6 +50,11 @@ class Address extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function country(): BelongsTo
+    {
+        return $this->belongsTo(static::class, 'country_id')->whereRaw('1 = 0');
+    }
+
     protected static function newFactory(): AddressFactory
     {
         return AddressFactory::new();

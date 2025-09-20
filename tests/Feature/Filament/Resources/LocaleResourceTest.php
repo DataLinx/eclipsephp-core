@@ -3,6 +3,7 @@
 use Eclipse\Core\Filament\Resources\LocaleResource;
 use Eclipse\Core\Filament\Resources\LocaleResource\Pages\ListLocales;
 use Eclipse\Core\Models\Locale;
+use Illuminate\Support\Arr;
 
 use function Pest\Livewire\livewire;
 
@@ -86,7 +87,7 @@ test('new locale can be created', function () {
 test('existing locale can be updated', function () {
     $locale = Locale::factory()->create();
 
-    $new_data = \Illuminate\Support\Arr::except(Locale::factory()->definition(), ['id', 'is_active', 'is_available_in_panel']);
+    $new_data = Arr::except(Locale::factory()->definition(), ['id', 'is_active', 'is_available_in_panel']);
 
     livewire(ListLocales::class)
         ->callTableAction('edit', $locale, $new_data)

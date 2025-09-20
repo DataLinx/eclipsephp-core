@@ -1,6 +1,7 @@
 <?php
 
 use Eclipse\Core\Database\Seeders\CoreSeeder;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 /*
@@ -15,7 +16,7 @@ use Tests\TestCase;
 */
 
 uses(TestCase::class)
-    ->use(Illuminate\Foundation\Testing\RefreshDatabase::class)
+    ->use(RefreshDatabase::class)
     ->beforeEach(function () {
         $this->seed(CoreSeeder::class);
     })
