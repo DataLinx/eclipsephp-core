@@ -3,7 +3,7 @@
 namespace Eclipse\Core\Filament\Actions;
 
 use Eclipse\Core\Models\User;
-use Filament\Tables\Actions\Action;
+use Filament\Actions\Action;
 
 class SendEmailTableAction extends SendEmailAction
 {

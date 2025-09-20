@@ -3,15 +3,14 @@
 namespace Eclipse\Core\Filament\Pages;
 
 use Eclipse\Core\Filament\Resources\UserResource;
-use Filament\Forms\Form;
-use Filament\Pages\Auth\EditProfile as BaseEditProfile;
+use Filament\Schemas\Schema;
 
-class EditProfile extends BaseEditProfile
+class EditProfile extends \Filament\Auth\Pages\EditProfile
 {
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema
+            ->components([
                 UserResource::getFirstNameFormComponent(),
                 UserResource::getLastNameFormComponent(),
                 UserResource::getEmailFormComponent(),

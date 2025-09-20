@@ -5,24 +5,41 @@ namespace Eclipse\Core\Filament\Resources;
 use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
 use Eclipse\Core\Filament\Actions\SendEmailTableAction;
 use Eclipse\Core\Filament\Exports\TableExport;
-use Eclipse\Core\Filament\Resources;
+use Eclipse\Core\Filament\Resources\UserResource\Pages\CreateUser;
+use Eclipse\Core\Filament\Resources\UserResource\Pages\EditUser;
+use Eclipse\Core\Filament\Resources\UserResource\Pages\ListUsers;
+use Eclipse\Core\Filament\Resources\UserResource\Pages\ViewUser;
 use Eclipse\Core\Filament\Resources\UserResource\RelationManagers\AddressesRelationManager;
 use Eclipse\Core\Models\User;
-use Filament\Forms;
-use Filament\Forms\Components\Actions\Action;
-use Filament\Forms\Form;
-use Filament\Forms\Set;
-use Filament\Infolists\Components\Group;
-use Filament\Infolists\Components\Section;
+use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\RestoreAction;
+use Filament\Actions\ViewAction;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
+use Filament\Forms\Components\TextInput;
 use Filament\Infolists\Components\SpatieMediaLibraryImageEntry;
 use Filament\Infolists\Components\TextEntry;
-use Filament\Infolists\Infolist;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Group;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Set;
+use Filament\Schemas\Schema;
 use Filament\Support\Colors\Color;
-use Filament\Tables;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\QueryBuilder;
 use Filament\Tables\Filters\QueryBuilder\Constraints\TextConstraint;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
+use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -35,16 +52,16 @@ class UserResource extends Resource implements HasShieldPermissions
 {
     protected static ?string $model = User::class;
 
-    protected static ?string $navigationGroup = 'Users';
+    protected static string|\UnitEnum|null $navigationGroup = 'Users';
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-rectangle-stack';
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form->schema([
-            Forms\Components\SpatieMediaLibraryFileUpload::make('avatar')
+        return $schema->components([
+            SpatieMediaLibraryFileUpload::make('avatar')
                 ->collection('avatars')
                 ->avatar()
                 ->imageEditor()
@@ -52,13 +69,13 @@ class UserResource extends Resource implements HasShieldPermissions
             self::getFirstNameFormComponent(),
             self::getLastNameFormComponent(),
             self::getEmailFormComponent(),
-            Forms\Components\TextInput::make('phone_number')
+            TextInput::make('phone_number')
                 ->label('Phone')
                 ->tel(),
-            Forms\Components\DateTimePicker::make('email_verified_at')
+            DateTimePicker::make('email_verified_at')
                 ->visible(config('eclipse.email_verification'))
                 ->disabled(),
-            Forms\Components\TextInput::make('password')
+            TextInput::make('password')
                 ->password()
                 ->revealable()
                 ->dehydrateStateUsing(fn ($state) => Hash::make($state))
@@ -74,16 +91,16 @@ class UserResource extends Resource implements HasShieldPermissions
                             fn (Set $set) => $set('password', Str::password(16))
                         )
                 ),
-            Forms\Components\Select::make('country_id')
+            Select::make('country_id')
                 ->relationship('country', 'name')
                 ->preload()
                 ->optionsLimit(20)
                 ->searchable(),
-            Forms\Components\DatePicker::make('date_of_birth')
+            DatePicker::make('date_of_birth')
                 ->native(false)
                 ->minDate(now()->subYears(80))
                 ->maxDate(now()),
-            Forms\Components\Select::make('roles')
+            Select::make('roles')
                 ->relationship('roles', 'name')
                 ->saveRelationshipsUsing(function (User $record, $state) {
                     $record->roles()->syncWithPivotValues($state, [config('permission.column_names.team_foreign_key') => getPermissionsTeamId()]);
@@ -103,25 +120,25 @@ class UserResource extends Resource implements HasShieldPermissions
                 ->size(50)
                 ->circular()
                 ->defaultImageUrl(fn (User $user) => 'https://ui-avatars.com/api/?name='.urlencode($user->name)),
-            Tables\Columns\TextColumn::make('first_name')
+            TextColumn::make('first_name')
                 ->searchable()
                 ->sortable()
                 ->toggleable(),
-            Tables\Columns\TextColumn::make('last_name')
+            TextColumn::make('last_name')
                 ->searchable()
                 ->sortable()
                 ->toggleable(),
-            Tables\Columns\TextColumn::make('name')
+            TextColumn::make('name')
                 ->label('Full name')
                 ->searchable()
                 ->sortable()
                 ->toggleable(),
-            Tables\Columns\TextColumn::make('last_login_at')
+            TextColumn::make('last_login_at')
                 ->label('Last login')
                 ->dateTime()
                 ->sortable()
                 ->toggleable(),
-            Tables\Columns\TextColumn::make('login_count')
+            TextColumn::make('login_count')
                 ->label('Total Logins')
                 ->sortable()
                 ->numeric()
@@ -129,7 +146,7 @@ class UserResource extends Resource implements HasShieldPermissions
         ];
 
         if (config('eclipse.email_verification')) {
-            $columns[] = Tables\Columns\TextColumn::make('email')
+            $columns[] = TextColumn::make('email')
                 ->searchable()
                 ->sortable()
                 ->width(150)
@@ -137,16 +154,16 @@ class UserResource extends Resource implements HasShieldPermissions
                 ->iconColor(fn (User $user) => $user->email_verified_at ? Color::Green : Color::Red)
                 ->tooltip(fn (User $user) => $user->email_verified_at ? 'Verified' : 'Not verified');
         } else {
-            $columns[] = Tables\Columns\TextColumn::make('email')
+            $columns[] = TextColumn::make('email')
                 ->searchable()
                 ->sortable()
                 ->width(150);
         }
 
-        $columns[] = Tables\Columns\TextColumn::make('phone_number')
+        $columns[] = TextColumn::make('phone_number')
             ->label('Phone');
 
-        $columns[] = Tables\Columns\TextColumn::make('email_verified_at')
+        $columns[] = TextColumn::make('email_verified_at')
             ->label('Verified email')
             ->placeholder('Not verified')
             ->dateTime()
@@ -155,26 +172,26 @@ class UserResource extends Resource implements HasShieldPermissions
             ->visible(config('eclipse.email_verification'))
             ->width(150);
 
-        $columns[] = Tables\Columns\TextColumn::make('country.name')
+        $columns[] = TextColumn::make('country.name')
             ->badge();
 
-        $columns[] = Tables\Columns\TextColumn::make('date_of_birth')
+        $columns[] = TextColumn::make('date_of_birth')
             ->date('M d, Y');
 
-        $columns[] = Tables\Columns\TextColumn::make('created_at')
+        $columns[] = TextColumn::make('created_at')
             ->dateTime()
             ->sortable()
             ->toggleable(isToggledHiddenByDefault: true)
             ->width(150);
 
-        $columns[] = Tables\Columns\TextColumn::make('updated_at')
+        $columns[] = TextColumn::make('updated_at')
             ->dateTime()
             ->sortable()
             ->toggleable(isToggledHiddenByDefault: true)
             ->width(150);
 
         $filters = [
-            Tables\Filters\TernaryFilter::make('email_verified_at')
+            TernaryFilter::make('email_verified_at')
                 ->label('Email verification')
                 ->nullable()
                 ->placeholder('All users')
@@ -186,13 +203,13 @@ class UserResource extends Resource implements HasShieldPermissions
                     blank: fn (Builder $query) => $query,
                 )
                 ->visible(config('eclipse.email_verification')),
-            Tables\Filters\SelectFilter::make('country_id')
+            SelectFilter::make('country_id')
                 ->label('Country')
                 ->multiple()
                 ->relationship('country', 'name', fn (Builder $query): Builder => $query->distinct())
                 ->preload()
                 ->optionsLimit(20),
-            Tables\Filters\QueryBuilder::make()
+            QueryBuilder::make()
                 ->constraints([
                     TextConstraint::make('first_name')
                         ->label('First name'),
@@ -205,31 +222,31 @@ class UserResource extends Resource implements HasShieldPermissions
                     TextConstraint::make('login_count')
                         ->label('Total Logins'),
                 ]),
-            Tables\Filters\TrashedFilter::make(),
+            TrashedFilter::make(),
         ];
 
         return $table
             ->columns($columns)
             ->filters($filters)
-            ->actions([
-                Tables\Actions\ActionGroup::make([
-                    Tables\Actions\ViewAction::make(),
-                    Tables\Actions\EditAction::make(),
+            ->recordActions([
+                ActionGroup::make([
+                    ViewAction::make(),
+                    EditAction::make(),
                     SendEmailTableAction::makeAction(),
                     Impersonate::make()
                         ->grouped()
                         ->redirectTo(route('filament.admin.tenant')),
-                    Tables\Actions\DeleteAction::make()
+                    DeleteAction::make()
                         ->authorize(fn (User $record) => auth()->user()->can('delete_user') && auth()->id() !== $record->id)
                         ->requiresConfirmation(),
-                    Tables\Actions\RestoreAction::make()
+                    RestoreAction::make()
                         ->visible(fn (User $user) => $user->trashed() && auth()->user()->can('restore_user'))
                         ->requiresConfirmation(),
                 ]),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make()->before(function ($records, Tables\Actions\DeleteBulkAction $action) {
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make()->before(function ($records, DeleteBulkAction $action) {
                         $user_id = auth()->id();
                         $ids = $records->pluck('id')->toArray();
                         if (in_array($user_id, $ids)) {
@@ -249,9 +266,9 @@ class UserResource extends Resource implements HasShieldPermissions
             ]);
     }
 
-    public static function infolist(Infolist $infolist): Infolist
+    public static function infolist(Schema $schema): Schema
     {
-        return $infolist->schema([
+        return $schema->components([
             Section::make()
                 ->columns(2)
                 ->schema([
@@ -297,32 +314,32 @@ class UserResource extends Resource implements HasShieldPermissions
     public static function getPages(): array
     {
         return [
-            'index' => Resources\UserResource\Pages\ListUsers::route('/'),
-            'create' => Resources\UserResource\Pages\CreateUser::route('/create'),
-            'view' => Resources\UserResource\Pages\ViewUser::route('/{record}'),
-            'edit' => Resources\UserResource\Pages\EditUser::route('/{record}/edit'),
+            'index' => ListUsers::route('/'),
+            'create' => CreateUser::route('/create'),
+            'view' => ViewUser::route('/{record}'),
+            'edit' => EditUser::route('/{record}/edit'),
         ];
     }
 
-    public static function getFirstNameFormComponent(): Forms\Components\TextInput
+    public static function getFirstNameFormComponent(): TextInput
     {
-        return Forms\Components\TextInput::make('first_name')
+        return TextInput::make('first_name')
             ->label('First name')
             ->required()
             ->maxLength(255);
     }
 
-    public static function getLastNameFormComponent(): Forms\Components\TextInput
+    public static function getLastNameFormComponent(): TextInput
     {
-        return Forms\Components\TextInput::make('last_name')
+        return TextInput::make('last_name')
             ->label('Last name')
             ->required()
             ->maxLength(255);
     }
 
-    public static function getEmailFormComponent(): Forms\Components\TextInput
+    public static function getEmailFormComponent(): TextInput
     {
-        return Forms\Components\TextInput::make('email')
+        return TextInput::make('email')
             ->email()
             ->required()
             ->maxLength(255)

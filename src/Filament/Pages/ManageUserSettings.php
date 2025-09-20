@@ -3,28 +3,30 @@
 namespace Eclipse\Core\Filament\Pages;
 
 use Eclipse\Core\Settings\UserSettings;
-use Filament\Forms\Components;
-use Filament\Forms\Form;
+use Filament\Forms\Components\RichEditor;
+use Filament\Forms\Components\TextInput;
 use Filament\Pages\SettingsPage;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
 
 class ManageUserSettings extends SettingsPage
 {
-    protected static ?string $navigationIcon = 'heroicon-o-cog-6-tooth';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-cog-6-tooth';
 
     protected static string $settings = UserSettings::class;
 
     protected static bool $shouldRegisterNavigation = false;
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
-                Components\Section::make('Email settings')
+        return $schema
+            ->components([
+                Section::make('Email settings')
                     ->schema([
-                        Components\TextInput::make('outgoing_email_address')
+                        TextInput::make('outgoing_email_address')
                             ->email()
                             ->label('Outgoing email address'),
-                        Components\RichEditor::make('outgoing_email_signature')
+                        RichEditor::make('outgoing_email_signature')
                             ->label('Outgoing email signature'),
                     ]),
             ]);

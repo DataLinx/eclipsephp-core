@@ -4,7 +4,7 @@ namespace Eclipse\Core\Filament\Resources\UserResource\Pages;
 
 use Eclipse\Core\Filament\Actions\SendEmailAction;
 use Eclipse\Core\Filament\Resources\UserResource;
-use Filament\Actions;
+use Filament\Actions\EditAction;
 use Filament\Resources\Pages\ViewRecord;
 use Nben\FilamentRecordNav\Actions\NextRecordAction;
 use Nben\FilamentRecordNav\Actions\PreviousRecordAction;
@@ -32,7 +32,7 @@ class ViewUser extends ViewRecord
         return [
             PreviousRecordAction::make(),
             NextRecordAction::make(),
-            Actions\EditAction::make(),
+            EditAction::make(),
             SendEmailAction::make(),
             Impersonate::make()
                 ->record($this->getRecord())

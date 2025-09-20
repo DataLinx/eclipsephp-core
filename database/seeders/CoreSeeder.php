@@ -16,7 +16,6 @@ class CoreSeeder extends Seeder
             '--all' => null,
             '--panel' => 'admin',
             '--option' => 'permissions',
-            '--minimal' => null,
         ]);
 
         // Seed additional roles

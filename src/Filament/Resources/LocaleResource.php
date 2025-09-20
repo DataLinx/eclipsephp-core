@@ -4,16 +4,22 @@ namespace Eclipse\Core\Filament\Resources;
 
 use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
 use Eclipse\Common\Foundation\Models\Scopes\ActiveScope;
-use Eclipse\Core\Filament\Resources;
+use Eclipse\Core\Filament\Resources\LocaleResource\Pages\CreateLocale;
+use Eclipse\Core\Filament\Resources\LocaleResource\Pages\EditLocale;
+use Eclipse\Core\Filament\Resources\LocaleResource\Pages\ListLocales;
 use Eclipse\Core\Models\Locale;
-use Filament\Forms\Components\Section;
+use Filament\Actions\ActionGroup;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Tables;
-use Filament\Tables\Actions\ActionGroup;
-use Filament\Tables\Actions\DeleteAction;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\HtmlString;
@@ -22,9 +28,9 @@ class LocaleResource extends Resource implements HasShieldPermissions
 {
     protected static ?string $model = Locale::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-language';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-language';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
         $basic = [
             TextInput::make('id')
@@ -63,7 +69,7 @@ class LocaleResource extends Resource implements HasShieldPermissions
                 ->label(__('eclipse::locale.system_locale'));
         }
 
-        return $form->schema([
+        return $schema->components([
             Section::make(__('eclipse::locale.sections.basic'))
                 ->schema($basic),
             Section::make(__('eclipse::locale.sections.datetime_formats'))
@@ -91,36 +97,36 @@ class LocaleResource extends Resource implements HasShieldPermissions
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('id')
+                TextColumn::make('id')
                     ->label('ID')
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('name')
+                TextColumn::make('name')
                     ->label(__('eclipse::locale.name'))
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('native_name')
+                TextColumn::make('native_name')
                     ->label(__('eclipse::locale.native_name'))
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('system_locale')
+                TextColumn::make('system_locale')
                     ->label(__('eclipse::locale.system_locale'))
                     ->sortable()
                     ->formatStateUsing(fn (?string $state = null): HtmlString => new HtmlString("<code>$state</code>")),
-                Tables\Columns\TextColumn::make('datetime_format')
+                TextColumn::make('datetime_format')
                     ->formatStateUsing(fn (?string $state = null): HtmlString => new HtmlString("<code>$state</code>"))
                     ->label(__('eclipse::locale.datetime_format')),
-                Tables\Columns\TextColumn::make('date_format')
+                TextColumn::make('date_format')
                     ->formatStateUsing(fn (?string $state = null): HtmlString => new HtmlString("<code>$state</code>"))
                     ->label(__('eclipse::locale.date_format')),
-                Tables\Columns\TextColumn::make('time_format')
+                TextColumn::make('time_format')
                     ->formatStateUsing(fn (?string $state = null): HtmlString => new HtmlString("<code>$state</code>"))
                     ->label(__('eclipse::locale.time_format')),
-                Tables\Columns\ToggleColumn::make('is_active')
+                ToggleColumn::make('is_active')
                     ->label(__('eclipse::locale.is_active'))
                     ->sortable()
                     ->disabled(fn (Locale $record): bool => ! auth()->user()->can('update', $record)),
-                Tables\Columns\ToggleColumn::make('is_available_in_panel')
+                ToggleColumn::make('is_available_in_panel')
                     ->label(__('eclipse::locale.is_available_in_panel'))
                     ->disabled(function (Locale $record): bool {
                         return ! $record->is_active or ! auth()->user()->can('update', $record);
@@ -129,17 +135,17 @@ class LocaleResource extends Resource implements HasShieldPermissions
             ->filters([
                 //
             ])
-            ->actions([
-                Tables\Actions\EditAction::make()->label(__('eclipse::locale.actions.edit.label')),
+            ->recordActions([
+                EditAction::make()->label(__('eclipse::locale.actions.edit.label')),
                 ActionGroup::make([
                     DeleteAction::make()
                         ->label(__('eclipse-world::countries.actions.delete.label'))
                         ->modalHeading(__('eclipse-world::countries.actions.delete.heading')),
                 ]),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }
@@ -154,9 +160,9 @@ class LocaleResource extends Resource implements HasShieldPermissions
     public static function getPages(): array
     {
         return [
-            'index' => Resources\LocaleResource\Pages\ListLocales::route('/'),
-            'create' => Resources\LocaleResource\Pages\CreateLocale::route('/create'),
-            'edit' => Resources\LocaleResource\Pages\EditLocale::route('/{record}/edit'),
+            'index' => ListLocales::route('/'),
+            'create' => CreateLocale::route('/create'),
+            'edit' => EditLocale::route('/{record}/edit'),
         ];
     }
 

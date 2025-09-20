@@ -16,7 +16,6 @@ use Eclipse\Core\Models\Locale;
 use Eclipse\Core\Models\Site;
 use Eclipse\Core\Models\User;
 use Eclipse\Core\Services\Registry;
-use Eclipse\World\EclipseWorld;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
@@ -24,16 +23,14 @@ use Filament\Navigation\NavigationItem;
 use Filament\Notifications\Livewire\Notifications;
 use Filament\Panel;
 use Filament\PanelProvider;
-use Filament\SpatieLaravelTranslatablePlugin;
 use Filament\Support\Colors\Color;
 use Filament\Support\Enums\Alignment;
 use Filament\Support\Enums\Platform;
 use Filament\Support\Enums\VerticalAlignment;
 use Filament\Support\Facades\FilamentView;
 use Filament\View\PanelsRenderHook;
-use Filament\Widgets;
-use Hasnayeen\Themes\Http\Middleware\SetTheme;
-use Hasnayeen\Themes\ThemesPlugin;
+use Filament\Widgets\AccountWidget;
+use Filament\Widgets\FilamentInfoWidget;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -44,8 +41,10 @@ use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Illuminate\View\View;
+use LaraZeus\SpatieTranslatable\SpatieTranslatablePlugin;
 use pxlrbt\FilamentEnvironmentIndicator\EnvironmentIndicatorPlugin;
 use pxlrbt\FilamentSpotlight\SpotlightPlugin;
+use pxlrbt\FilamentSpotlightPro\SpotlightProviders\RegisterResources;
 use ShuvroRoy\FilamentSpatieLaravelHealth\FilamentSpatieLaravelHealthPlugin;
 
 class AdminPanelProvider extends PanelProvider
@@ -100,13 +99,12 @@ class AdminPanelProvider extends PanelProvider
             ->tenantDomain('{tenant:domain}')
             ->tenantMiddleware([
                 SyncShieldTenant::class,
-                SetTheme::class,
             ], isPersistent: true)
             // ->tenantMenu(config('eclipse.multi_site', false))
             ->tenantMenu(false)
             ->widgets([
-                Widgets\AccountWidget::class,
-                Widgets\FilamentInfoWidget::class,
+                AccountWidget::class,
+                FilamentInfoWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,
@@ -130,10 +128,8 @@ class AdminPanelProvider extends PanelProvider
                     ->enabled(app()->isLocal())
                     ->modelClass(User::class)
                     ->users(config('eclipse.developer_logins') ?: []),
-                EclipseWorld::make(),
-                SpatieLaravelTranslatablePlugin::make()
+                SpatieTranslatablePlugin::make()
                     ->defaultLocales($localeIds),
-                ThemesPlugin::make(),
                 FilamentSpatieLaravelHealthPlugin::make()
                     ->usingPage(HealthCheckResults::class)
                     ->authorize(fn (): bool => auth()->user()->hasRole('super_admin')),
@@ -184,7 +180,7 @@ class AdminPanelProvider extends PanelProvider
             $panel->plugin(
                 \pxlrbt\FilamentSpotlightPro\SpotlightPlugin::make()
                     ->registerItems([
-                        \pxlrbt\FilamentSpotlightPro\SpotlightProviders\RegisterResources::make(),
+                        RegisterResources::make(),
                     ])
                     ->hotkeys(['¸'])
             );

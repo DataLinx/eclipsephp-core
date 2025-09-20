@@ -2,7 +2,7 @@
 
 namespace Eclipse\Core;
 
-use BezhanSalleh\FilamentLanguageSwitch\LanguageSwitch;
+use BezhanSalleh\LanguageSwitch\LanguageSwitch;
 use Eclipse\Common\Foundation\Providers\PackageServiceProvider;
 use Eclipse\Common\Package;
 use Eclipse\Core\Console\Commands\ClearCommand;
@@ -69,7 +69,6 @@ class EclipseServiceProvider extends PackageServiceProvider
                 'permission',
                 'settings',
                 'telescope',
-                'themes',
                 'health',
             ])
             ->hasViews()

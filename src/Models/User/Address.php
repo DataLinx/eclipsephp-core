@@ -5,7 +5,6 @@ namespace Eclipse\Core\Models\User;
 use Eclipse\Core\Database\Factories\AddressFactory;
 use Eclipse\Core\Enums\AddressType;
 use Eclipse\Core\Models\User;
-use Eclipse\World\Models\Country;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -49,11 +48,6 @@ class Address extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
-    }
-
-    public function country(): BelongsTo
-    {
-        return $this->belongsTo(Country::class);
     }
 
     protected static function newFactory(): AddressFactory
