@@ -16,6 +16,7 @@ use Eclipse\Core\Models\Locale;
 use Eclipse\Core\Models\Site;
 use Eclipse\Core\Models\User;
 use Eclipse\Core\Services\Registry;
+use Eclipse\World\EclipseWorld;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
@@ -128,6 +129,7 @@ class AdminPanelProvider extends PanelProvider
                     ->enabled(app()->isLocal())
                     ->modelClass(User::class)
                     ->users(config('eclipse.developer_logins') ?: []),
+                EclipseWorld::make(),
                 SpatieTranslatablePlugin::make()
                     ->defaultLocales($localeIds),
                 FilamentSpatieLaravelHealthPlugin::make()

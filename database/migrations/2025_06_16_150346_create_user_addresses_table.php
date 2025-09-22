@@ -28,6 +28,9 @@ return new class extends Migration
                 ->cascadeOnDelete();
             $table->softDeletes();
             $table->timestamps();
+            $table->foreign('country_id')
+                ->references('id')
+                ->on('world_countries');
         });
     }
 

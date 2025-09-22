@@ -22,6 +22,11 @@ return new class extends Migration
             $table->index('phone_number');
             $table->index('country_id');
             $table->index('date_of_birth');
+
+            $table->foreign('country_id')
+                ->references('id')
+                ->on('world_countries')
+                ->onDelete('set null');
         });
     }
 

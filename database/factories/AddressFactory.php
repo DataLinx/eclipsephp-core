@@ -5,6 +5,7 @@ namespace Eclipse\Core\Database\Factories;
 use Eclipse\Core\Enums\AddressType;
 use Eclipse\Core\Models\User;
 use Eclipse\Core\Models\User\Address;
+use Eclipse\World\Models\Country;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class AddressFactory extends Factory
@@ -42,7 +43,7 @@ class AddressFactory extends Factory
             'postal_code' => fake()->postcode(),
             'city' => fake()->city(),
             'type' => $type,
-            'country_id' => 1,
+            'country_id' => Country::inRandomOrder()->first()?->id ?? Country::factory()->create()->id,
             'user_id' => User::inRandomOrder()->first()?->id ?? User::factory()->create()->id,
         ];
     }

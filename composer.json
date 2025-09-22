@@ -48,6 +48,7 @@
         "datalinx/php-utils": "^2.5",
         "dutchcodingcompany/filament-developer-logins": "^2.0",
         "eclipsephp/common": "dev-f4@dev",
+        "eclipsephp/world-plugin": "dev-f4@dev",
         "filament/filament": "^4.0",
         "filament/spatie-laravel-media-library-plugin": "^4.0",
         "lara-zeus/spatie-translatable": "^1.0",
@@ -73,7 +74,11 @@
         {
           "type": "vcs",
           "url": "https://github.com/KilianTrunk/eclipsephp-common.git"
-        }
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/KilianTrunk/eclipsephp-world-plugin.git"
+          }
       ],
     "require-dev": {
         "filament/upgrade": "^4.0",
