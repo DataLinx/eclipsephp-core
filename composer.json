@@ -81,7 +81,6 @@
           }
       ],
     "require-dev": {
-        "filament/upgrade": "^4.0",
         "laravel/pint": "^1.21",
         "orchestra/testbench": "^10.0",
         "pestphp/pest": "^3.7",
