@@ -1,14 +1,17 @@
 @php
+    use Illuminate\Database\Eloquent\Model;
+    
     $currentTenant = filament()->getTenant();
-    $currentTenantName = filament()->getTenantName($currentTenant);
+    $currentTenantName = $currentTenant ? filament()->getTenantName($currentTenant) : null;
 
-    $canSwitchTenants = count(
+    $canSwitchTenants = $currentTenant ? count(
         $tenants = array_filter(
             filament()->getUserTenants(filament()->auth()->user()),
-            fn(\Illuminate\Database\Eloquent\Model $tenant): bool => !$tenant->is($currentTenant),
+            fn(Model $tenant): bool => $tenant && !$tenant->is($currentTenant),
         ),
-    );
+    ) : 0;
 @endphp
+@if($currentTenant)
 <x-filament::dropdown placement="bottom-start" size teleport>
     <x-slot name="trigger">
         <button type="button"
@@ -23,11 +26,14 @@
     @if ($canSwitchTenants)
         <x-filament::dropdown.list>
             @foreach ($tenants as $tenant)
+                @if($tenant)
                 <x-filament::dropdown.list.item :href="route('filament.admin.pages.dashboard', ['tenant' => $tenant])" :image="filament()->getTenantAvatarUrl($tenant)" tag="a">
                     {{ filament()->getTenantName($tenant) }}
                 </x-filament::dropdown.list.item>
+                @endif
             @endforeach
         </x-filament::dropdown.list>
     @endif
 
 </x-filament::dropdown>
+@endif
