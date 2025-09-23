@@ -6,7 +6,6 @@ use Filament\Widgets\AccountWidget;
 use Filament\Widgets\FilamentInfoWidget;
 
 return [
-
     'shield_resource' => [
         'slug' => 'shield/roles',
         'show_model_path' => true,
@@ -66,8 +65,7 @@ return [
                 'viewAny', 'view', 'create', 'update', 'delete',
             ],
         ],
-        'exclude' => [
-        ],
+        'exclude' => [],
     ],
 
     'pages' => [
