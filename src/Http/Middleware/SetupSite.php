@@ -7,6 +7,7 @@ use Eclipse\Core\Models\Site;
 use Eclipse\Core\Services\Registry;
 use Illuminate\Http\Request;
 use Opcodes\LogViewer\Facades\LogViewer;
+use Spatie\Permission\PermissionRegistrar;
 use Symfony\Component\HttpFoundation\Response;
 
 class SetupSite
@@ -25,6 +26,8 @@ class SetupSite
         }
 
         Registry::setSite($site);
+
+        app(PermissionRegistrar::class)->setPermissionsTeamId($site->id);
 
         // Set log viewer restriction... must be done after the site is initialized
         LogViewer::auth(function ($request) {

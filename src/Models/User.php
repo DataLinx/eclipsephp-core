@@ -47,6 +47,8 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, HasMedia,
 
     protected $dates = ['deleted_at'];
 
+    protected $guard_name = 'web';
+
     /**
      * The attributes that are mass assignable.
      *
