@@ -10,14 +10,7 @@ class CoreSeeder extends Seeder
 {
     public function run(): void
     {
-        // Seed locales
         $this->call(LocaleSeeder::class);
-
-        // Seed sites
-        $this->call(SiteSeeder::class);
-
-        // Set permissions team ID
-        setPermissionsTeamId(Site::first()->id);
 
         // Seed roles and permissions with Filament Shield plugin
         Artisan::call('shield:generate', [
@@ -29,7 +22,38 @@ class CoreSeeder extends Seeder
         // Seed additional roles
         $this->call(RoleSeeder::class);
 
-        // Seed users
+        // Sites
+        $this->call(SiteSeeder::class);
+
+        // Assign permissions to roles
+        $this->assignPermissionsToRoles();
+
+        // Users
         $this->call(UserSeeder::class);
+    }
+
+    private function assignPermissionsToRoles(): void
+    {
+        $allPermissions = \Eclipse\Core\Models\User\Permission::all();
+        $primarySite = Site::first();
+
+        $superAdminRoles = \Eclipse\Core\Models\User\Role::where('name', 'super_admin')->get();
+        $adminRoles = \Eclipse\Core\Models\User\Role::where('name', 'admin')->get();
+
+        foreach ($superAdminRoles as $role) {
+            if (! $role->site_id) {
+                $role->site_id = $primarySite->id;
+                $role->save();
+            }
+            $role->syncPermissions($allPermissions);
+        }
+
+        foreach ($adminRoles as $role) {
+            if (! $role->site_id) {
+                $role->site_id = $primarySite->id;
+                $role->save();
+            }
+            $role->syncPermissions($allPermissions);
+        }
     }
 }
