@@ -3,6 +3,8 @@
 namespace Eclipse\Core\Database\Seeders;
 
 use Eclipse\Core\Models\Site;
+use Eclipse\Core\Models\User\Permission;
+use Eclipse\Core\Models\User\Role;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Artisan;
 
@@ -34,26 +36,18 @@ class CoreSeeder extends Seeder
 
     private function assignPermissionsToRoles(): void
     {
-        $allPermissions = \Eclipse\Core\Models\User\Permission::all();
-        $primarySite = Site::first();
+        $allPermissions = Permission::all();
 
-        $superAdminRoles = \Eclipse\Core\Models\User\Role::where('name', 'super_admin')->get();
-        $adminRoles = \Eclipse\Core\Models\User\Role::where('name', 'admin')->get();
+        foreach (Site::all() as $site) {
+            foreach (['super_admin', 'admin'] as $roleName) {
+                $role = Role::firstOrCreate([
+                    'name' => $roleName,
+                    'guard_name' => 'web',
+                    'site_id' => $site->id,
+                ]);
 
-        foreach ($superAdminRoles as $role) {
-            if (! $role->site_id) {
-                $role->site_id = $primarySite->id;
-                $role->save();
+                $role->syncPermissions($allPermissions);
             }
-            $role->syncPermissions($allPermissions);
-        }
-
-        foreach ($adminRoles as $role) {
-            if (! $role->site_id) {
-                $role->site_id = $primarySite->id;
-                $role->save();
-            }
-            $role->syncPermissions($allPermissions);
         }
     }
 }

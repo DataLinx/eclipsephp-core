@@ -14,7 +14,11 @@ class RoleSeeder extends Seeder
     {
         if (is_array(config('eclipse.seed.roles.presets'))) {
             foreach (config('eclipse.seed.roles.presets') as $preset) {
-                Role::create($preset['data']);
+                $data = $preset['data'];
+                Role::firstOrCreate([
+                    'name' => $data['name'],
+                    'guard_name' => $data['guard_name'] ?? 'web',
+                ], $data);
             }
         }
 
