@@ -119,12 +119,12 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, HasMedia,
         return $this->sites()->whereKey($tenant)->exists();
     }
 
-    public function getTenants(Panel $panel = null): Collection
+    public function getTenants(?Panel $panel = null): Collection
     {
         return $this->sites()->where('is_active', true)->get();
     }
 
-    public function canAccessPanel(Panel $panel = null): bool
+    public function canAccessPanel(?Panel $panel = null): bool
     {
         return true;
     }
