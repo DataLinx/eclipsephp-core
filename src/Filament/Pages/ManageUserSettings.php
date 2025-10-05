@@ -28,7 +28,8 @@ class ManageUserSettings extends SettingsPage
                             ->label('Outgoing email address'),
                         RichEditor::make('outgoing_email_signature')
                             ->label('Outgoing email signature'),
-                    ]),
+                    ])
+                    ->columnSpanFull(),
             ]);
     }
 

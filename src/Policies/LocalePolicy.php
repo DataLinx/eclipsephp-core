@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Eclipse\Core\Policies;
 
 use Eclipse\Core\Models\Locale;
-use Eclipse\Core\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
+use Illuminate\Foundation\Auth\User as AuthUser;
 
 class LocalePolicy
 {
@@ -13,40 +15,40 @@ class LocalePolicy
     /**
      * Determine whether the user can view any models.
      */
-    public function viewAny(User $user): bool
+    public function viewAny(AuthUser $authUser): bool
     {
-        return $user->can('view_any_locale');
+        return $authUser->can('view_any_locale');
     }
 
     /**
      * Determine whether the user can create models.
      */
-    public function create(User $user): bool
+    public function create(AuthUser $authUser): bool
     {
-        return $user->can('create_locale');
+        return $authUser->can('create_locale');
     }
 
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, Locale $locale): bool
+    public function update(AuthUser $authUser, Locale $locale): bool
     {
-        return $user->can('update_locale');
+        return $authUser->can('update_locale');
     }
 
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, Locale $locale): bool
+    public function delete(AuthUser $authUser, Locale $locale): bool
     {
-        return $user->can('delete_locale');
+        return $authUser->can('delete_locale');
     }
 
     /**
      * Determine whether the user can bulk delete.
      */
-    public function deleteAny(User $user): bool
+    public function deleteAny(AuthUser $authUser): bool
     {
-        return $user->can('delete_any_locale');
+        return $authUser->can('delete_any_locale');
     }
 }

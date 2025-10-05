@@ -2,7 +2,6 @@
 
 namespace Eclipse\Core\Filament\Resources;
 
-use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
 use Eclipse\Core\Filament\Resources\SiteResource\Pages\CreateSite;
 use Eclipse\Core\Filament\Resources\SiteResource\Pages\EditSite;
 use Eclipse\Core\Filament\Resources\SiteResource\Pages\ListSites;
@@ -18,7 +17,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Table;
 
-class SiteResource extends Resource implements HasShieldPermissions
+class SiteResource extends Resource
 {
     protected static ?string $model = Site::class;
 
@@ -100,17 +99,6 @@ class SiteResource extends Resource implements HasShieldPermissions
     public static function getNavigationGroup(): ?string
     {
         return __('eclipse-common::nav.configuration');
-    }
-
-    public static function getPermissionPrefixes(): array
-    {
-        return [
-            'view_any',
-            'create',
-            'update',
-            'delete',
-            'delete_any',
-        ];
     }
 
     public static function shouldRegisterNavigation(): bool

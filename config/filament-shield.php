@@ -1,6 +1,10 @@
 <?php
 
 use BezhanSalleh\FilamentShield\Resources\Roles\RoleResource;
+use Eclipse\Core\Filament\Resources\LocaleResource;
+use Eclipse\Core\Filament\Resources\MailLogResource;
+use Eclipse\Core\Filament\Resources\SiteResource;
+use Eclipse\Core\Filament\Resources\UserResource;
 use Filament\Pages\Dashboard;
 use Filament\Widgets\AccountWidget;
 use Filament\Widgets\FilamentInfoWidget;
@@ -62,7 +66,43 @@ return [
         'subject' => 'model',
         'manage' => [
             RoleResource::class => [
-                'viewAny', 'view', 'create', 'update', 'delete',
+                'viewAny',
+                'view',
+                'create',
+                'update',
+                'delete',
+            ],
+            MailLogResource::class => [
+                'viewAny',
+                'view',
+            ],
+            LocaleResource::class => [
+                'viewAny',
+                'create',
+                'update',
+                'delete',
+                'deleteAny',
+            ],
+            SiteResource::class => [
+                'viewAny',
+                'create',
+                'update',
+                'delete',
+                'deleteAny',
+            ],
+            UserResource::class => [
+                'viewAny',
+                'view',
+                'create',
+                'update',
+                'delete',
+                'deleteAny',
+                'restore',
+                'restoreAny',
+                'forceDelete',
+                'forceDeleteAny',
+                'impersonate',
+                'sendEmail',
             ],
         ],
         'exclude' => [],

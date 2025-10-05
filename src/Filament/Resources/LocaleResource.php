@@ -2,7 +2,6 @@
 
 namespace Eclipse\Core\Filament\Resources;
 
-use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
 use Eclipse\Common\Foundation\Models\Scopes\ActiveScope;
 use Eclipse\Core\Filament\Resources\LocaleResource\Pages\CreateLocale;
 use Eclipse\Core\Filament\Resources\LocaleResource\Pages\EditLocale;
@@ -24,7 +23,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\HtmlString;
 
-class LocaleResource extends Resource implements HasShieldPermissions
+class LocaleResource extends Resource
 {
     protected static ?string $model = Locale::class;
 
@@ -187,16 +186,5 @@ class LocaleResource extends Resource implements HasShieldPermissions
             ->withoutGlobalScopes([
                 ActiveScope::class,
             ]);
-    }
-
-    public static function getPermissionPrefixes(): array
-    {
-        return [
-            'view_any',
-            'create',
-            'update',
-            'delete',
-            'delete_any',
-        ];
     }
 }
