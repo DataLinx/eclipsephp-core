@@ -1,7 +1,7 @@
 name: Tests
 
 on:
-  # Run testing on all push and pull requests for the main branch that have committed changes in PHP files
+  # Run testing on all push and pull requests that have committed changes in PHP files
   push:
     paths:
       - '**/*.php'
