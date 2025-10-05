@@ -49,5 +49,15 @@ class CoreSeeder extends Seeder
                 $role->syncPermissions($allPermissions);
             }
         }
+
+        $this->assignCustomPermissionsToRoles();
+    }
+
+    private function assignCustomPermissionsToRoles(): void
+    {
+        app(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
+        $guard = config('auth.defaults.guard', 'web');
+        Permission::findOrCreate('impersonate_user', $guard);
+        Permission::findOrCreate('send_email_user', $guard);
     }
 }
