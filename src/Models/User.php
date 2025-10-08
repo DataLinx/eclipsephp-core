@@ -14,6 +14,7 @@ use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -91,7 +92,7 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, HasMedia,
     /**
      * Get the sites.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     * @return BelongsToMany
      */
     public function sites()
     {
@@ -118,12 +119,12 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, HasMedia,
         return $this->sites()->whereKey($tenant)->exists();
     }
 
-    public function getTenants(Panel $panel): Collection
+    public function getTenants(?Panel $panel = null): Collection
     {
         return $this->sites()->where('is_active', true)->get();
     }
 
-    public function canAccessPanel(Panel $panel): bool
+    public function canAccessPanel(?Panel $panel = null): bool
     {
         return true;
     }

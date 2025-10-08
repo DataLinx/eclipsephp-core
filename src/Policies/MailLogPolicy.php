@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Eclipse\Core\Policies;
 
 use Eclipse\Core\Models\MailLog;
-use Eclipse\Core\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
+use Illuminate\Foundation\Auth\User as AuthUser;
 
 class MailLogPolicy
 {
@@ -13,16 +15,16 @@ class MailLogPolicy
     /**
      * Determine whether the user can view any models.
      */
-    public function viewAny(User $user): bool
+    public function viewAny(AuthUser $authUser): bool
     {
-        return $user->can('view_any_mail::log');
+        return $authUser->can('view_any_mail_log');
     }
 
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, MailLog $mailLog): bool
+    public function view(AuthUser $authUser, MailLog $mailLog): bool
     {
-        return $user->can('view_mail::log');
+        return $authUser->can('view_mail_log');
     }
 }

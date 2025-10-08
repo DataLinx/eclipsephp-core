@@ -2,6 +2,7 @@
 
 namespace Workbench\App\Providers;
 
+use Eclipse\Core\Providers\AdminPanelProvider;
 use Illuminate\Support\ServiceProvider;
 
 class WorkbenchServiceProvider extends ServiceProvider
@@ -11,7 +12,7 @@ class WorkbenchServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->register(\Eclipse\Core\Providers\AdminPanelProvider::class);
+        $this->app->register(AdminPanelProvider::class);
     }
 
     /**

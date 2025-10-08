@@ -14,6 +14,7 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Mail\Mailables\Headers;
 use Illuminate\Queue\SerializesModels;
+use Throwable;
 
 class SendEmailToUser extends Mailable implements ShouldQueue
 {
@@ -125,7 +126,7 @@ class SendEmailToUser extends Mailable implements ShouldQueue
     /**
      * Handle the failed event.
      */
-    public function failed(\Throwable $exception): void
+    public function failed(Throwable $exception): void
     {
         if (! $this->sender) {
             return;

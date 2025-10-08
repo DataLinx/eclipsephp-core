@@ -31,7 +31,6 @@ class PostComposerUpdate extends Command
         // ------------------
         $this->call('vendor:publish', ['--tag' => 'laravel-assets', '--force' => true]);
         $this->call('log-viewer:publish');
-        $this->call('themes:upgrade');
 
         // ------------------
 

@@ -2,13 +2,18 @@
 
 namespace Eclipse\Core;
 
-use BezhanSalleh\FilamentLanguageSwitch\LanguageSwitch;
+use BezhanSalleh\FilamentShield\Resources\Roles\RoleResource;
+use BezhanSalleh\LanguageSwitch\LanguageSwitch;
 use Eclipse\Common\Foundation\Providers\PackageServiceProvider;
 use Eclipse\Common\Package;
 use Eclipse\Core\Console\Commands\ClearCommand;
 use Eclipse\Core\Console\Commands\DeployCommand;
 use Eclipse\Core\Console\Commands\PostComposerUpdate;
 use Eclipse\Core\Console\Commands\SetupReverb;
+use Eclipse\Core\Filament\Resources\LocaleResource;
+use Eclipse\Core\Filament\Resources\MailLogResource;
+use Eclipse\Core\Filament\Resources\SiteResource;
+use Eclipse\Core\Filament\Resources\UserResource;
 use Eclipse\Core\Health\Checks\ReverbCheck;
 use Eclipse\Core\Listeners\LogEmailToDatabase;
 use Eclipse\Core\Listeners\SendEmailSuccessNotification;
@@ -69,7 +74,6 @@ class EclipseServiceProvider extends PackageServiceProvider
                 'permission',
                 'settings',
                 'telescope',
-                'themes',
                 'health',
             ])
             ->hasViews()
@@ -118,6 +122,59 @@ class EclipseServiceProvider extends PackageServiceProvider
     public function boot(): void
     {
         parent::boot();
+
+        // Merge per-resource abilities into the effective config
+        $this->app->booted(function () {
+            $manage = config('filament-shield.resources.manage', []);
+
+            $pluginManage = [
+
+                RoleResource::class => [
+                    'viewAny',
+                    'view',
+                    'create',
+                    'update',
+                    'delete',
+                ],
+                MailLogResource::class => [
+                    'viewAny',
+                    'view',
+                ],
+                LocaleResource::class => [
+                    'viewAny',
+                    'create',
+                    'update',
+                    'delete',
+                    'deleteAny',
+                ],
+                SiteResource::class => [
+                    'viewAny',
+                    'create',
+                    'update',
+                    'delete',
+                    'deleteAny',
+                ],
+                UserResource::class => [
+                    'viewAny',
+                    'view',
+                    'create',
+                    'update',
+                    'delete',
+                    'deleteAny',
+                    'restore',
+                    'restoreAny',
+                    'forceDelete',
+                    'forceDeleteAny',
+                    'impersonate',
+                    'sendEmail',
+                ],
+            ];
+
+            config()->set('filament-shield.resources.manage', array_replace_recursive(
+                $manage,
+                $pluginManage,
+            ));
+        });
 
         // For unit tests...
         if (app()->runningUnitTests()) {

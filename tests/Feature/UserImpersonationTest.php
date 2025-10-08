@@ -4,8 +4,7 @@ use Eclipse\Core\Models\User;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
-use STS\FilamentImpersonate\Pages\Actions\Impersonate as ImpersonatePageAction;
-use STS\FilamentImpersonate\Tables\Actions\Impersonate as ImpersonateTableAction;
+use STS\FilamentImpersonate\Actions\Impersonate as ImpersonateAction;
 
 beforeEach(function () {
     $this->set_up_super_admin_and_tenant();
@@ -55,7 +54,7 @@ test('non-authorized user cannot see and trigger the impersonate table and page 
     $this->assertFalse($this->unauthorizedUser->hasPermissionTo('impersonate_user'));
 
     // Create an instance of the Impersonate action
-    $action = ImpersonateTableAction::make('impersonate')
+    $action = ImpersonateAction::make('impersonate')
         ->record($this->targetUser);
 
     // Assert the action is not authorized
@@ -63,7 +62,7 @@ test('non-authorized user cannot see and trigger the impersonate table and page 
     $this->assertFalse($action->isEnabled());
 
     // Create an instance of the Impersonate page action
-    $action = ImpersonatePageAction::make('impersonate')
+    $action = ImpersonateAction::make('impersonate')
         ->record($this->targetUser);
 
     // Assert the action is not authorized
@@ -92,7 +91,7 @@ test('authorized user can see and trigger the impersonate table and page action'
     $this->assertTrue($this->authorizedUser->hasPermissionTo('impersonate_user'));
 
     // Create an instance of the Impersonate action
-    $action = ImpersonateTableAction::make('impersonate')
+    $action = ImpersonateAction::make('impersonate')
         ->record($this->targetUser);
 
     // Assert the action is authorized
@@ -100,7 +99,7 @@ test('authorized user can see and trigger the impersonate table and page action'
     $this->assertTrue($action->isEnabled());
 
     // Create an instance of the Impersonate page action
-    $action = ImpersonatePageAction::make('impersonate')
+    $action = ImpersonateAction::make('impersonate')
         ->record($this->targetUser);
 
     // Assert the action is authorized
