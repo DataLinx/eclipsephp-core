@@ -9,6 +9,7 @@ use function Pest\Livewire\livewire;
 
 beforeEach(function () {
     $this->set_up_super_admin_and_tenant();
+    MailLogResource::canViewAny();
 });
 
 test('authorized access can be allowed', function () {

@@ -3,12 +3,15 @@
 use Eclipse\Core\Filament\Resources\LocaleResource;
 use Eclipse\Core\Filament\Resources\LocaleResource\Pages\ListLocales;
 use Eclipse\Core\Models\Locale;
+use Eclipse\Core\Models\Site;
+use Filament\Facades\Filament;
 use Illuminate\Support\Arr;
 
 use function Pest\Livewire\livewire;
 
 beforeEach(function () {
     $this->set_up_super_admin_and_tenant();
+    LocaleResource::canViewAny();
 });
 
 test('unauthorized access can be prevented', function () {
@@ -48,8 +51,14 @@ test('locales table can be displayed', function () {
 test('form validation works', function () {
     $component = livewire(ListLocales::class);
 
+    // Check if create action is visible
+    $component->assertActionVisible('create');
+
+    // Mount the create action
+    $component->mountAction('create');
+
     // Test required fields
-    $component->callAction('create')
+    $component->callMountedAction()
         ->assertHasActionErrors([
             'id' => 'required',
             'name' => 'required',
@@ -61,7 +70,11 @@ test('form validation works', function () {
         ]);
 
     // Test with valid data
-    $component->callAction('create', Locale::factory()->definition())
+    $validData = Locale::factory()->definition();
+    $validData['system_locale'] = 'en_US.UTF-8';
+    $component->mountAction('create')
+        ->setActionData($validData)
+        ->callMountedAction()
         ->assertHasNoActionErrors();
 });
 
@@ -71,9 +84,12 @@ test('new locale can be created', function () {
     // Remove is_active and is_available_in_panel attributes, since they're not used when creating a locale
     unset($data['is_active']);
     unset($data['is_available_in_panel']);
+    $data['system_locale'] = 'en_US.UTF-8';
 
     livewire(ListLocales::class)
-        ->callAction('create', $data)
+        ->mountAction('create')
+        ->setActionData($data)
+        ->callMountedAction()
         ->assertHasNoActionErrors();
 
     $locale = Locale::where('id', $data['id'])->first();
@@ -88,6 +104,7 @@ test('existing locale can be updated', function () {
     $locale = Locale::factory()->create();
 
     $new_data = Arr::except(Locale::factory()->definition(), ['id', 'is_active', 'is_available_in_panel']);
+    $new_data['system_locale'] = 'en_US.UTF-8';
 
     livewire(ListLocales::class)
         ->callTableAction('edit', $locale, $new_data)
