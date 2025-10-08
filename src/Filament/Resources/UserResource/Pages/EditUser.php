@@ -3,7 +3,8 @@
 namespace Eclipse\Core\Filament\Resources\UserResource\Pages;
 
 use Eclipse\Core\Filament\Resources\UserResource;
-use Filament\Actions;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\ViewAction;
 use Filament\Resources\Pages\EditRecord;
 use Nben\FilamentRecordNav\Actions\NextRecordAction;
 use Nben\FilamentRecordNav\Actions\PreviousRecordAction;
@@ -30,8 +31,8 @@ class EditUser extends EditRecord
         return [
             PreviousRecordAction::make(),
             NextRecordAction::make(),
-            Actions\ViewAction::make(),
-            Actions\DeleteAction::make(),
+            ViewAction::make(),
+            DeleteAction::make(),
         ];
     }
 }

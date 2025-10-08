@@ -65,7 +65,7 @@ abstract class TestCase extends BaseTestCase
         $site = Site::first();
 
         $this->superAdmin = User::factory()->make();
-        $this->superAdmin->assignRole('super_admin')->save();
+        $this->superAdmin->assignRole('super_admin', $site->id)->save();
         $this->superAdmin->sites()->attach($site);
 
         $this->actingAs($this->superAdmin);

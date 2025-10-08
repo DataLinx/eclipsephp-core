@@ -3,8 +3,11 @@
 namespace Eclipse\Core\Listeners;
 
 use Eclipse\Core\Models\MailLog;
+use Exception;
 use Illuminate\Mail\Events\MessageSent;
 use Illuminate\Support\Facades\Log;
+use Symfony\Component\Mime\Email;
+use Symfony\Component\Mime\Header\Headers;
 
 class LogEmailToDatabase
 {
@@ -37,7 +40,7 @@ class LogEmailToDatabase
                 'status' => 'sent',
                 'sent_at' => now(),
             ]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Email logging failed: '.$e->getMessage(), [
                 'exception' => $e,
                 'trace' => $e->getTraceAsString(),
@@ -48,7 +51,7 @@ class LogEmailToDatabase
     /**
      * Extract a header value from the headers.
      */
-    private function extractHeaderValue(\Symfony\Component\Mime\Header\Headers $headers, string $headerName): ?string
+    private function extractHeaderValue(Headers $headers, string $headerName): ?string
     {
         if (! $headers->has($headerName)) {
             return null;
@@ -56,7 +59,7 @@ class LogEmailToDatabase
 
         try {
             return $headers->get($headerName)->getBodyAsString();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::warning("Failed to extract header {$headerName}: ".$e->getMessage());
 
             return null;
@@ -66,7 +69,7 @@ class LogEmailToDatabase
     /**
      * Extract the email body from the message.
      */
-    private function extractEmailBody(\Symfony\Component\Mime\Email $message): string
+    private function extractEmailBody(Email $message): string
     {
         if (method_exists($message, 'getHtmlBody')) {
             return $message->getHtmlBody() ?? '';
@@ -82,7 +85,7 @@ class LogEmailToDatabase
     /**
      * Collect all headers from the message.
      */
-    private function collectAllHeaders(\Symfony\Component\Mime\Header\Headers $headers): array
+    private function collectAllHeaders(Headers $headers): array
     {
         $allHeaders = [];
 
