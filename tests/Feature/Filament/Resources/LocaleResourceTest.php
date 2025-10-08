@@ -3,8 +3,6 @@
 use Eclipse\Core\Filament\Resources\LocaleResource;
 use Eclipse\Core\Filament\Resources\LocaleResource\Pages\ListLocales;
 use Eclipse\Core\Models\Locale;
-use Eclipse\Core\Models\Site;
-use Filament\Facades\Filament;
 use Illuminate\Support\Arr;
 
 use function Pest\Livewire\livewire;
