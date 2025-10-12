@@ -1,11 +1,11 @@
-@if ($shouldShowDropdown)
+@if ($shouldShowDropdown())
     <div class="flex items-center gap-x-2">
-        <a @if ($hasSpaMode) wire:navigate @endif href="{{ $getDashboardUrl }}" class="flex-1">
+        <a @if ($hasSpaMode()) wire:navigate @endif href="{{ $getDashboardUrl() }}" class="flex-1">
             <div class="fi-logo flex text-xl font-bold leading-5 tracking-tight text-gray-950 dark:text-white">
-                {{ $getAppName }}
-                @if ($getCurrentTenant && $getCurrentTenantName !== $getAppName)
+                {{ $getAppName() }}
+                @if ($getCurrentTenant() && $getCurrentTenantName() !== $getAppName())
                     <span class="text-gray-500 dark:text-gray-400 text-sm font-normal ml-2">
-                        - {{ $getCurrentTenantName }}
+                        - {{ $getCurrentTenantName() }}
                     </span>
                 @endif
             </div>
@@ -21,8 +21,8 @@
             </x-slot>
 
             <x-filament::dropdown.list>
-                @if ($canSwitchTenants)
-                    @foreach ($getTenants as $tenant)
+                @if ($canSwitchTenants())
+                    @foreach ($getTenants() as $tenant)
                         <x-filament::dropdown.list.item :href="route('filament.admin.pages.dashboard', ['tenant' => $tenant])" :image="filament()->getTenantAvatarUrl($tenant)" tag="a">
                             {{ filament()->getTenantName($tenant) }}
                         </x-filament::dropdown.list.item>
@@ -30,13 +30,13 @@
                 @endif
 
 
-                @if ($hasFrontend)
-                    @if ($canSwitchTenants)
+                @if ($hasFrontend())
+                    @if ($canSwitchTenants())
                         <x-filament::dropdown.list.item tag="div"
                             class="border-t border-gray-200 dark:border-gray-700 my-1"></x-filament::dropdown.list.item>
                     @endif
 
-                    <x-filament::dropdown.list.item :href="$getFrontendUrl" tag="a" target="_blank"
+                    <x-filament::dropdown.list.item :href="$getFrontendUrl()" tag="a" target="_blank"
                         class="font-medium">
                         <div class="flex items-center gap-2">
                             <x-filament::icon icon="heroicon-s-globe-alt"
@@ -52,10 +52,10 @@
     </div>
 @else
     <div class="fi-logo flex text-xl font-bold leading-5 tracking-tight text-gray-950 dark:text-white">
-        {{ $getAppName }}
-        @if ($getCurrentTenant && $getCurrentTenantName !== $getAppName)
+        {{ $getAppName() }}
+        @if ($getCurrentTenant() && $getCurrentTenantName() !== $getAppName())
             <span class="text-gray-500 dark:text-gray-400 text-sm font-normal ml-2">
-                - {{ $getCurrentTenantName }}
+                - {{ $getCurrentTenantName() }}
             </span>
         @endif
     </div>

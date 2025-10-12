@@ -41,7 +41,6 @@ use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
-use Illuminate\View\View;
 use LaraZeus\SpatieTranslatable\SpatieTranslatablePlugin;
 use pxlrbt\FilamentEnvironmentIndicator\EnvironmentIndicatorPlugin;
 use pxlrbt\FilamentSpotlight\SpotlightPlugin;
@@ -77,7 +76,7 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->topNavigation()
             ->brandLogo(
-                fn (): View => app(BrandWithTenantSwitcher::class)->render()
+                fn () => app(BrandWithTenantSwitcher::class)
             )
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverResources(in: $package_src.'Filament/Resources', for: 'Eclipse\\Core\\Filament\\Resources')

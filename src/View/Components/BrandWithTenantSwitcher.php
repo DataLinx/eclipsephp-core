@@ -5,26 +5,12 @@ namespace Eclipse\Core\View\Components;
 use Eclipse\Core\Services\Registry;
 use Exception;
 use Filament\Facades\Filament;
+use Filament\Support\Components\ViewComponent;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\View\Component;
 
-class BrandWithTenantSwitcher extends Component
+class BrandWithTenantSwitcher extends ViewComponent
 {
-    public function render()
-    {
-        return view('eclipse::filament.components.brand-with-tenant-switcher', [
-            'shouldShowDropdown' => $this->shouldShowDropdown(),
-            'getAppName' => $this->getAppName(),
-            'hasSpaMode' => $this->hasSpaMode(),
-            'getDashboardUrl' => $this->getDashboardUrl(),
-            'getCurrentTenant' => $this->getCurrentTenant(),
-            'getCurrentTenantName' => $this->getCurrentTenantName(),
-            'canSwitchTenants' => $this->canSwitchTenants(),
-            'getTenants' => $this->getTenants(),
-            'hasFrontend' => $this->hasFrontend(),
-            'getFrontendUrl' => $this->getFrontendUrl(),
-        ]);
-    }
+    protected string $view = 'eclipse::filament.components.brand-with-tenant-switcher';
 
     public function getAppName(): string
     {
