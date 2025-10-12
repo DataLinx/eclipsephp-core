@@ -27,6 +27,7 @@ use Eclipse\Core\Providers\AdminPanelProvider;
 use Eclipse\Core\Providers\HorizonServiceProvider;
 use Eclipse\Core\Providers\TelescopeServiceProvider;
 use Eclipse\Core\Services\Registry;
+use Eclipse\Frontend\Providers\FrontendPanelProvider;
 use Filament\Facades\Filament;
 use Filament\Resources\Resource;
 use Filament\Support\Facades\FilamentAsset;
@@ -101,6 +102,10 @@ class EclipseServiceProvider extends PackageServiceProvider
 
         if ($this->app->runningInConsole() || $this->isAdminRequest()) {
             $this->app->register(AdminPanelProvider::class);
+        }
+
+        if (class_exists(FrontendPanelProvider::class)) {
+            $this->app->register(FrontendPanelProvider::class);
         }
 
         if ($this->app->environment('local')) {
