@@ -1,15 +1,13 @@
 name: Tests
 
 on:
-  # Run testing on all push and pull requests for the main branch that have committed changes in PHP files
+  # Run testing on all push and pull requests that have committed changes in PHP files
   push:
-    branches: [ "main" ]
     paths:
-      - '**.php'
+      - '**/*.php'
   pull_request:
-    branches: [ "main" ]
     paths:
-      - '**.php'
+      - '**/*.php'
   # Make it possible to run the workflow manually
   workflow_dispatch:
 

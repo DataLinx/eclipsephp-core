@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Eclipse\Core\Policies;
 
 use Eclipse\Core\Models\Site;
-use Eclipse\Core\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
+use Illuminate\Foundation\Auth\User as AuthUser;
 
 class SitePolicy
 {
@@ -13,40 +15,40 @@ class SitePolicy
     /**
      * Determine whether the user can view any models.
      */
-    public function viewAny(User $user): bool
+    public function viewAny(AuthUser $authUser): bool
     {
-        return $user->can('view_any_site');
+        return $authUser->can('view_any_site');
     }
 
     /**
      * Determine whether the user can create models.
      */
-    public function create(User $user): bool
+    public function create(AuthUser $authUser): bool
     {
-        return $user->can('create_site');
+        return $authUser->can('create_site');
     }
 
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, Site $site): bool
+    public function update(AuthUser $authUser, Site $site): bool
     {
-        return $user->can('update_site');
+        return $authUser->can('update_site');
     }
 
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, Site $site): bool
+    public function delete(AuthUser $authUser, Site $site): bool
     {
-        return $user->can('delete_site');
+        return $authUser->can('delete_site');
     }
 
     /**
      * Determine whether the user can bulk delete.
      */
-    public function deleteAny(User $user): bool
+    public function deleteAny(AuthUser $authUser): bool
     {
-        return $user->can('delete_any_site');
+        return $authUser->can('delete_any_site');
     }
 }

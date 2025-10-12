@@ -6,13 +6,27 @@ namespace Eclipse\Core\Filament\Resources\UserResource\RelationManagers;
 
 use Eclipse\Core\Enums\AddressType;
 use Eclipse\Core\Settings\EclipseSettings;
-use Filament\Forms;
-use Filament\Forms\Get;
-use Filament\Infolists;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\CreateAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ForceDeleteBulkAction;
+use Filament\Actions\RestoreBulkAction;
+use Filament\Actions\ViewAction;
+use Filament\Forms\Components\CheckboxList;
+use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Schemas\Components\Flex;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Support\Enums\FontWeight;
-use Filament\Tables;
-use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -32,42 +46,42 @@ class AddressesRelationManager extends RelationManager
     public static function getAddressForm(): array
     {
         return [
-            Forms\Components\CheckboxList::make('type')
+            CheckboxList::make('type')
                 ->live()
                 ->default([AddressType::DEFAULT_ADDRESS->value])
                 ->options(AddressType::class)
                 ->columns(2),
-            Forms\Components\TextInput::make('recipient')
+            TextInput::make('recipient')
                 ->maxLength(100)
                 ->label('Full name')
                 ->required(),
-            Forms\Components\TextInput::make('company_name')
+            TextInput::make('company_name')
                 ->visible(fn (Get $get): bool => in_array(AddressType::COMPANY_ADDRESS->value, $get('type') ?? []))
                 ->required()
                 ->maxLength(100),
-            Forms\Components\TextInput::make('company_vat_id')
+            TextInput::make('company_vat_id')
                 ->visible(fn (Get $get): bool => in_array(AddressType::COMPANY_ADDRESS->value, $get('type') ?? []))
                 ->label('Company VAT ID')
                 ->maxLength(50),
-            Forms\Components\Repeater::make('street_address')
+            Repeater::make('street_address')
                 ->minItems(1)
                 ->maxItems(3)
                 ->required()
                 ->simple(
-                    Forms\Components\TextInput::make('street_address')
+                    TextInput::make('street_address')
                         ->maxLength(255)
                         ->required()
                 )
                 ->addActionLabel(__('Add address line')),
-            Forms\Components\Split::make([
-                Forms\Components\TextInput::make('postal_code')
+            Flex::make([
+                TextInput::make('postal_code')
                     ->required()
                     ->maxLength(50),
-                Forms\Components\TextInput::make('city')
+                TextInput::make('city')
                     ->required()
                     ->maxLength(100),
             ]),
-            Forms\Components\Select::make('country_id')
+            Select::make('country_id')
                 ->required()
                 ->relationship('country', 'name'),
         ];
@@ -76,26 +90,26 @@ class AddressesRelationManager extends RelationManager
     public static function getAddressInfolist(): array
     {
         return [
-            Infolists\Components\Grid::make()->schema([
-                Infolists\Components\TextEntry::make('type')
+            Grid::make()->schema([
+                TextEntry::make('type')
                     ->badge()
                     ->formatStateUsing(fn ($state) => self::formatAddressTypeLabels($state)),
-                Infolists\Components\TextEntry::make('recipient'),
-                Infolists\Components\TextEntry::make('company_name')
+                TextEntry::make('recipient'),
+                TextEntry::make('company_name')
                     ->visible(fn ($record): bool => self::hasCompanyAddress($record->type)),
-                Infolists\Components\TextEntry::make('company_vat_id')
+                TextEntry::make('company_vat_id')
                     ->visible(fn ($record): bool => self::hasCompanyAddress($record->type))
                     ->default('-')
                     ->label('Company VAT ID'),
-                Infolists\Components\TextEntry::make('street_address')
+                TextEntry::make('street_address')
                     ->listWithLineBreaks(),
-                Infolists\Components\TextEntry::make('country')
+                TextEntry::make('country')
                     ->formatStateUsing(fn ($state) => "{$state->name} {$state->flag}"),
-                Infolists\Components\Split::make([
-                    Infolists\Components\TextEntry::make('postal_code')
+                Flex::make([
+                    TextEntry::make('postal_code')
                         ->badge()
                         ->color('warning'),
-                    Infolists\Components\TextEntry::make('city'),
+                    TextEntry::make('city'),
                 ])->columnSpanFull(),
             ]),
         ];
@@ -137,7 +151,7 @@ class AddressesRelationManager extends RelationManager
         return $table
             ->modifyQueryUsing(fn (Builder $query) => $query->with(['country']))
             ->columns([
-                Tables\Columns\TextColumn::make('recipient')
+                TextColumn::make('recipient')
                     ->weight(FontWeight::Bold)
                     ->description(function ($record) {
                         $recipient = [];
@@ -153,16 +167,16 @@ class AddressesRelationManager extends RelationManager
                         return new HtmlString(implode('<br/>', $recipient));
                     })
                     ->searchable(['recipient', 'company_name', 'street_address', 'country_id']),
-                Tables\Columns\TextColumn::make('company_vat_id')
+                TextColumn::make('company_vat_id')
                     ->placeholder('-')
                     ->label('Company VAT ID'),
-                Tables\Columns\TextColumn::make('type')
+                TextColumn::make('type')
                     ->badge()
                     ->placeholder('-')
                     ->formatStateUsing(fn ($state) => self::formatAddressTypeLabels($state)),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('type')
+                SelectFilter::make('type')
                     ->options(AddressType::class)
                     ->query(function (Builder $query, array $data): Builder {
                         if (filled($data['value'])) {
@@ -171,27 +185,27 @@ class AddressesRelationManager extends RelationManager
 
                         return $query;
                     }),
-                Tables\Filters\TrashedFilter::make(),
+                TrashedFilter::make(),
             ])
-            ->actions([
-                Tables\Actions\ViewAction::make()
-                    ->infolist(self::getAddressInfolist()),
-                Tables\Actions\EditAction::make()
-                    ->form(self::getAddressForm()),
-                Tables\Actions\DeleteAction::make(),
+            ->recordActions([
+                ViewAction::make()
+                    ->schema(self::getAddressInfolist()),
+                EditAction::make()
+                    ->schema(self::getAddressForm()),
+                DeleteAction::make(),
             ])
-            ->bulkActions([
+            ->toolbarActions([
                 BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                    Tables\Actions\ForceDeleteBulkAction::make(),
-                    Tables\Actions\RestoreBulkAction::make(),
+                    DeleteBulkAction::make(),
+                    ForceDeleteBulkAction::make(),
+                    RestoreBulkAction::make(),
                 ]),
             ])
             ->headerActions([
-                Tables\Actions\CreateAction::make()
+                CreateAction::make()
                     ->label('Add new address')
                     ->icon('heroicon-o-plus-circle')
-                    ->form(self::getAddressForm()),
+                    ->schema(self::getAddressForm()),
             ]);
     }
 }

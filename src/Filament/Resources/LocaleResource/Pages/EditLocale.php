@@ -3,7 +3,7 @@
 namespace Eclipse\Core\Filament\Resources\LocaleResource\Pages;
 
 use Eclipse\Core\Filament\Resources\LocaleResource;
-use Filament\Actions;
+use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Contracts\Support\Htmlable;
 
@@ -19,7 +19,7 @@ class EditLocale extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make()
+            DeleteAction::make()
                 ->modalHeading(__('eclipse::locale.actions.delete.heading')),
         ];
     }

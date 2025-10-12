@@ -3,12 +3,13 @@
 use Eclipse\Core\Filament\Resources\MailLogResource;
 use Eclipse\Core\Filament\Resources\MailLogResource\Pages\ListMailLogs;
 use Eclipse\Core\Models\MailLog;
-use Filament\Tables\Actions\ViewAction;
+use Filament\Actions\ViewAction;
 
 use function Pest\Livewire\livewire;
 
 beforeEach(function () {
     $this->set_up_super_admin_and_tenant();
+    MailLogResource::canViewAny();
 });
 
 test('authorized access can be allowed', function () {

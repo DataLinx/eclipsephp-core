@@ -2,8 +2,8 @@
 
 namespace Eclipse\Core\Policies;
 
-use Eclipse\Core\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
+use Illuminate\Foundation\Auth\User as AuthUser;
 
 class UserPolicy
 {
@@ -12,100 +12,100 @@ class UserPolicy
     /**
      * Determine whether the user can view any models.
      */
-    public function viewAny(User $user): bool
+    public function viewAny(AuthUser $authUser): bool
     {
-        return $user->can('view_any_user');
+        return $authUser->can('view_any_user');
     }
 
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user): bool
+    public function view(AuthUser $authUser): bool
     {
-        return $user->can('view_user');
+        return $authUser->can('view_user');
     }
 
     /**
      * Determine whether the user can create models.
      */
-    public function create(User $user): bool
+    public function create(AuthUser $authUser): bool
     {
-        return $user->can('create_user');
+        return $authUser->can('create_user');
     }
 
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user): bool
+    public function update(AuthUser $authUser): bool
     {
-        return $user->can('update_user');
+        return $authUser->can('update_user');
     }
 
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $authenticatedUser, User $user): bool
+    public function delete(AuthUser $authUser, AuthUser $user): bool
     {
-        if ($authenticatedUser->id === $user->id) {
+        if ($authUser->id === $user->id) {
             return false;
         }
 
-        return $authenticatedUser->can('delete_user');
+        return $authUser->can('delete_user');
     }
 
     /**
      * Determine whether the user can bulk delete.
      */
-    public function deleteAny(User $user): bool
+    public function deleteAny(AuthUser $authUser): bool
     {
-        return $user->can('delete_any_user');
+        return $authUser->can('delete_any_user');
     }
 
     /**
      * Determine whether the user can restore the model.
      */
-    public function restore(User $user): bool
+    public function restore(AuthUser $authUser): bool
     {
-        return $user->can('restore_user');
+        return $authUser->can('restore_user');
     }
 
     /**
      * Determine whether the user can bulk restore.
      */
-    public function restoreAny(User $user): bool
+    public function restoreAny(AuthUser $authUser): bool
     {
-        return $user->can('restore_any_user');
+        return $authUser->can('restore_any_user');
     }
 
     /**
      * Determine whether the user can permanently delete the model.
      */
-    public function forceDelete(User $user): bool
+    public function forceDelete(AuthUser $authUser): bool
     {
-        return $user->can('force_delete_user');
+        return $authUser->can('force_delete_user');
     }
 
     /**
      * Determine whether the user can permanently bulk delete.
      */
-    public function forceDeleteAny(User $user): bool
+    public function forceDeleteAny(AuthUser $authUser): bool
     {
-        return $user->can('force_delete_any_user');
+        return $authUser->can('force_delete_any_user');
     }
 
     /**
      * Determine whether the user can impersonate other users.
      */
-    public function impersonate(User $user): bool
+    public function impersonate(AuthUser $authUser): bool
     {
-        return $user->can('impersonate_user');
+        return $authUser->can('impersonate_user');
     }
 
     /**
      * Determine whether the user can send emails to other users.
      */
-    public function sendEmail(User $user): bool
+    public function sendEmail(AuthUser $authUser): bool
     {
-        return $user->can('send_email_user');
+        return $authUser->can('send_email_user');
     }
 }

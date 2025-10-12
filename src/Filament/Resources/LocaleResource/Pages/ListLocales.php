@@ -3,20 +3,20 @@
 namespace Eclipse\Core\Filament\Resources\LocaleResource\Pages;
 
 use Eclipse\Core\Filament\Resources\LocaleResource;
-use Filament\Actions;
+use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
-use Filament\Support\Enums\MaxWidth;
+use Filament\Support\Enums\Width;
 
 class ListLocales extends ListRecords
 {
     protected static string $resource = LocaleResource::class;
 
-    protected ?string $maxContentWidth = MaxWidth::Full->value;
+    protected Width|string|null $maxContentWidth = Width::Full->value;
 
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make()->label(__('eclipse::locale.actions.create.label')),
+            CreateAction::make()->label(__('eclipse::locale.actions.create.label')),
         ];
     }
 }

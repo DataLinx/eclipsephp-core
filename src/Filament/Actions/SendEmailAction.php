@@ -2,18 +2,21 @@
 
 namespace Eclipse\Core\Filament\Actions;
 
+use Closure;
 use Eclipse\Core\Mail\SendEmailToUser;
 use Eclipse\Core\Models\User;
+use Exception;
 use Filament\Actions\Action;
-use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\RichEditor;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 
 class SendEmailAction
 {
@@ -96,7 +99,7 @@ class SendEmailAction
         ];
     }
 
-    protected static function getEmailActionClosure(): \Closure
+    protected static function getEmailActionClosure(): Closure
     {
         return function (array $data) {
             try {
@@ -130,7 +133,7 @@ class SendEmailAction
                     ->success()
                     ->sendToDatabase(auth()->user())
                     ->broadcast([auth()->user()]);
-            } catch (\Illuminate\Validation\ValidationException $e) {
+            } catch (ValidationException $e) {
                 $errors = collect($e->errors())->flatten()->implode(' ');
 
                 Notification::make()
@@ -139,7 +142,7 @@ class SendEmailAction
                     ->danger()
                     ->sendToDatabase(auth()->user())
                     ->broadcast([auth()->user()]);
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 Notification::make()
                     ->title(__('eclipse::email.error'))
                     ->body(__('eclipse::email.send_error_message', ['error' => $e->getMessage()]))

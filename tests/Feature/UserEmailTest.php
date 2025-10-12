@@ -1,6 +1,8 @@
 <?php
 
+use Eclipse\Core\Filament\Actions\SendEmailTableAction;
 use Eclipse\Core\Mail\SendEmailToUser;
+use Eclipse\Core\Models\Site;
 use Eclipse\Core\Models\User;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Queue;
@@ -23,7 +25,7 @@ beforeEach(function () {
     $this->regularRole->givePermissionTo(['view_any_user']);
 
     // Create users with site association
-    $site = \Eclipse\Core\Models\Site::first();
+    $site = Site::first();
 
     $this->authorizedUser = User::factory()->create();
     $this->authorizedUser->assignRole($this->emailRole);
@@ -58,7 +60,7 @@ test('send email action requires authorization', function () {
     expect($this->unauthorizedUser->can('sendEmail', User::class))->toBeFalse();
 
     // Test that action is properly configured
-    $action = \Eclipse\Core\Filament\Actions\SendEmailTableAction::makeAction();
+    $action = SendEmailTableAction::makeAction();
     expect($action->getName())->toBe('sendEmail');
     expect($action->getIcon())->toBe('heroicon-o-envelope');
 });
@@ -67,7 +69,7 @@ test('send email action visibility rules', function () {
     $this->actingAs($this->authorizedUser);
 
     // Test that action has the proper visibility configuration
-    $action = \Eclipse\Core\Filament\Actions\SendEmailTableAction::makeAction();
+    $action = SendEmailTableAction::makeAction();
 
     // Action should be properly configured
     expect($action)->not->toBeNull();
