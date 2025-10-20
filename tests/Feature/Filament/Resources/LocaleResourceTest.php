@@ -69,7 +69,7 @@ test('form validation works', function () {
 
     // Test with valid data
     $validData = Locale::factory()->definition();
-    $validData['system_locale'] = 'C.UTF-8';
+    $validData['system_locale'] = 'C';
     $component->mountAction('create')
         ->setActionData($validData)
         ->callMountedAction()
@@ -82,7 +82,7 @@ test('new locale can be created', function () {
     // Remove is_active and is_available_in_panel attributes, since they're not used when creating a locale
     unset($data['is_active']);
     unset($data['is_available_in_panel']);
-    $data['system_locale'] = 'C.UTF-8';
+    $data['system_locale'] = 'C';
 
     livewire(ListLocales::class)
         ->mountAction('create')
@@ -102,7 +102,7 @@ test('existing locale can be updated', function () {
     $locale = Locale::factory()->create();
 
     $new_data = Arr::except(Locale::factory()->definition(), ['id', 'is_active', 'is_available_in_panel']);
-    $new_data['system_locale'] = 'C.UTF-8';
+    $new_data['system_locale'] = 'C';
 
     livewire(ListLocales::class)
         ->callTableAction('edit', $locale, $new_data)
