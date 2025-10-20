@@ -167,7 +167,8 @@ class AdminPanelProvider extends PanelProvider
             ->renderHook(
                 PanelsRenderHook::USER_MENU_PROFILE_AFTER,
                 fn () => view('eclipse::filament.components.my-settings')
-            );
+            )
+            ->viteTheme('resources/css/filament/admin/theme.css');
 
         if ($hasTenantMenu) {
             $panel->renderHook(
