@@ -190,10 +190,10 @@ class LocaleResource extends Resource
     {
         static $locales = null;
 
-        if (!isset($locales)) {
+        if (! isset($locales)) {
             $list = shell_exec('locale -a');
 
-            if (!empty($list)) {
+            if (! empty($list)) {
                 $array = explode("\n", trim($list));
 
                 $locales = array_combine($array, $array);
