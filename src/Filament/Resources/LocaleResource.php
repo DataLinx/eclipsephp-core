@@ -51,14 +51,12 @@ class LocaleResource extends Resource
                 ->label(__('eclipse::locale.native_name')),
         ];
 
-        $locales = shell_exec('locale -a');
+        $locales = self::getSystemLocales();
 
         if (! empty($locales)) {
-            $options = explode("\n", trim($locales));
-
             $basic[] = Select::make('system_locale')
                 ->required()
-                ->options(array_combine($options, $options))
+                ->options($locales)
                 ->searchable()
                 ->label(__('eclipse::locale.system_locale'));
         } else {
@@ -186,5 +184,22 @@ class LocaleResource extends Resource
             ->withoutGlobalScopes([
                 ActiveScope::class,
             ]);
+    }
+
+    public static function getSystemLocales(): array
+    {
+        static $locales = null;
+
+        if (! isset($locales)) {
+            $list = shell_exec('locale -a');
+
+            if (! empty($list)) {
+                $array = explode("\n", trim($list));
+
+                $locales = array_combine($array, $array);
+            }
+        }
+
+        return $locales;
     }
 }

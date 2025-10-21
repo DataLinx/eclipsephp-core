@@ -78,7 +78,7 @@
     },
     "scripts": {
         "format": "vendor/bin/pint",
-        "test": "vendor/bin/testbench package:test",
+        "test": "vendor/bin/testbench package:test --parallel",
         "post-install-cmd": "@setup",
         "post-update-cmd": "@setup",
         "post-autoload-dump": [

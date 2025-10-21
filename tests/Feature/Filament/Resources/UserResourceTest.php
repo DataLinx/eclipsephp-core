@@ -90,6 +90,8 @@ test('existing user can be updated', function () {
         'last_name' => 'Doe',
         'email' => 'updated@example.com',
         // Without password, since it's not required
+        // With phone number, since faker doesn't generate always the correct format
+        'phone_number' => '0123456789',
     ];
 
     livewire(EditUser::class, ['record' => $user->id])
