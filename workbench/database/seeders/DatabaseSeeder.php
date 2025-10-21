@@ -2,9 +2,10 @@
 
 namespace Workbench\Database\Seeders;
 
+use Eclipse\Core\Database\Factories\UserFactory;
 use Illuminate\Database\Seeder;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Workbench\Database\Factories\UserFactory;
+
 
 class DatabaseSeeder extends Seeder
 {
@@ -16,7 +17,8 @@ class DatabaseSeeder extends Seeder
         // UserFactory::new()->times(10)->create();
 
         UserFactory::new()->create([
-            'name' => 'Test User',
+            'first_name' => 'Test',
+            'last_name' => 'User',
             'email' => 'test@example.com',
         ]);
     }
