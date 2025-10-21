@@ -5,7 +5,6 @@ namespace Eclipse\Core\Providers;
 use BezhanSalleh\FilamentShield\Facades\FilamentShield;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use BezhanSalleh\FilamentShield\Middleware\SyncShieldTenant;
-use BezhanSalleh\PanelSwitch\PanelSwitch;
 use DutchCodingCompany\FilamentDeveloperLogins\FilamentDeveloperLoginsPlugin;
 use Eclipse\Common\CommonPlugin;
 use Eclipse\Common\Providers\GlobalSearchProvider;
@@ -16,6 +15,7 @@ use Eclipse\Core\Models\Locale;
 use Eclipse\Core\Models\Site;
 use Eclipse\Core\Models\User;
 use Eclipse\Core\Services\Registry;
+use Eclipse\Core\View\Components\BrandWithTenantSwitcher;
 use Eclipse\World\EclipseWorld;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -41,7 +41,6 @@ use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
-use Illuminate\View\View;
 use LaraZeus\SpatieTranslatable\SpatieTranslatablePlugin;
 use pxlrbt\FilamentEnvironmentIndicator\EnvironmentIndicatorPlugin;
 use pxlrbt\FilamentSpotlight\SpotlightPlugin;
@@ -77,7 +76,7 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->topNavigation()
             ->brandLogo(
-                fn (): View => view('eclipse::filament.components.brand')
+                fn () => app(BrandWithTenantSwitcher::class)
             )
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverResources(in: $package_src.'Filament/Resources', for: 'Eclipse\\Core\\Filament\\Resources')
@@ -170,13 +169,6 @@ class AdminPanelProvider extends PanelProvider
             )
             ->viteTheme('resources/css/filament/admin/theme.css');
 
-        if ($hasTenantMenu) {
-            $panel->renderHook(
-                PanelsRenderHook::GLOBAL_SEARCH_END,
-                fn () => view('eclipse::filament.components.tenant-menu')
-            );
-        }
-
         // If the Pro version of the Spotlight plugin is installed, use that, otherwise use the free version
         if (class_exists(\pxlrbt\FilamentSpotlightPro\SpotlightPlugin::class)) {
             /** @noinspection PhpFullyQualifiedNameUsageInspection */
@@ -241,20 +233,5 @@ class AdminPanelProvider extends PanelProvider
 
         // Load customized translations for Filament Shield
         $this->loadTranslationsFrom(__DIR__.'/../../resources/lang/vendor/filament-shield', 'filament-shield');
-
-        // Configure Panel Switch
-        PanelSwitch::configureUsing(function (PanelSwitch $panelSwitch) {
-            $panelSwitch
-                ->simple()
-                ->icons([
-                    'admin' => 'heroicon-s-cog-6-tooth',
-                    'frontend' => 'heroicon-s-globe-alt',
-                ])
-                ->labels([
-                    'admin' => 'Admin Panel',
-                    'frontend' => 'Frontend',
-                ])
-                ->visible(fn (): bool => auth()->check());
-        });
     }
 }
