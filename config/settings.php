@@ -1,5 +1,11 @@
 <?php
 
+use Eclipse\Core\Settings\Repositories\SiteSettingsRepository;
+use Eclipse\Core\Settings\Repositories\UserSiteSettingsRepository;
+use Spatie\LaravelSettings\SettingsCasts\DateTimeInterfaceCast;
+use Spatie\LaravelSettings\SettingsCasts\DateTimeZoneCast;
+use Spatie\LaravelSettings\SettingsRepositories\RedisSettingsRepository;
+
 return [
 
     /*
@@ -35,19 +41,19 @@ return [
      */
     'repositories' => [
         'database' => [
-            'type' => \Eclipse\Core\Settings\Repositories\SiteSettingsRepository::class,
+            'type' => SiteSettingsRepository::class,
             'model' => null,
             'table' => null,
             'connection' => null,
         ],
         'user_tenant' => [
-            'type' => \Eclipse\Core\Settings\Repositories\UserSiteSettingsRepository::class,
+            'type' => UserSiteSettingsRepository::class,
             'model' => null,
             'table' => 'user_site_settings',
             'connection' => null,
         ],
         'redis' => [
-            'type' => Spatie\LaravelSettings\SettingsRepositories\RedisSettingsRepository::class,
+            'type' => RedisSettingsRepository::class,
             'connection' => null,
             'prefix' => null,
         ],
@@ -78,8 +84,8 @@ return [
      * your settings class isn't a default PHP type.
      */
     'global_casts' => [
-        DateTimeInterface::class => Spatie\LaravelSettings\SettingsCasts\DateTimeInterfaceCast::class,
-        DateTimeZone::class => Spatie\LaravelSettings\SettingsCasts\DateTimeZoneCast::class,
+        DateTimeInterface::class => DateTimeInterfaceCast::class,
+        DateTimeZone::class => DateTimeZoneCast::class,
         // Spatie\DataTransferObject\DataTransferObject::class => Spatie\LaravelSettings\SettingsCasts\DtoCast::class,
         // Spatie\LaravelData\Data::class => Spatie\LaravelSettings\SettingsCasts\DataCast::class,
     ],

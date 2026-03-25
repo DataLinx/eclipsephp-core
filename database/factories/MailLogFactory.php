@@ -6,16 +6,17 @@ use Eclipse\Core\Models\MailLog;
 use Eclipse\Core\Models\Site;
 use Eclipse\Core\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Database\Eloquent\Model;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<MailLog>
+ * @extends Factory<MailLog>
  */
 class MailLogFactory extends Factory
 {
     /**
      * The name of the factory's corresponding model.
      *
-     * @var class-string<\Illuminate\Database\Eloquent\Model>
+     * @var class-string<Model>
      */
     protected $model = MailLog::class;
 

@@ -7,6 +7,7 @@ use Eclipse\Core\Models\User\Permission;
 use Eclipse\Core\Models\User\Role;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Artisan;
+use Spatie\Permission\PermissionRegistrar;
 
 class CoreSeeder extends Seeder
 {
@@ -55,7 +56,7 @@ class CoreSeeder extends Seeder
 
     private function assignCustomPermissionsToRoles(): void
     {
-        app(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
         $guard = config('auth.defaults.guard', 'web');
         Permission::findOrCreate('impersonate_user', $guard);
         Permission::findOrCreate('send_email_user', $guard);

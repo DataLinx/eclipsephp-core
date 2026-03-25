@@ -1,5 +1,7 @@
 <?php
 
+use Eclipse\Core\Models\Site;
+use Eclipse\Core\Models\User;
 use Filament\Pages\Dashboard;
 use Filament\Widgets\AccountWidget;
 use Filament\Widgets\FilamentInfoWidget;
@@ -17,9 +19,9 @@ return [
         ],
     ],
 
-    'tenant_model' => \Eclipse\Core\Models\Site::class,
+    'tenant_model' => Site::class,
 
-    'auth_provider_model' => \Eclipse\Core\Models\User::class,
+    'auth_provider_model' => User::class,
 
     'super_admin' => [
         'enabled' => true,
