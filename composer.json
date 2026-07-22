@@ -42,8 +42,8 @@
     },
     "require": {
         "php": "^8.3",
-        "bezhansalleh/filament-language-switch": "^4.0",
-        "bezhansalleh/filament-panel-switch": "^2.0",
+        "bezhansalleh/filament-language-switch": "^5.0",
+        "bezhansalleh/filament-panel-switch": "^3.0",
         "bezhansalleh/filament-shield": "^4.0",
         "datalinx/php-utils": "^2.5",
         "dutchcodingcompany/filament-developer-logins": "^2.0",
