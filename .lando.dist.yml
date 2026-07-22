@@ -2,11 +2,11 @@
 name: eclipse-core
 services:
   appserver:
-    type: php:custom
+    type: php:8.3
     xdebug: "debug,develop,coverage"
     via: cli
     overrides:
-      image: slimdeluxe/php:8.3-v1.2
+      image: slimdeluxe/php:8.3-v1.5
 tooling:
   php:
     service: appserver
