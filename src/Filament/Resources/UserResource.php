@@ -99,14 +99,6 @@ class UserResource extends Resource
                 ->native(false)
                 ->minDate(now()->subYears(80))
                 ->maxDate(now()),
-            Select::make('roles')
-                ->relationship('roles', 'name')
-                ->saveRelationshipsUsing(function (User $record, $state) {
-                    $record->roles()->syncWithPivotValues($state, [config('permission.column_names.team_foreign_key') => getPermissionsTeamId()]);
-                })
-                ->multiple()
-                ->preload()
-                ->searchable(),
         ]);
     }
 
@@ -236,7 +228,7 @@ class UserResource extends Resource
                         ->grouped()
                         ->redirectTo(route('filament.admin.tenant')),
                     DeleteAction::make()
-                        ->authorize(fn (User $record) => auth()->user()->can('delete_user') && auth()->id() !== $record->id)
+                        ->authorize(fn (User $record) => auth()->check() && auth()->id() !== $record->id)
                         ->requiresConfirmation(),
                     RestoreAction::make()
                         ->visible(fn (User $user) => $user->trashed() && auth()->user()->can('restore_user'))

@@ -54,14 +54,11 @@ return [
                         'last_name' => 'User',
                         'password' => 'test123',
                     ],
-                    // Optional role(s) to set (for multiple, use an array)
-                    'role' => 'super_admin',
                 ],
                 [
                     'data' => [
                         'email' => 'admin@example.com',
                     ],
-                    'role' => 'admin',
                 ],
             ],
         ],

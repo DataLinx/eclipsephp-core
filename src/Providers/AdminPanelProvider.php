@@ -2,9 +2,6 @@
 
 namespace Eclipse\Core\Providers;
 
-use BezhanSalleh\FilamentShield\Facades\FilamentShield;
-use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
-use BezhanSalleh\FilamentShield\Middleware\SyncShieldTenant;
 use DutchCodingCompany\FilamentDeveloperLogins\FilamentDeveloperLoginsPlugin;
 use Eclipse\Common\CommonPlugin;
 use Eclipse\Common\Providers\GlobalSearchProvider;
@@ -97,9 +94,6 @@ class AdminPanelProvider extends PanelProvider
             })
             ->tenant(Site::class, slugAttribute: 'domain')
             ->tenantDomain('{tenant:domain}')
-            ->tenantMiddleware([
-                SyncShieldTenant::class,
-            ], isPersistent: true)
             // ->tenantMenu(config('eclipse.multi_site', false))
             ->tenantMenu(false)
             ->widgets([
@@ -122,7 +116,6 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->plugins([
                 CommonPlugin::make(),
-                FilamentShieldPlugin::make(),
                 EnvironmentIndicatorPlugin::make(),
                 FilamentDeveloperLoginsPlugin::make()
                     ->enabled(app()->isLocal())
@@ -133,7 +126,7 @@ class AdminPanelProvider extends PanelProvider
                     ->defaultLocales($localeIds),
                 FilamentSpatieLaravelHealthPlugin::make()
                     ->usingPage(HealthCheckResults::class)
-                    ->authorize(fn (): bool => auth()->user()->hasRole('super_admin')),
+                    ->authorize(fn (): bool => auth()->check()),
             ])
             ->navigationGroups([
                 'Users',
@@ -153,13 +146,13 @@ class AdminPanelProvider extends PanelProvider
                     ->group('Tools')
                     ->sort(2000)
                     // Always visible for local env, otherwise the viewHorizon permission is required
-                    ->visible(fn (): bool => app()->isLocal() || (auth()->user()?->can('viewHorizon') ?? false)),
+                    ->visible(fn (): bool => app()->isLocal()),
                 NavigationItem::make('Log viewer')
                     ->url('/'.config('log-viewer.route_path', 'log-viewer'), shouldOpenInNewTab: true)
                     ->icon('heroicon-s-arrow-top-right-on-square')
                     ->group('Tools')
                     ->sort(3000)
-                    ->hidden(fn (): bool => ! config('log-viewer.enabled', false) || ! auth()->user()->hasRole('super_admin')),
+                    ->hidden(fn (): bool => ! config('log-viewer.enabled', false) || ! auth()->check()),
             ])
             ->databaseNotifications()
             ->unsavedChangesAlerts()
@@ -171,7 +164,6 @@ class AdminPanelProvider extends PanelProvider
 
         // If the Pro version of the Spotlight plugin is installed, use that, otherwise use the free version
         if (class_exists(\pxlrbt\FilamentSpotlightPro\SpotlightPlugin::class)) {
-            /** @noinspection PhpFullyQualifiedNameUsageInspection */
             $panel->plugin(
                 \pxlrbt\FilamentSpotlightPro\SpotlightPlugin::make()
                     ->registerItems([
@@ -221,17 +213,5 @@ class AdminPanelProvider extends PanelProvider
 
         FilamentView::registerRenderHook('panels::body.end', fn (): string => Blade::render("@vite('resources/js/app.js')"));
         FilamentView::registerRenderHook('panels::body.end', fn (): string => view('eclipse::filament.partials.tenant-scoped-notifications')->render());
-    }
-
-    /**
-     * Bootstrap any admin-specific services.
-     */
-    public function boot(): void
-    {
-        // Prohibit Filament Shield's destructive commands in production
-        FilamentShield::prohibitDestructiveCommands($this->app->isProduction());
-
-        // Load customized translations for Filament Shield
-        $this->loadTranslationsFrom(__DIR__.'/../../resources/lang/vendor/filament-shield', 'filament-shield');
     }
 }

@@ -2,7 +2,6 @@
 
 namespace Eclipse\Core\Filament\Pages;
 
-use BezhanSalleh\FilamentShield\Traits\HasPageShield;
 use Eclipse\Common\CommonPlugin;
 use Eclipse\Core\Settings\EclipseSettings;
 use Filament\Forms\Components\Toggle;
@@ -12,8 +11,6 @@ use Illuminate\Contracts\Support\Htmlable;
 
 class ManageEclipse extends SettingsPage
 {
-    use HasPageShield;
-
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-cog-6-tooth';
 
     protected static string $settings = EclipseSettings::class;

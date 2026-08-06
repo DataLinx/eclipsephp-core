@@ -15,11 +15,6 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        // If the site/tenant ID is not set, default to the first one
-        if (empty(getPermissionsTeamId())) {
-            setPermissionsTeamId(Site::first()->id);
-        }
-
         // Create users from provided presets
         foreach (config('eclipse.seed.users.presets') as $preset) {
 
@@ -52,9 +47,6 @@ class UserSeeder extends Seeder
                 }
             }
         }
-
-        // Reset tenant ID, in case it was changed
-        setPermissionsTeamId(Site::first()->id);
 
         // Create an additional batch of random users, if required
         if (config('eclipse.seed.users.count') > 0) {

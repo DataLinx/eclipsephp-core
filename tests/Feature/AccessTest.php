@@ -46,49 +46,23 @@ test('log viewer is not accessible for guests', function () {
     $this->get(config('log-viewer.route_path', 'log-viewer'))->assertStatus(403);
 });
 
-test('log viewer is not accessible for non-super-admin users', function () {
-    // Create a regular user
-    $user = User::factory()->create();
-
-    // Assert the user doesn't have super_admin role
-    $this->assertFalse($user->hasRole('super_admin'));
-
-    // Test access
-    $this->actingAs($user);
-    $this->get(config('log-viewer.route_path', 'log-viewer'))->assertStatus(403);
-});
-
-test('log viewer is accessible for super admin users', function () {
+test('log viewer is accessible for logged-in users', function () {
     // Create a user
     $user = User::factory()->create();
-
-    // Assign super_admin role
-    $user->assignRole('super_admin');
-
-    // Assert the user has super_admin role
-    $this->assertTrue($user->hasRole('super_admin'));
 
     // Test access
     $this->actingAs($user);
     $this->get(config('log-viewer.route_path', 'log-viewer'))->assertStatus(200);
 });
 
-test('health check is not accessible for non-super-admin users', function () {
-    $this->set_up_common_user_and_tenant();
-
-    // Assert the user doesn't have super_admin role
-    $this->assertFalse(auth()->user()->hasRole('super_admin'));
-
+test('health check is not accessible for guest users', function () {
     // Test access
     $this->get('/admin/health-check-results')
-        ->assertStatus(403);
+        ->assertRedirect('admin/login');
 });
 
-test('health check is accessible for super admin users', function () {
-    $this->set_up_super_admin_and_tenant();
-
-    // Assert the user has super_admin role
-    $this->assertTrue(auth()->user()->hasRole('super_admin'));
+test('health check is accessible for logged-in users', function () {
+    $this->setUpUserAndTenant();
 
     // Test access
     $this->get('/admin/health-check-results')

@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 beforeEach(function () {
-    $this->set_up_common_user_and_tenant();
+    $this->setUpUserAndTenant();
 });
 
 test('default user setting value is used when user has no settings yet', function () {

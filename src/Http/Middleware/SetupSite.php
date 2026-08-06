@@ -28,7 +28,7 @@ class SetupSite
 
         // Set log viewer restriction... must be done after the site is initialized
         LogViewer::auth(function ($request) {
-            return $request->user() && $request->user()->hasRole('super_admin');
+            return $request->user();
         });
 
         return $next($request);

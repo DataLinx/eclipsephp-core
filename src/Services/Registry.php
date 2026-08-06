@@ -31,8 +31,6 @@ class Registry
         }
 
         Context::add('site', self::getSite()->id);
-
-        setPermissionsTeamId(self::getSite()->id);
     }
 
     /**

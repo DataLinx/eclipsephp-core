@@ -24,7 +24,6 @@ use Illuminate\Support\Collection;
 use Spatie\LaravelSettings\Settings;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
-use Spatie\Permission\Traits\HasRoles;
 
 /**
  * @property int $id
@@ -41,7 +40,7 @@ use Spatie\Permission\Traits\HasRoles;
  */
 class User extends Authenticatable implements FilamentUser, HasAvatar, HasMedia, HasTenants
 {
-    use HasFactory, HasRoles, InteractsWithMedia, Notifiable, SoftDeletes;
+    use HasFactory, InteractsWithMedia, Notifiable, SoftDeletes;
 
     protected $table = 'users';
 

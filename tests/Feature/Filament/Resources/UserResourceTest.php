@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Hash;
 use function Pest\Livewire\livewire;
 
 beforeEach(function () {
-    $this->set_up_super_admin_and_tenant();
+    $this->setUpUserAndTenant();
     UserResource::canViewAny();
 });
 
@@ -139,11 +139,11 @@ test('user can be deleted', function () {
 });
 
 test('authed user cannot delete himself', function () {
-    $superAdmin = User::withTrashed()->find($this->superAdmin->id);
+    $user = User::withTrashed()->find($this->user->id);
 
     // Assert on table row action
     livewire(ListUsers::class)
-        ->assertTableActionDisabled(DeleteAction::class, $superAdmin);
+        ->assertTableActionDisabled(DeleteAction::class, $user);
 
     // Assert on bulk delete
     $users = User::all();

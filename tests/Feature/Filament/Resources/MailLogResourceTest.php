@@ -8,7 +8,7 @@ use Filament\Actions\ViewAction;
 use function Pest\Livewire\livewire;
 
 beforeEach(function () {
-    $this->set_up_super_admin_and_tenant();
+    $this->setUpUserAndTenant();
     MailLogResource::canViewAny();
 });
 

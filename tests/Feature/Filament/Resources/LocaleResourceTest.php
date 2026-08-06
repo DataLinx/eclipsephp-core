@@ -8,37 +8,8 @@ use Illuminate\Support\Arr;
 use function Pest\Livewire\livewire;
 
 beforeEach(function () {
-    $this->set_up_super_admin_and_tenant();
+    $this->setUpUserAndTenant();
     LocaleResource::canViewAny();
-});
-
-test('unauthorized access can be prevented', function () {
-    // Create regular user with no permissions
-    $this->set_up_common_user_and_tenant();
-
-    // Create test locale
-    $locale = Locale::factory()->create();
-
-    // View table
-    $this->get(LocaleResource::getUrl())
-        ->assertForbidden();
-
-    // Add direct permission to view the table, since otherwise any other action below is not available even for testing
-    $this->user->givePermissionTo('view_any_locale');
-
-    // Create locale
-    livewire(ListLocales::class)
-        ->assertActionDisabled('create');
-
-    // Edit locale
-    livewire(ListLocales::class)
-        ->assertCanSeeTableRecords([$locale])
-        ->assertTableActionDisabled('edit', $locale);
-
-    // Delete locale
-    livewire(ListLocales::class)
-        ->assertTableActionDisabled('delete', $locale)
-        ->assertTableBulkActionDisabled('delete');
 });
 
 test('locales table can be displayed', function () {

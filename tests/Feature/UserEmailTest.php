@@ -6,67 +6,23 @@ use Eclipse\Core\Models\Site;
 use Eclipse\Core\Models\User;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Queue;
-use Spatie\Permission\Models\Permission;
-use Spatie\Permission\Models\Role;
 
 beforeEach(function () {
     // Set up the tenant and super admin
-    $this->set_up_super_admin_and_tenant();
-
-    // Create additional permissions
-    Permission::firstOrCreate(['name' => 'send_email_user']);
-
-    // Create role with email permission
-    $this->emailRole = Role::firstOrCreate(['name' => 'email_sender']);
-    $this->emailRole->givePermissionTo(['send_email_user', 'view_any_user']);
-
-    // Create role without email permission
-    $this->regularRole = Role::firstOrCreate(['name' => 'regular_user']);
-    $this->regularRole->givePermissionTo(['view_any_user']);
+    $this->setUpUserAndTenant();
 
     // Create users with site association
     $site = Site::first();
 
-    $this->authorizedUser = User::factory()->create();
-    $this->authorizedUser->assignRole($this->emailRole);
-    $this->authorizedUser->sites()->attach($site);
-
-    $this->unauthorizedUser = User::factory()->create();
-    $this->unauthorizedUser->assignRole($this->regularRole);
-    $this->unauthorizedUser->sites()->attach($site);
+    $this->senderUser = User::factory()->create();
+    $this->senderUser->sites()->attach($site);
 
     $this->recipientUser = User::factory()->create();
     $this->recipientUser->sites()->attach($site);
 });
 
-test('authorized user has send email permission', function () {
-    $this->actingAs($this->authorizedUser);
-
-    expect($this->authorizedUser->can('sendEmail', User::class))->toBeTrue();
-});
-
-test('unauthorized user does not have send email permission', function () {
-    $this->actingAs($this->unauthorizedUser);
-
-    expect($this->unauthorizedUser->can('sendEmail', User::class))->toBeFalse();
-});
-
-test('send email action requires authorization', function () {
-    // Test authorization through the policy directly
-    $this->actingAs($this->authorizedUser);
-    expect($this->authorizedUser->can('sendEmail', User::class))->toBeTrue();
-
-    $this->actingAs($this->unauthorizedUser);
-    expect($this->unauthorizedUser->can('sendEmail', User::class))->toBeFalse();
-
-    // Test that action is properly configured
-    $action = SendEmailTableAction::makeAction();
-    expect($action->getName())->toBe('sendEmail');
-    expect($action->getIcon())->toBe('heroicon-o-envelope');
-});
-
 test('send email action visibility rules', function () {
-    $this->actingAs($this->authorizedUser);
+    $this->actingAs($this->senderUser);
 
     // Test that action has the proper visibility configuration
     $action = SendEmailTableAction::makeAction();
@@ -87,7 +43,7 @@ test('send email functionality queues mail', function () {
     Queue::fake();
     Mail::fake();
 
-    $this->actingAs($this->authorizedUser);
+    $this->actingAs($this->senderUser);
 
     // Send email directly using the Mail class
     $emailData = [
@@ -103,7 +59,7 @@ test('send email functionality queues mail', function () {
         $emailData['message'],
         $emailData['cc'],
         $emailData['bcc'],
-        $this->authorizedUser
+        $this->senderUser
     ));
 
     // Assert email was queued
@@ -113,7 +69,7 @@ test('send email functionality queues mail', function () {
             && $mail->emailMessage === $emailData['message']
             && $mail->ccEmails === $emailData['cc']
             && $mail->bccEmails === $emailData['bcc']
-            && $mail->sender->id === $this->authorizedUser->id;
+            && $mail->sender->id === $this->senderUser->id;
     });
 });
 
@@ -124,7 +80,7 @@ test('email template renders correctly', function () {
         'Test message content',
         'cc@example.com',
         'bcc@example.com',
-        $this->authorizedUser
+        $this->senderUser
     );
 
     $view = $mail->content()->view;
@@ -133,7 +89,7 @@ test('email template renders correctly', function () {
     expect($view)->toBe('eclipse::mail.send-email-to-user');
     expect($data['recipient']->id)->toBe($this->recipientUser->id);
     expect($data['messageContent'])->toBe('Test message content');
-    expect($data['sender']->id)->toBe($this->authorizedUser->id);
+    expect($data['sender']->id)->toBe($this->senderUser->id);
     expect($data['subject'])->toBe('Test Subject');
 });
 
@@ -144,7 +100,7 @@ test('email envelope has correct recipients', function () {
         'Test message content',
         'cc1@example.com, cc2@example.com',
         'bcc1@example.com, bcc2@example.com',
-        $this->authorizedUser
+        $this->senderUser
     );
 
     $envelope = $mail->envelope();

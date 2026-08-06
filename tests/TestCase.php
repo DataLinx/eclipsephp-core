@@ -14,8 +14,6 @@ abstract class TestCase extends BaseTestCase
 {
     use WithWorkbench;
 
-    protected ?User $superAdmin = null;
-
     protected ?User $user = null;
 
     protected function setUp(): void
@@ -58,27 +56,9 @@ abstract class TestCase extends BaseTestCase
     }
 
     /**
-     * Set up default "super admin" user and tenant (site)
+     * Set up a common user and tenant (site)
      */
-    protected function set_up_super_admin_and_tenant(): self
-    {
-        $site = Site::first();
-
-        $this->superAdmin = User::factory()->make();
-        $this->superAdmin->assignRole('super_admin', $site->id)->save();
-        $this->superAdmin->sites()->attach($site);
-
-        $this->actingAs($this->superAdmin);
-
-        Filament::setTenant($site);
-
-        return $this;
-    }
-
-    /**
-     * Set up a common user with no roles or permissions
-     */
-    protected function set_up_common_user_and_tenant(): self
+    protected function setUpUserAndTenant(): self
     {
         $site = Site::first();
 
