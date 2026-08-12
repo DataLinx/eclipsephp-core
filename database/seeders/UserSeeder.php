@@ -40,11 +40,6 @@ class UserSeeder extends Seeder
                 Address::factory()->create([
                     'user_id' => $user->id,
                 ]);
-
-                if (isset($preset['role'])) {
-                    setPermissionsTeamId($site->id);
-                    $user->assignRole($preset['role'])->save();
-                }
             }
         }
 
