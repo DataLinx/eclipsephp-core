@@ -13,7 +13,6 @@ use Eclipse\Core\Console\Commands\SetupReverb;
 use Eclipse\Core\Health\Checks\ReverbCheck;
 use Eclipse\Core\Listeners\LogEmailToDatabase;
 use Eclipse\Core\Listeners\SendEmailSuccessNotification;
-use Eclipse\Core\Models\Locale;
 use Eclipse\Core\Models\User;
 use Eclipse\Core\Notifications\Channels\SiteDatabaseChannel;
 use Eclipse\Core\Providers\AdminPanelProvider;
