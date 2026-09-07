@@ -47,6 +47,21 @@ class Locale extends Model
             ->get();
     }
 
+    /**
+     * Get an array of available locale IDs.
+     * E.g.
+     * ```
+     * [
+     *     'en',
+     *     'sl',
+     * ]
+     * ```
+     */
+    public static function getLocaleOptions(): array
+    {
+        return self::getAvailableLocales()->pluck('id')->toArray();
+    }
+
     protected static function newFactory(): LocaleFactory
     {
         return LocaleFactory::new();
