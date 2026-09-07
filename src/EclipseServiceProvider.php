@@ -4,6 +4,7 @@ namespace Eclipse\Core;
 
 use BezhanSalleh\LanguageSwitch\LanguageSwitch;
 use Eclipse\Common\Foundation\Providers\PackageServiceProvider;
+use Eclipse\Common\Helpers\L10nHelper;
 use Eclipse\Common\Package;
 use Eclipse\Core\Console\Commands\ClearCommand;
 use Eclipse\Core\Console\Commands\DeployCommand;
@@ -140,11 +141,7 @@ class EclipseServiceProvider extends PackageServiceProvider
 
         // Configure language switcher
         LanguageSwitch::configureUsing(function (LanguageSwitch $switch) {
-            $availableLocales = Locale::getAvailableLocales();
-
-            $switch
-                ->locales($availableLocales->pluck('id')->toArray())
-                ->labels($availableLocales->pluck('native_name', 'id')->toArray());
+            $switch->locales(array_keys(L10nHelper::getLocaleOptions()));
         });
 
         // Register tenant and user IDs in Filament script data
