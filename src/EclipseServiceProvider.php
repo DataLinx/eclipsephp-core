@@ -167,12 +167,10 @@ class EclipseServiceProvider extends PackageServiceProvider
         ]);
 
         // Set Livewire's update route with admin path
-        if ($this->isAdminRequest()) {
-            Livewire::setUpdateRoute(function ($handle) {
-                return Route::post('/admin/livewire/update', $handle)
-                    ->middleware(['web']);
-            });
-        }
+        Livewire::setUpdateRoute(function ($handle, $path) {
+            return Route::post("/admin$path", $handle)
+                ->middleware(['web']);
+        });
     }
 
     private function isAdminRequest(): bool
