@@ -6,6 +6,7 @@ use Closure;
 use Eclipse\Core\Models\Site;
 use Eclipse\Core\Services\Registry;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Opcodes\LogViewer\Facades\LogViewer;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -21,6 +22,8 @@ class SetupSite
         $site = Site::where('domain', $request->getHost())->first();
 
         if (! $site) {
+            Log::error('Site not found for host: {host}', ['host' => $request->getHost()]);
+
             abort(404);
         }
 
