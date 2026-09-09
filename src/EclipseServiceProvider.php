@@ -8,6 +8,7 @@ use Eclipse\Common\Helpers\L10nHelper;
 use Eclipse\Common\Package;
 use Eclipse\Core\Console\Commands\ClearCommand;
 use Eclipse\Core\Console\Commands\DeployCommand;
+use Eclipse\Core\Console\Commands\OptimizeCommand;
 use Eclipse\Core\Console\Commands\PostComposerUpdate;
 use Eclipse\Core\Console\Commands\SetupReverb;
 use Eclipse\Core\Health\Checks\ReverbCheck;
@@ -54,6 +55,7 @@ class EclipseServiceProvider extends PackageServiceProvider
                 DeployCommand::class,
                 SetupReverb::class,
                 PostComposerUpdate::class,
+                OptimizeCommand::class,
             ])
             ->hasConfigFile([
                 'blade-heroicons',
