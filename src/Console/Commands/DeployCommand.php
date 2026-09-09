@@ -14,13 +14,9 @@ class DeployCommand extends Command
     {
         $this->line('Running deployment procedure...');
 
-        // Laravel config and route caching
+        // Run database migrations
         // ------------------
-        $this->call('optimize');
-
-        // Filament optimization
-        // ------------------
-        $this->call('filament:optimize');
+        $this->call('migrate', ['--force' => true]);
 
         // Terminate Horizon workers so that any code changes are received
         // ------------------
