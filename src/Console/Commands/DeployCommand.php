@@ -18,10 +18,6 @@ class DeployCommand extends Command
         // ------------------
         $this->call('migrate', ['--force' => true]);
 
-        // Terminate Horizon workers so that any code changes are received
-        // ------------------
-        $this->call('horizon:terminate');
-
         // ------------------
 
         $this->newLine();
