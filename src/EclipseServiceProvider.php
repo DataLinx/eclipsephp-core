@@ -25,6 +25,7 @@ use Filament\Resources\Resource;
 use Filament\Support\Facades\FilamentAsset;
 use Filament\Tables\Columns\Column;
 use Illuminate\Auth\Events\Login;
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Mail\Events\MessageSent;
 use Illuminate\Notifications\Channels\DatabaseChannel;
@@ -41,6 +42,8 @@ use Spatie\Health\Checks\Checks\OptimizedAppCheck;
 use Spatie\Health\Checks\Checks\RedisCheck;
 use Spatie\Health\Checks\Checks\ScheduleCheck;
 use Spatie\Health\Checks\Checks\UsedDiskSpaceCheck;
+use Spatie\Health\Commands\RunHealthChecksCommand;
+use Spatie\Health\Commands\ScheduleCheckHeartbeatCommand;
 use Spatie\Health\Facades\Health;
 use Spatie\LaravelPackageTools\Package as SpatiePackage;
 use Spatie\SecurityAdvisoriesHealthCheck\SecurityAdvisoriesCheck;
@@ -74,10 +77,8 @@ class EclipseServiceProvider extends PackageServiceProvider
             ->hasRoute('console');
     }
 
-    public function register(): self
+    public function registeringPackage(): self
     {
-        parent::register();
-
         require_once __DIR__.'/Helpers/helpers.php';
 
         Event::listen(Login::class, function ($event) {
@@ -109,10 +110,8 @@ class EclipseServiceProvider extends PackageServiceProvider
         return $this;
     }
 
-    public function boot(): void
+    public function bootingPackage(): void
     {
-        parent::boot();
-
         // For unit tests...
         if (app()->runningUnitTests()) {
             // Set the correct user model in auth config
@@ -166,6 +165,11 @@ class EclipseServiceProvider extends PackageServiceProvider
         Livewire::setUpdateRoute(function ($handle, $path) {
             return Route::post("/admin$path", $handle)
                 ->middleware(['web']);
+        });
+
+        $this->callAfterResolving(Schedule::class, function (Schedule $schedule) {
+            $schedule->command(RunHealthChecksCommand::class)->everyMinute();
+            $schedule->command(ScheduleCheckHeartbeatCommand::class)->everyMinute();
         });
     }
 

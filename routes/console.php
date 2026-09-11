@@ -1,9 +1,5 @@
 <?php
 
-use Illuminate\Support\Facades\Schedule;
-use Spatie\Health\Commands\RunHealthChecksCommand;
-use Spatie\Health\Commands\ScheduleCheckHeartbeatCommand;
-
 /*
 |--------------------------------------------------------------------------
 | Console Routes
@@ -14,6 +10,3 @@ use Spatie\Health\Commands\ScheduleCheckHeartbeatCommand;
 | simple approach to interacting with each command's IO methods.
 |
 */
-
-Schedule::command(RunHealthChecksCommand::class)->everyMinute();
-Schedule::command(ScheduleCheckHeartbeatCommand::class)->everyMinute();
