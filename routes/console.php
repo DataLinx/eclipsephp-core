@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Facades\Schedule;
+
 /*
 |--------------------------------------------------------------------------
 | Console Routes
@@ -10,3 +12,5 @@
 | simple approach to interacting with each command's IO methods.
 |
 */
+
+Schedule::command('horizon:snapshot')->everyFiveMinutes();
