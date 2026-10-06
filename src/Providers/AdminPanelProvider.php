@@ -144,9 +144,7 @@ class AdminPanelProvider extends PanelProvider
                     ->url('/horizon', shouldOpenInNewTab: true)
                     ->icon('heroicon-s-arrow-top-right-on-square')
                     ->group('Tools')
-                    ->sort(2000)
-                    // Always visible for local env, otherwise the viewHorizon permission is required
-                    ->visible(fn (): bool => app()->isLocal()),
+                    ->sort(2000),
                 NavigationItem::make('Log viewer')
                     ->url('/'.config('log-viewer.route_path', 'log-viewer'), shouldOpenInNewTab: true)
                     ->icon('heroicon-s-arrow-top-right-on-square')
