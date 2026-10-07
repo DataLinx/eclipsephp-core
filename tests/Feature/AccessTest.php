@@ -1,6 +1,7 @@
 <?php
 
 use Eclipse\Core\Models\User;
+use Illuminate\Support\Facades\Config;
 
 test('panel login is visible', function () {
     $this->get('/admin/login')->assertStatus(200);
