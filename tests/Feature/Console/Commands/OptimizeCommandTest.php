@@ -5,4 +5,6 @@ test('it runs the optimize command and calls the expected sub-commands', functio
         ->expectsOutput('Running optimization procedure...')
         ->expectsOutput('Optimization procedure complete!')
         ->assertSuccessful();
+
+    $this->artisan('config:clear');
 });
