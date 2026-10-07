@@ -12,3 +12,7 @@
 /node_modules
 /phpunit.xml
 /vendor
+
+# Laravel Boost generated files
+/.junie
+/boost.json

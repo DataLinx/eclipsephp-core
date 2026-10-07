@@ -2,4 +2,8 @@
 # .gitignore documentation: https://git-scm.com/docs/gitignore
 # JetBrains AI Assistant, Junie, Cursor, and Claude Code automatically respect the project's .gitignore in any location,
 # and also the system's global .gitignore file that may be specified in the `core.excludesfile` config parameter.
-# Only add any extra files that should be ignored by AI systems.
+# Only add any extra files that should be ignored by AI systems. You cannot, however, unblock files that are git-ignored.
+
+# Do not include content that is already included in AGENTS.md
+.ai/guidelines
+resources/ai/guidelines.md

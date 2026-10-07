@@ -70,6 +70,7 @@
         "typesense/typesense-php": "^5.0"
     },
     "require-dev": {
+        "laravel/boost": "^2.9",
         "laravel/pint": "^1.21",
         "orchestra/testbench": "^10.0",
         "pestphp/pest": "^4.7",

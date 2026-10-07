@@ -10,6 +10,7 @@
 *.php diff=php
 
 # Ignore all development content with "export-ignore".
+/.ai export-ignore
 /.aiassistant export-ignore
 /.github export-ignore
 /.husky export-ignore
