@@ -37,12 +37,18 @@ abstract class TestCase extends BaseTestCase
         require_once __DIR__.'/../src/Helpers/helpers.php';
     }
 
-    public function ignorePackageDiscoveriesFrom(): array
+    protected function defineEnvironment($app): void
     {
-        return [
-            // A list of packages that should not be auto-discovered when running tests
-            'laravel/telescope',
-        ];
+        parent::defineEnvironment($app);
+
+        $token = getenv('TEST_TOKEN') ?: 'default';
+        $path = $app->storagePath("framework/views/$token");
+
+        if (! is_dir($path)) {
+            mkdir($path, 0777, true);
+        }
+
+        $app['config']->set('view.compiled', $path);
     }
 
     /**
@@ -70,5 +76,13 @@ abstract class TestCase extends BaseTestCase
         Filament::setTenant($site);
 
         return $this;
+    }
+
+    public function ignorePackageDiscoveriesFrom(): array
+    {
+        return [
+            // A list of packages that should not be auto-discovered when running tests
+            'laravel/telescope',
+        ];
     }
 }
