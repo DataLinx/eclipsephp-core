@@ -10,6 +10,7 @@
 /build
 /composer.lock
 /node_modules
+/packages
 /phpunit.xml
 /vendor
 
