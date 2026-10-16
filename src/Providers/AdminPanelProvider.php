@@ -41,6 +41,7 @@ use Illuminate\View\Middleware\ShareErrorsFromSession;
 use LaraZeus\SpatieTranslatable\SpatieTranslatablePlugin;
 use pxlrbt\FilamentEnvironmentIndicator\EnvironmentIndicatorPlugin;
 use pxlrbt\FilamentSpotlight\SpotlightPlugin;
+use pxlrbt\FilamentSpotlightPro\SpotlightProviders\RegisterResources;
 use ShuvroRoy\FilamentSpatieLaravelHealth\FilamentSpatieLaravelHealthPlugin;
 
 class AdminPanelProvider extends PanelProvider
@@ -165,7 +166,7 @@ class AdminPanelProvider extends PanelProvider
             $panel->plugin(
                 \pxlrbt\FilamentSpotlightPro\SpotlightPlugin::make()
                     ->registerItems([
-                        \pxlrbt\FilamentSpotlightPro\SpotlightProviders\RegisterResources::make(),
+                        RegisterResources::make(),
                     ])
                     ->hotkeys(['¸'])
             );
