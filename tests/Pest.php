@@ -18,6 +18,9 @@ use Tests\TestCase;
 uses(TestCase::class)
     ->use(RefreshDatabase::class)
     ->beforeEach(function () {
+        // Migrate database and seed permissions manually
+        $this->migrate();
+
         $this->seed(CoreSeeder::class);
     })
     ->in(__DIR__);

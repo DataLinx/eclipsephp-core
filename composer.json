@@ -72,32 +72,33 @@
     "require-dev": {
         "laravel/boost": "^2.9",
         "laravel/pint": "^1.21",
-        "orchestra/testbench": "^10.0",
+        "orchestra/testbench": "^10.11",
         "pestphp/pest": "^4.7",
+        "pestphp/pest-plugin-laravel": "^4.1",
         "pestphp/pest-plugin-livewire": "^4.1"
     },
     "scripts": {
-        "format": "vendor/bin/pint",
-        "test": "vendor/bin/testbench package:test --parallel",
-        "post-install-cmd": "@setup",
-        "post-update-cmd": "@setup",
         "post-autoload-dump": [
             "@clear",
             "@prepare"
         ],
+        "post-install-cmd": "@setup",
+        "post-update-cmd": "@setup",
+        "format": "vendor/bin/pint",
+        "test": "vendor/bin/pest --parallel",
         "clear": "@php vendor/bin/testbench package:purge-skeleton --ansi",
         "prepare": "@php vendor/bin/testbench package:discover --ansi",
         "build": "@php vendor/bin/testbench workbench:build --ansi",
-        "serve": [
-            "Composer\\Config::disableProcessTimeout",
-            "@build",
-            "@php vendor/bin/testbench serve --ansi"
-        ],
         "setup": [
+            "@php -r \"if (!file_exists('workbench/.env')) { copy('workbench/.env.example', 'workbench/.env'); echo '.env file created from .env.example\n'; }\"",
+            "@php vendor/bin/testbench key:generate --ansi",
             "npm install",
-            "@php vendor/bin/testbench eclipse:post-composer-update",
-            "@php vendor/bin/testbench vendor:publish --tag=eclipse-config --force",
-            "@php vendor/bin/testbench package:sync-skeleton"
+            "@php vendor/bin/testbench filament:assets",
+            "@php vendor/bin/testbench package:sync-skeleton",
+            "@php vendor/bin/testbench vendor:publish --tag=eclipse-ai-guidelines --force --ansi",
+            "if [ -d workbench/.ai/guidelines ]; then rsync -a workbench/.ai/guidelines/ .ai/guidelines/ && rm -rf workbench/.ai/guidelines; fi",
+            "if [ -f boost.json ]; then php vendor/bin/testbench boost:update --ansi; fi",
+            "if [ -d workbench/.ai ] && [ -z \"$(ls -A workbench/.ai)\" ]; then rmdir workbench/.ai; fi"
         ]
     },
     "extra": {

@@ -1,32 +1,26 @@
-laravel: '@testbench'
+laravel: './workbench'
 
 providers:
   - Workbench\App\Providers\WorkbenchServiceProvider
 
 migrations:
   - workbench/database/migrations
-
-seeders:
-  - Workbench\Database\Seeders\DatabaseSeeder
+  - database/migrations
 
 workbench:
   start: '/'
-  install: false
+  install: true
   health: false
   discovers:
     web: true
     api: false
-    commands: false
+    commands: true
     components: false
     views: false
   build:
     - asset-publish
-    - create-sqlite-db
     - db-wipe
     - migrate-fresh
+    - db-seed
   assets:
     - laravel-assets
-  sync:
-    - from: storage
-      to: workbench/storage
-      reverse: true

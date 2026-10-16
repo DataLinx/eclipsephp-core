@@ -41,7 +41,6 @@ use Illuminate\View\Middleware\ShareErrorsFromSession;
 use LaraZeus\SpatieTranslatable\SpatieTranslatablePlugin;
 use pxlrbt\FilamentEnvironmentIndicator\EnvironmentIndicatorPlugin;
 use pxlrbt\FilamentSpotlight\SpotlightPlugin;
-use pxlrbt\FilamentSpotlightPro\SpotlightProviders\RegisterResources;
 use ShuvroRoy\FilamentSpatieLaravelHealth\FilamentSpatieLaravelHealthPlugin;
 
 class AdminPanelProvider extends PanelProvider
@@ -56,8 +55,6 @@ class AdminPanelProvider extends PanelProvider
         } else {
             $localeIds = [config('app.locale', 'en')];
         }
-
-        $hasTenantMenu = config('eclipse.multi_site', false);
 
         $panel
             ->default()
@@ -94,7 +91,6 @@ class AdminPanelProvider extends PanelProvider
             })
             ->tenant(Site::class, slugAttribute: 'domain')
             ->tenantDomain('{tenant:domain}')
-            // ->tenantMenu(config('eclipse.multi_site', false))
             ->tenantMenu(false)
             ->widgets([
                 AccountWidget::class,
@@ -157,15 +153,19 @@ class AdminPanelProvider extends PanelProvider
             ->renderHook(
                 PanelsRenderHook::USER_MENU_PROFILE_AFTER,
                 fn () => view('eclipse::filament.components.my-settings')
-            )
-            ->viteTheme('resources/css/filament/admin/theme.css');
+            );
+
+        if (file_exists(resource_path('css/filament/admin/theme.css'))) {
+            $panel->viteTheme('resources/css/filament/admin/theme.css');
+        }
 
         // If the Pro version of the Spotlight plugin is installed, use that, otherwise use the free version
-        if (class_exists(\pxlrbt\FilamentSpotlightPro\SpotlightPlugin::class)) {
+        if (class_exists("\pxlrbt\FilamentSpotlightPro\SpotlightPlugin")) {
+            /** @noinspection PhpUndefinedClassInspection, PhpFullyQualifiedNameUsageInspection, PhpUndefinedNamespaceInspection */
             $panel->plugin(
                 \pxlrbt\FilamentSpotlightPro\SpotlightPlugin::make()
                     ->registerItems([
-                        RegisterResources::make(),
+                        \pxlrbt\FilamentSpotlightPro\SpotlightProviders\RegisterResources::make(),
                     ])
                     ->hotkeys(['¸'])
             );
@@ -209,7 +209,10 @@ class AdminPanelProvider extends PanelProvider
     {
         parent::register();
 
-        FilamentView::registerRenderHook('panels::body.end', fn (): string => Blade::render("@vite('resources/js/app.js')"));
+        if (file_exists(resource_path('js/app.js'))) {
+            FilamentView::registerRenderHook('panels::body.end', fn (): string => Blade::render("@vite('resources/js/app.js')"));
+        }
+
         FilamentView::registerRenderHook('panels::body.end', fn (): string => view('eclipse::filament.partials.tenant-scoped-notifications')->render());
     }
 }

@@ -2,39 +2,25 @@
 
 namespace Workbench\App\Providers;
 
-use Eclipse\Common\CommonServiceProvider;
+use Eclipse\Core\EclipseServiceProvider;
 use Eclipse\Core\Providers\AdminPanelProvider;
-use Eclipse\Frontend\Providers\FrontendPanelProvider;
-use Illuminate\Support\ServiceProvider;
-use Nben\FilamentRecordNav\FilamentRecordNavServiceProvider;
+use Workbench\Database\Seeders\DatabaseSeeder;
 
-class WorkbenchServiceProvider extends ServiceProvider
+class WorkbenchServiceProvider extends \Eclipse\Common\Workbench\Providers\WorkbenchServiceProvider
 {
+    protected bool $shouldLoadMigrations = false;
+
     /**
      * Register services.
      */
     public function register(): void
     {
-        if (class_exists(CommonServiceProvider::class)) {
-            $this->app->register(CommonServiceProvider::class);
-        }
+        parent::register();
 
-        if (class_exists(FilamentRecordNavServiceProvider::class)) {
-            $this->app->register(FilamentRecordNavServiceProvider::class);
-        }
+        $this->app->register(AdminPanelProvider::class, true);
+        $this->app->register(EclipseServiceProvider::class);
 
-        $this->app->register(AdminPanelProvider::class);
-
-        if (class_exists(FrontendPanelProvider::class)) {
-            $this->app->register(FrontendPanelProvider::class);
-        }
-    }
-
-    /**
-     * Bootstrap services.
-     */
-    public function boot(): void
-    {
-        //
+        // Set default seeder class
+        $this->app->bind('DatabaseSeeder', DatabaseSeeder::class);
     }
 }

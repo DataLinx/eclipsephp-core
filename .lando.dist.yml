@@ -1,16 +1,48 @@
-#file: noinspection ComposeUnknownKeys
+#file: noinspection YAMLSchemaValidation
 name: eclipse-core
+recipe: laravel
+config:
+  webroot: workbench/public
+  php: '8.3'
+  via: nginx
+  database: mariadb:10.11
 services:
   appserver:
-    type: php:8.3
     xdebug: "debug,develop,coverage"
-    via: cli
+    environment:
+      TZ: "Europe/Ljubljana"
+      APP_BASE_PATH: "/app/workbench"
+      TESTBENCH_WORKING_PATH: "/app"
     overrides:
       image: slimdeluxe/php:8.3-v1.5
+      platform: linux/amd64
+    run:
+      - composer install --no-interaction --prefer-dist
+      - composer run setup --no-interaction
+      - composer run build --no-interaction
+  appserver_nginx:
+    # Set scanner to admin/login page and not the root, to prevent 403 error
+    scanner:
+      path: /admin/login
+      retry: 5
+  database:
+    creds:
+      database: eclipse
+      user: developer
+      password: developer
+  pma:
+    type: phpmyadmin
+    hosts:
+      - database
+    database:
+      type: mariadb:10.11
+    overrides:
+      image: phpmyadmin
+proxy:
+  pma:
+    - pma.eclipse-core.lndo.site
 tooling:
-  php:
-    service: appserver
-  composer:
+  npm:
     service: appserver
   test:
     service: appserver
