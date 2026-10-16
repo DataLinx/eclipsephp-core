@@ -3,6 +3,7 @@
 use Eclipse\Core\Filament\Resources\LocaleResource;
 use Eclipse\Core\Filament\Resources\LocaleResource\Pages\ListLocales;
 use Eclipse\Core\Models\Locale;
+use Filament\Actions\Testing\TestAction;
 use Illuminate\Support\Arr;
 
 use function Pest\Livewire\livewire;
@@ -76,8 +77,10 @@ test('existing locale can be updated', function () {
     $new_data['system_locale'] = array_rand(LocaleResource::getSystemLocales());
 
     livewire(ListLocales::class)
-        ->callTableAction('edit', $locale, $new_data)
-        ->assertHasNoTableActionErrors();
+        ->mountAction(TestAction::make('edit')->table($locale))
+        ->fillForm($new_data)
+        ->callMountedAction()
+        ->assertHasNoFormErrors();
 
     $locale->refresh();
 
