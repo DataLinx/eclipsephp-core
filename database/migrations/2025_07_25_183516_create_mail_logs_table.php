@@ -24,7 +24,7 @@ return new class extends Migration
             $table->text('body');
             $table->text('headers')->nullable();
             $table->longText('attachments')->nullable();
-            $table->uuid('message_id')->nullable();
+            $table->string('message_id')->nullable();
             $table->string('status')->nullable();
             $table->longText('data')->nullable();
             $table->timestamp('opened')->nullable();

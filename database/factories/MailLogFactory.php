@@ -5,6 +5,7 @@ namespace Eclipse\Core\Database\Factories;
 use Eclipse\Core\Models\MailLog;
 use Eclipse\Core\Models\Site;
 use Eclipse\Core\Models\User;
+use Eclipse\Core\Services\Registry;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -28,7 +29,7 @@ class MailLogFactory extends Factory
     public function definition(): array
     {
         return [
-            'site_id' => Site::inRandomOrder()->first()?->id ?? Site::factory()->create()->id,
+            'site_id' => Registry::getSite()?->id ?? Site::first()?->id ?? Site::factory()->create()->id,
             'message_id' => fake()->uuid(),
             'from' => fake()->email(),
             'to' => fake()->email(),

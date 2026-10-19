@@ -4,6 +4,8 @@ namespace Tests\Unit\Listeners;
 
 use Eclipse\Core\Listeners\LogEmailToDatabase;
 use Eclipse\Core\Models\MailLog;
+use Eclipse\Core\Models\Site;
+use Eclipse\Core\Models\User;
 use Illuminate\Mail\Events\MessageSent;
 use Illuminate\Mail\SentMessage as LaravelSentMessage;
 use Mockery;
@@ -13,6 +15,10 @@ use Symfony\Component\Mime\Header\IdentificationHeader;
 // Tests for the LogEmailToDatabase listener
 
 test('it logs email to database when MessageSent event is handled', function () {
+    $site = Site::factory()->create();
+    $sender = User::factory()->create();
+    $recipient = User::factory()->create();
+
     // Create a Symfony Email instance with body and recipients
     $email = (new Email)
         ->subject('Hello World')
@@ -29,9 +35,9 @@ test('it logs email to database when MessageSent event is handled', function () 
     $headers->add(new IdentificationHeader('Message-ID', 'test-123@example.com'));
 
     // Add custom application headers
-    $headers->addTextHeader('X-Eclipse-Site-ID', '123');
-    $headers->addTextHeader('X-Eclipse-Sender-ID', '456');
-    $headers->addTextHeader('X-Eclipse-Recipient-ID', '789');
+    $headers->addTextHeader('X-Eclipse-Site-ID', (string) $site->id);
+    $headers->addTextHeader('X-Eclipse-Sender-ID', (string) $sender->id);
+    $headers->addTextHeader('X-Eclipse-Recipient-ID', (string) $recipient->id);
 
     // Create a mock SentMessage that wraps the Email
     $sentMessage = Mockery::mock(LaravelSentMessage::class);
@@ -44,9 +50,9 @@ test('it logs email to database when MessageSent event is handled', function () 
 
     expect(MailLog::count())->toBe(1)
         ->and($log->message_id)->toBe('<test-123@example.com>')
-        ->and($log->site_id)->toBe(123)
-        ->and($log->sender_id)->toBe(456)
-        ->and($log->recipient_id)->toBe(789)
+        ->and($log->site_id)->toBe($site->id)
+        ->and($log->sender_id)->toBe($sender->id)
+        ->and($log->recipient_id)->toBe($recipient->id)
         ->and($log->from)->toBe('from@example.com')
         ->and($log->to)->toBe('to@example.com')
         ->and($log->cc)->toBe('cc@example.com')
