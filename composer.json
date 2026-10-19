@@ -85,7 +85,7 @@
         "post-install-cmd": "@setup",
         "post-update-cmd": "@setup",
         "format": "vendor/bin/pint",
-        "test": "vendor/bin/pest --parallel",
+        "test": "@php vendor/bin/testbench package:test --parallel",
         "clear": "@php vendor/bin/testbench package:purge-skeleton --ansi",
         "prepare": "@php vendor/bin/testbench package:discover --ansi",
         "build": "@php vendor/bin/testbench workbench:build --ansi",
