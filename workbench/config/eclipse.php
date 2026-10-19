@@ -70,7 +70,7 @@ return [
             'presets' => [
                 [
                     'data' => [
-                        'domain' => basename(config('app.url')),
+                        'domain' => parse_url(env('APP_URL', 'http://localhost'), PHP_URL_HOST) ?? 'localhost',
                         'name' => config('app.name'),
                     ],
                 ],
