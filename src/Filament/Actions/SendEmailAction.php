@@ -24,7 +24,6 @@ class SendEmailAction
     {
         return static::configureEmailAction(
             Action::make('sendEmail')
-                ->authorize(fn () => auth()->user()->can('sendEmail', User::class))
         );
     }
 
