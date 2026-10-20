@@ -86,6 +86,11 @@
         "post-update-cmd": "@setup",
         "format": "vendor/bin/pint",
         "test": "@php vendor/bin/testbench package:test --parallel",
+        "test:mariadb": "@php vendor/bin/testbench package:test --parallel --configuration=phpunit.mariadb.xml",
+        "test:all": [
+            "@test",
+            "@test:mariadb"
+        ],
         "clear": "@php vendor/bin/testbench package:purge-skeleton --ansi",
         "prepare": "@php vendor/bin/testbench package:discover --ansi",
         "build": "@php vendor/bin/testbench workbench:build --ansi",
