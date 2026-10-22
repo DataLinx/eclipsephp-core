@@ -70,7 +70,7 @@ return [
             'presets' => [
                 [
                     'data' => [
-                        'domain' => basename(config('app.url')),
+                        'domain' => parse_url(env('APP_URL', 'http://localhost'), PHP_URL_HOST) ?? 'localhost',
                         'name' => config('app.name'),
                     ],
                 ],
@@ -131,6 +131,18 @@ return [
     'tools' => [
         'phpmyadmin' => env('PHPMYADMIN_URL'),
         'typesense_dashboard' => env('TYPESENSE_DASHBOARD_URL'),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Settings for health checks
+    |--------------------------------------------------------------------------
+    */
+    'health_checks' => [
+        'used_disk_space' => [
+            'warning_from' => 70,
+            'fail_from' => 90,
+        ],
     ],
 
 ];

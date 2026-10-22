@@ -151,13 +151,13 @@ class EclipseServiceProvider extends PackageServiceProvider
             DebugModeCheck::new(),
             EnvironmentCheck::new(),
             UsedDiskSpaceCheck::new()
-                ->warnWhenUsedSpaceIsAbovePercentage(70)
-                ->failWhenUsedSpaceIsAbovePercentage(90),
+                ->warnWhenUsedSpaceIsAbovePercentage(config('eclipse.health_checks.used_disk_space.warning_from', 70))
+                ->failWhenUsedSpaceIsAbovePercentage(config('eclipse.health_checks.used_disk_space.fail_from', 90)),
             CacheCheck::new(),
             HorizonCheck::new(),
             ReverbCheck::new(),
             RedisCheck::new(),
-            ScheduleCheck::new(),
+            ScheduleCheck::new()->heartbeatMaxAgeInMinutes(2),
             SecurityAdvisoriesCheck::new(),
         ]);
 

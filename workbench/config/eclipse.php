@@ -133,4 +133,16 @@ return [
         'typesense_dashboard' => env('TYPESENSE_DASHBOARD_URL'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Settings for health checks
+    |--------------------------------------------------------------------------
+    */
+    'health_checks' => [
+        'used_disk_space' => [
+            'warning_from' => 70,
+            'fail_from' => 90,
+        ],
+    ],
+
 ];
